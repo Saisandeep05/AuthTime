@@ -47,6 +47,7 @@
 ## 📊 Explore Results & Sample Artifacts
 
 - 📈 [**Interactive Visual Dashboard**](dashboard/index.html) — Timeline charts, probe markers, and audit logs
+- 🧪 [**Live Multi-Process Validation Results**](docs/distributed-validation-results.md) — Empirical evidence & scenario metrics
 - 📄 [**Sample Security Report (Markdown)**](reports/examples/sample_report.md) — Generated audit write-up
 - 🌐 [**Sample Security Report (HTML)**](reports/examples/sample_report.html) — Styled HTML audit artifact
 - 🤖 [**Machine-Readable Telemetry (JSON)**](reports/examples/results.json) — Auditable JSON metadata & results

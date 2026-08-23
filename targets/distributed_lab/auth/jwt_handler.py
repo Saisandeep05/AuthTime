@@ -16,7 +16,7 @@ class LabJWTHandler:
     """
 
     def __init__(self, secret: Optional[str] = None):
-        self.secret = secret or os.getenv("JWT_SECRET") or f"lab-secret-{uuid.uuid4().hex}"
+        self.secret = secret or os.getenv("JWT_SECRET") or "authtime-lab-shared-jwt-secret-key-32bytes!"
         self.algorithm = "HS256"
 
     def create_access_token(

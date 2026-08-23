@@ -130,11 +130,26 @@ def create_lab_replica_app(
                 detail=f"Forbidden: Requires Admin role (current role: {role})",
             )
 
+    peer_ports = [8010, 8011, 8012]
+
+    async def _broadcast_to_peers(endpoint: str, json_data: dict):
+        import httpx
+        async with httpx.AsyncClient(timeout=0.5) as client:
+            for p in peer_ports:
+                try:
+                    await client.post(f"http://127.0.0.1:{p}{endpoint}?broadcast=false", json=json_data)
+                except Exception:
+                    pass
+
     @app.post("/faults/revoke")
-    async def revoke_user(req: RevokeRequest):
+    async def revoke_user(req: RevokeRequest, broadcast: bool = True):
         event = await db_instance.revoke_user_role(req.user_id, req.new_role)
         auth_ver = event["auth_version"]
         await cache_instance.invalidate_user(req.user_id, req.new_role, auth_ver, replica_list)
+
+        if broadcast:
+            await _broadcast_to_peers("/faults/revoke", req.model_dump())
+
         return {
             "status": "REVOKED",
             "event": event,
@@ -142,13 +157,17 @@ def create_lab_replica_app(
         }
 
     @app.post("/faults/configure-cache-mode")
-    async def configure_cache_mode(req: FaultConfigRequest):
+    async def configure_cache_mode(req: FaultConfigRequest, broadcast: bool = True):
         cache_instance.configure_fault_mode(
             mode=req.mode,
             delay_sec=req.delay_sec,
             target_replica=req.target_replica,
             ttl_sec=req.ttl_sec,
         )
+
+        if broadcast:
+            await _broadcast_to_peers("/faults/configure-cache-mode", req.model_dump())
+
         return {
             "status": "CONFIGURED",
             "mode": req.mode,
@@ -158,9 +177,19 @@ def create_lab_replica_app(
         }
 
     @app.post("/reset")
-    async def reset():
+    async def reset(broadcast: bool = True):
         await db_instance.reset_database()
         await cache_instance.clear_cache()
+
+        if broadcast:
+            import httpx
+            async with httpx.AsyncClient(timeout=0.5) as client:
+                for p in peer_ports:
+                    try:
+                        await client.post(f"http://127.0.0.1:{p}/reset?broadcast=false")
+                    except Exception:
+                        pass
+
         return {"status": "RESET_COMPLETE", "replica_id": replica_id}
 
     @app.get("/events")
@@ -169,3 +198,4 @@ def create_lab_replica_app(
         return {"events": events, "replica_id": replica_id}
 
     return app
+
