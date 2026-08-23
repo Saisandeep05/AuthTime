@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthTime Control Center & Temporal Exposure Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --bg-card: #151d30;
+            --bg-card-hover: #1e2942;
+            --border-color: #2a3654;
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.4);
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: rgba(21, 29, 48, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .brand-logo {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: #fff;
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .brand-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #f8fafc, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-green);
+            padding: 0.4rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        main {
+            max-width: 1280px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 900px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.85rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select, input {
+            background: #0f172a;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus { border-color: var(--primary); }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: #fff;
+            border: none;
+            padding: 0.85rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 14px var(--primary-glow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            background: #1e293b;
+            color: var(--text-main);
+            box-shadow: none;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { background: #334155; box-shadow: none; }
+        .btn-danger { background: linear-gradient(135deg, var(--accent-red), #dc2626); box-shadow: 0 4px 14px rgba(239, 68, 68, 0.3); }
+
+        .metrics-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .metric-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-val {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-top: 0.3rem;
+            color: var(--primary);
+        }
+
+        .chart-box {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        .console {
+            background: #050811;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #38bdf8;
+            height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .log-time { color: var(--text-sub); margin-right: 0.5rem; }
+        .log-err { color: var(--accent-red); }
+        .log-warn { color: var(--accent-amber); }
+        .log-success { color: var(--accent-green); }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th { color: var(--text-sub); font-weight: 600; font-size: 0.8rem; text-transform: uppercase; }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            text-align: center;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <div class="brand-logo">🛡️</div>
+            <div>
+                <div class="brand-title">AuthTime Control Center</div>
+                <div style="font-size: 0.8rem; color: var(--text-sub)">Temporal Authorization Exposure & Verification Engine</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <a href="/docs" target="_blank" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 600;">📖 OpenAPI Docs</a>
+            <div class="status-pill">
+                <div class="status-dot"></div>
+                Target Active (127.0.0.1:8000)
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Metric Highlights Bar -->
+        <div class="metrics-bar">
+            <div class="metric-box">
+                <div class="metric-label" style="font-size:0.75rem; color:var(--text-sub)">EXPOSURE WINDOW</div>
+                <div class="metric-val" id="metric-exposure">0.00s</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label" style="font-size:0.75rem; color:var(--text-sub)">SEVERITY SCORE</div>
+                <div class="metric-val" id="metric-severity" style="color: var(--accent-amber)">0.0 / 10.0</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label" style="font-size:0.75rem; color:var(--text-sub)">ROOT CAUSE</div>
+                <div class="metric-val" id="metric-rootcause" style="font-size: 1.1rem; color: var(--accent-purple)">READY</div>
+            </div>
+            <div class="metric-box">
+                <div class="metric-label" style="font-size:0.75rem; color:var(--text-sub)">SCHEDULER JITTER</div>
+                <div class="metric-val" id="metric-jitter" style="color: var(--accent-green)">0.00ms</div>
+            </div>
+        </div>
+
+        <div class="grid-2">
+            <!-- Interactive Live Verification Launcher -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🧪 Run Live Verification Experiment</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Fault Scenario Type</label>
+                    <select id="fault-type">
+                        <option value="stale_cache">stale_cache (Stale Authorization Cache TTL)</option>
+                        <option value="role_revocation">role_revocation (Immediate DB Revocation)</option>
+                        <option value="agent_session_revocation">agent_session_revocation (Delegated AI Agent Session)</option>
+                        <option value="cross_user_isolation">cross_user_isolation (Multi-Tenant Isolation Check)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Timing Execution Mode</label>
+                    <select id="time-scale">
+                        <option value="0.1">0.1x — Accelerated Demo Mode (Fast 10x Speed)</option>
+                        <option value="1.0" selected>1.0x — Main Real-Time Engine Mode (Unaccelerated)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Trial Repetitions</label>
+                    <input type="number" id="repetitions" value="3" min="1" max="10">
+                </div>
+
+                <button class="btn" id="btn-run-experiment" onclick="runLiveExperiment()">
+                    ⚡ Execute Verification Experiment
+                </button>
+            </div>
+
+            <!-- Manual Target App Sandbox -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">🎮 Target App Live Sandbox</div>
+                    <span style="font-size: 0.8rem; color: var(--text-sub)">Manual Request Testing</span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button class="btn btn-secondary" onclick="manualLogin()">🔑 1. Login as Admin ('admin1')</button>
+                    <button class="btn btn-secondary" onclick="manualAccessAdmin()">🔒 2. Request Protected Admin Endpoint</button>
+                    <button class="btn btn-danger" onclick="manualInjectFault()">⚡ 3. Inject 10s Stale Cache Revocation</button>
+                    <button class="btn btn-secondary" onclick="manualReset()">🔄 4. Reset Target App State</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Exposure Timeline Chart -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📈 Exposure Window Timeline & Probe Transition Graph</div>
+            </div>
+            <div class="chart-box">
+                <canvas id="liveChart"></canvas>
+            </div>
+        </div>
+
+        <!-- History Log Table -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📊 Cross-Run Historical Audit Log</div>
+                <button class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;" onclick="loadHistory()">Refresh History</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Run ID</th>
+                            <th>Timestamp</th>
+                            <th>Fault Type</th>
+                            <th>Exposure (sec)</th>
+                            <th>Severity</th>
+                            <th>Root Cause</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-table-body">
+                        <tr><td colspan="6" style="text-align: center; color: var(--text-sub);">Click 'Refresh History' to view cross-run logs</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Real-Time Audit Console Log -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">📜 Real-Time Audit & Event Stream</div>
+                <button class="btn btn-secondary" style="padding: 0.3rem 0.75rem; font-size: 0.8rem;" onclick="clearConsole()">Clear Console</button>
+            </div>
+            <div class="console" id="console-log">
+                <div><span class="log-time">[System]</span> AuthTime Web Control Center initialized. Backend target active on http://127.0.0.1:8000.</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        AuthTime — Temporal Authorization Attack & Verification Engine | MIT License
+    </footer>
+
+    <script>
+        let currentToken = null;
+        let chartInstance = null;
+
+        function log(msg, type = 'normal') {
+            const consoleBox = document.getElementById('console-log');
+            const timeStr = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            let cls = '';
+            if (type === 'err') cls = 'log-err';
+            if (type === 'warn') cls = 'log-warn';
+            if (type === 'success') cls = 'log-success';
+            div.innerHTML = `<span class="log-time">[${timeStr}]</span> <span class="${cls}">${msg}</span>`;
+            consoleBox.appendChild(div);
+            consoleBox.scrollTop = consoleBox.scrollHeight;
+        }
+
+        function clearConsole() { document.getElementById('console-log').innerHTML = ''; }
+
+        function initChart() {
+            const ctx = document.getElementById('liveChart').getContext('2d');
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['t_fault (0.0s)', '+1.0s', '+2.0s', '+3.0s', '+4.0s', '+5.0s'],
+                    datasets: [{
+                        label: 'Application Authorization Access (1 = ALLOW 200, 0 = BLOCK 403)',
+                        data: [1, 1, 1, 1, 1, 0],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        fill: true,
+                        stepped: true,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: -0.2, max: 1.2,
+                            ticks: { callback: v => v === 1 ? 'ALLOW (200)' : (v === 0 ? 'BLOCK (403)' : ''), color: '#94a3b8' },
+                            grid: { color: '#2a3654' }
+                        },
+                        x: { grid: { color: '#2a3654' }, ticks: { color: '#94a3b8' } }
+                    },
+                    plugins: { legend: { labels: { color: '#f8fafc' } } }
+                }
+            });
+        }
+
+        function updateChartData(probes) {
+            if (!chartInstance || !probes || probes.length === 0) return;
+            const labels = probes.map(p => `+${p.rel_sec.toFixed(2)}s`);
+            const data = probes.map(p => p.allowed ? 1 : 0);
+            const colors = probes.map(p => p.allowed ? '#ef4444' : '#10b981');
+
+            chartInstance.data.labels = labels;
+            chartInstance.data.datasets[0].data = data;
+            chartInstance.data.datasets[0].pointBackgroundColor = colors;
+            chartInstance.update();
+        }
+
+        async function runLiveExperiment() {
+            const faultType = document.getElementById('fault-type').value;
+            const timeScale = parseFloat(document.getElementById('time-scale').value);
+            const repetitions = parseInt(document.getElementById('repetitions').value);
+            const btn = document.getElementById('btn-run-experiment');
+
+            btn.disabled = true;
+            btn.innerText = "⏳ Executing Probes in Engine...";
+            log(`🚀 Dispatching /api/run-experiment scenario='${faultType}' (scale=${timeScale}x, reps=${repetitions})...`, 'warn');
+
+            try {
+                const resp = await fetch('/api/run-experiment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fault_type: faultType, time_scale: timeScale, repetitions: repetitions })
+                });
+
+                const data = await resp.json();
+                if (data.status === 'SUCCESS') {
+                    document.getElementById('metric-exposure').innerText = `${data.estimated_exposure_sec.toFixed(2)}s ± ${data.precision_sec.toFixed(2)}s`;
+                    document.getElementById('metric-severity').innerText = `${data.severity_score.toFixed(1)} (${data.severity_label})`;
+                    document.getElementById('metric-rootcause').innerText = data.root_cause;
+                    document.getElementById('metric-jitter').innerText = `${data.jitter_ms.toFixed(2)}ms`;
+
+                    updateChartData(data.probes);
+                    log(`✅ Experiment Finished! Exposure=${data.estimated_exposure_sec.toFixed(2)}s, Severity=${data.severity_score} (${data.severity_label})`, 'success');
+                    await loadHistory();
+                } else {
+                    log(`❌ Experiment execution error: ${JSON.stringify(data)}`, 'err');
+                }
+            } catch (e) {
+                log(`❌ Experiment request failed: ${e}`, 'err');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "⚡ Execute Verification Experiment";
+            }
+        }
+
+        async function manualLogin() {
+            log("Sending POST /auth/login for user 'admin1'...");
+            try {
+                const resp = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: 'admin1' })
+                });
+                const data = await resp.json();
+                currentToken = data.access_token;
+                log(`✅ Login Successful! Token: ${currentToken.substring(0, 25)}...`, 'success');
+            } catch (e) {
+                log(`❌ Login failed: ${e}`, 'err');
+            }
+        }
+
+        async function manualAccessAdmin() {
+            if (!currentToken) {
+                log("⚠️ Please log in first!", 'warn');
+                return;
+            }
+            log("Sending GET /admin/users with Authorization token...");
+            try {
+                const resp = await fetch('/admin/users', {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
+                const text = await resp.text();
+                if (resp.status === 200) {
+                    log(`⚠️ Response 200 OK (Allowed): ${text}`, 'warn');
+                } else {
+                    log(`🔒 Response ${resp.status} (Blocked): ${text}`, 'success');
+                }
+            } catch (e) {
+                log(`❌ Request failed: ${e}`, 'err');
+            }
+        }
+
+        async function manualInjectFault() {
+            log("Sending POST /faults/inject (stale_cache, user='admin1', TTL=10s)...");
+            try {
+                const resp = await fetch('/faults/inject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fault_type: 'stale_cache', user_id: 'admin1', new_role: 'User', cache_ttl_seconds: 10 })
+                });
+                const data = await resp.json();
+                log(`⚡ Fault Injected! Role revoked in DB, cache active for 10s. Status: ${data.status}`, 'warn');
+            } catch (e) {
+                log(`❌ Fault injection failed: ${e}`, 'err');
+            }
+        }
+
+        async function manualReset() {
+            log("Sending POST /faults/reset...");
+            try {
+                const resp = await fetch('/faults/reset', { method: 'POST' });
+                const data = await resp.json();
+                currentToken = null;
+                log(`🔄 Target Application State Reset Complete. Status: ${data.status}`, 'success');
+            } catch (e) {
+                log(`❌ Reset failed: ${e}`, 'err');
+            }
+        }
+
+        async function loadHistory() {
+            try {
+                const resp = await fetch('/api/history');
+                const data = await resp.json();
+                const tbody = document.getElementById('history-table-body');
+                tbody.innerHTML = '';
+                if (!data.history || data.history.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No runs recorded yet</td></tr>';
+                    return;
+                }
+                data.history.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td style="font-family: monospace;">${item.run_id}</td>
+                        <td>${new Date(item.timestamp).toLocaleTimeString()}</td>
+                        <td>${item.fault_type}</td>
+                        <td><strong>${item.exposure_sec.toFixed(2)}s</strong></td>
+                        <td><span style="color: ${item.severity_score > 7 ? 'var(--accent-red)' : 'var(--accent-amber)'}">${item.severity_score.toFixed(1)} (${item.severity_label})</span></td>
+                        <td>${item.root_cause}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (e) {
+                log(`❌ Error loading history: ${e}`, 'err');
+            }
+        }
+
+        window.onload = function() {
+            initChart();
+            loadHistory();
+        };
+    </script>
+</body>
+</html>

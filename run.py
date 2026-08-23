@@ -38,24 +38,32 @@ from authtime.reporting.generator import ReportGenerator
 from authtime.history.tracker import ExposureHistoryTracker
 
 
+import webbrowser
+
 def start_server_in_thread(host: str = "127.0.0.1", port: int = 8000):
+    url = f"http://{host}:{port}"
     if httpx_mod is not None:
         try:
-            r = httpx_mod.get(f"http://{host}:{port}/faults/reset", timeout=1.0)
-            print(f"[*] Target server active on http://{host}:{port}.", flush=True)
+            r = httpx_mod.get(f"{url}/faults/reset", timeout=1.0)
+            print(f"[*] Target server & Web Control Center active on {url}", flush=True)
             return None
         except Exception:
             pass
 
-    print(f"[*] Launching local reference target server on http://{host}:{port}...", flush=True)
+    print(f"[*] Launching local reference target server & Web Control Center on {url}...", flush=True)
     if uvicorn_mod is not None:
         config = uvicorn_mod.Config(app=fastapi_app, host=host, port=port, log_level="error")
         server = uvicorn_mod.Server(config)
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
         time.sleep(1.5)
+        try:
+            webbrowser.open(url)
+        except Exception:
+            pass
         return server
     return None
+
 
 
 async def run_experiment(
@@ -141,6 +149,16 @@ async def run_experiment(
     print(f"  Severity Score: {last_res.finding.severity_score:.1f} / 10.0 ({last_res.finding.severity_label})\n", flush=True)
     print("=" * 70, flush=True)
 
+    print("[🌐] Web Control Center is ACTIVE and LISTENING at http://127.0.0.1:8000", flush=True)
+    print("[*] You can test endpoints, run live experiments, and view history directly in your browser.", flush=True)
+    print("[*] Press Ctrl+C in this terminal to stop the server.\n", flush=True)
+
+    try:
+        while True:
+            await asyncio.sleep(1)
+    except (KeyboardInterrupt, asyncio.CancelledError):
+        print("\n[*] Shutting down AuthTime Web Control Center.", flush=True)
+
 
 def main():
     parser = argparse.ArgumentParser(description="AuthTime — Main Engine Launcher")
@@ -173,3 +191,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

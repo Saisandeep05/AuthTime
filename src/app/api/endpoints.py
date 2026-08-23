@@ -2,8 +2,10 @@
 Reference Application API Routes & Fault Injection Controller.
 """
 
+import os
 from typing import Dict, Any, Optional, List
 from fastapi import APIRouter, Header, HTTPException, Request, Depends, status
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 import time
 from datetime import datetime, timezone
@@ -16,6 +18,16 @@ router = APIRouter()
 
 # Structured Audit Event Store
 EVENT_STORE: List[Dict[str, Any]] = []
+
+
+@router.get("/", response_class=HTMLResponse)
+def get_dashboard():
+    static_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static", "index.html")
+    if os.path.exists(static_path):
+        with open(static_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>AuthTime Control Center Target Server Active</h1>"
+
 
 
 class LoginRequest(BaseModel):
@@ -153,3 +165,81 @@ def reset_faults(x_authtime_request_id: str = Header(default="fault-reset")):
 @router.get("/events")
 def get_events(experiment_id: Optional[str] = None):
     return {"events": EVENT_STORE}
+
+
+class RunExperimentRequest(BaseModel):
+    fault_type: str = "stale_cache"
+    time_scale: float = 1.0
+    repetitions: int = 3
+    target_url: str = "http://127.0.0.1:8000"
+
+
+@router.post("/api/run-experiment", dependencies=[Depends(enforce_local_client)])
+async def api_run_experiment(req: RunExperimentRequest):
+    from authtime.controller.experiment import ExperimentController
+    from authtime.scenarios.generator import ScenarioGenerator
+    from authtime.reporting.generator import ReportGenerator
+    from authtime.history.tracker import ExposureHistoryTracker
+
+    controller = ExperimentController(req.target_url)
+    if req.fault_type == "cross_user_isolation":
+        scenario = ScenarioGenerator.generate_cross_user_isolation_scenario(
+            user_a_id="admin1", user_b_id="user1", time_scale_factor=req.time_scale
+        )
+    else:
+        scenario = ScenarioGenerator.generate_single_fault_scenario(
+            fault_type=req.fault_type, target_user_id="admin1", time_scale_factor=req.time_scale
+        )
+
+    results = []
+    for i in range(req.repetitions):
+        exp_id = f"EXP-WEB-{int(time.time())}-{i+1}"
+        res = await controller.run_single_trial(exp_id, scenario)
+        results.append(res)
+
+    stats = controller.aggregate_trial_statistics(results)
+    last_res = results[-1]
+
+    tracker = ExposureHistoryTracker()
+    tracker.record_run(last_res)
+
+    os.makedirs("reports", exist_ok=True)
+    md_content = ReportGenerator.generate_markdown_report(last_res, stats)
+    html_content = ReportGenerator.generate_html_report(last_res, stats)
+    json_content = ReportGenerator.generate_json_report(last_res, stats)
+
+    with open("reports/sample_report.md", "w", encoding="utf-8") as f:
+        f.write(md_content)
+    with open("reports/sample_report.html", "w", encoding="utf-8") as f:
+        f.write(html_content)
+    with open("reports/results.json", "w", encoding="utf-8") as f:
+        f.write(json_content)
+
+    return {
+        "status": "SUCCESS",
+        "estimated_exposure_sec": last_res.exposure_metrics.estimated_exposure_sec,
+        "precision_sec": last_res.exposure_metrics.precision_sec,
+        "severity_score": last_res.finding.severity_score,
+        "severity_label": last_res.finding.severity_label,
+        "root_cause": last_res.finding.root_cause,
+
+        "jitter_ms": last_res.exposure_metrics.scheduler_jitter_ms,
+        "probes": [{"rel_sec": p.offset_target, "allowed": (p.actual_decision == "ALLOW"), "status": p.http_status} for p in last_res.probes],
+
+        "stats": {
+            "mean": stats.get("mean_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "mean_exposure_sec", 0.0),
+            "std_dev": stats.get("std_dev_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "std_dev_sec", 0.0),
+            "min": stats.get("min_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "min_exposure_sec", 0.0),
+            "max": stats.get("max_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "max_exposure_sec", 0.0)
+        }
+
+    }
+
+
+
+@router.get("/api/history")
+def get_history():
+    from authtime.history.tracker import ExposureHistoryTracker
+    tracker = ExposureHistoryTracker()
+    return {"history": tracker.load_history()}
+
