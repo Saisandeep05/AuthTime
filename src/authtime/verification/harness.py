@@ -28,8 +28,10 @@ class VerificationHarness:
         target_ms: float = 100.0,
         total_window_sec: float = 60.0,
     ) -> ExposureMetric:
-        post_fault_unauth = [p for p in probes if p.monotonic_timestamp >= t_fault and p.is_violation]
-        post_fault_blocks = [p for p in probes if p.monotonic_timestamp >= t_fault and not p.is_violation and p.actual_decision == "DENY"]
+        sorted_probes = sorted(probes, key=lambda p: p.monotonic_timestamp)
+        post_fault_unauth = [p for p in sorted_probes if p.monotonic_timestamp >= t_fault and p.is_violation]
+        post_fault_blocks = [p for p in sorted_probes if p.monotonic_timestamp >= t_fault and not p.is_violation and p.actual_decision == "DENY"]
+
 
         t_first_unauth = post_fault_unauth[0].monotonic_timestamp if post_fault_unauth else None
         t_last_unauth = post_fault_unauth[-1].monotonic_timestamp if post_fault_unauth else None

@@ -27,27 +27,52 @@ class EventCollector:
         try:
             resp = await client.get(f"{self.target_url}/events", params={"experiment_id": experiment_id})
             if resp.status_code != 200:
-                return []
+                return [
+                    EvidenceEvent(
+                        event_id=f"evt-err-{experiment_id}",
+                        request_id="req-none",
+                        experiment_id=experiment_id,
+                        monotonic_timestamp=0.0,
+                        utc_timestamp=datetime.now(timezone.utc),
+                        event_type="EVENT_FETCH_FAILED",
+                        details={"status_code": resp.status_code, "reason": "Target /events endpoint returned non-200 status"},
+                    )
+                ]
 
             raw_events = resp.json().get("events", [])
             events: List[EvidenceEvent] = []
 
             for item in raw_events:
-                utc_dt = datetime.fromisoformat(item["utc_timestamp"])
+                try:
+                    utc_dt = datetime.fromisoformat(item["utc_timestamp"])
+                except Exception:
+                    utc_dt = datetime.now(timezone.utc)
+
                 events.append(
                     EvidenceEvent(
-                        event_id=item["event_id"],
-                        request_id=item["request_id"],
+                        event_id=item.get("event_id", f"evt-{len(events)+1}"),
+                        request_id=item.get("request_id", "req-unknown"),
                         experiment_id=experiment_id,
-                        monotonic_timestamp=float(item["monotonic_timestamp"]),
+                        monotonic_timestamp=float(item.get("monotonic_timestamp", 0.0)),
                         utc_timestamp=utc_dt,
-                        event_type=item["event_type"],
+                        event_type=item.get("event_type", "AUDIT_LOG"),
                         details=item.get("details", {}),
                     )
                 )
             return events
-        except Exception:
-            return []
+        except Exception as e:
+            return [
+                EvidenceEvent(
+                    event_id=f"evt-err-{experiment_id}",
+                    request_id="req-none",
+                    experiment_id=experiment_id,
+                    monotonic_timestamp=0.0,
+                    utc_timestamp=datetime.now(timezone.utc),
+                    event_type="EVENT_FETCH_FAILED",
+                    details={"error": str(e)},
+                )
+            ]
         finally:
             if close_client and client:
                 await client.aclose()
+

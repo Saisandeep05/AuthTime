@@ -1,8 +1,9 @@
 {
   "schema_version": "1.1",
   "protocol_version": "1.0",
-  "experiment_id": "EXP-MAIN-1787488711-3",
-  "created_at_utc": "2026-08-23T12:38:37.833195Z",
+  "experiment_id": "EXP-MAIN-1787491866-3",
+  "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+  "created_at_utc": "2026-08-23T13:31:13.528443Z",
   "config": {
     "target_url": "http://127.0.0.1:8000",
     "fault_type": "stale_cache",
@@ -12,17 +13,27 @@
     "trial_index": 1
   },
   "config_hash": "d0b46f4bde5a17e1d9ed964008a3a2df99088e7d3834f142e92f3ac31252113e",
-  "baseline_passed": true,
-  "cleanup_status": "SUCCESS",
+  "baseline_passed": false,
+  "cleanup_status": "FAILED",
+  "state_history": [
+    "CREATED",
+    "TARGET_VERIFIED",
+    "BASELINE_VERIFIED",
+    "FAULT_INJECTED",
+    "PROBING",
+    "ANALYZED",
+    "CLEANUP",
+    "INVALID"
+  ],
   "probes": [
     {
-      "request_id": "probe-EXP-MAIN-1787488711-3-0",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "request_id": "req-1f71b77352be4ec2b4b8421ac5ff3840",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 0,
       "offset_target": 0.0,
-      "monotonic_timestamp": 7828.593,
-      "utc_timestamp": "2026-08-23T12:38:31.814543Z",
+      "monotonic_timestamp": 10984.046,
+      "utc_timestamp": "2026-08-23T13:31:07.256185Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -33,13 +44,13 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "request_id": "req-ad7d6971dce34dc6aef05a1f76ef7fa4",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 1,
       "offset_target": 0.1,
-      "monotonic_timestamp": 7828.718,
-      "utc_timestamp": "2026-08-23T12:38:31.924587Z",
+      "monotonic_timestamp": 10984.14,
+      "utc_timestamp": "2026-08-23T13:31:07.359639Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -50,13 +61,13 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787488711-3-2",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "request_id": "req-06f8c6c2dd264276822cd42919762530",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 2,
       "offset_target": 0.5,
-      "monotonic_timestamp": 7829.093,
-      "utc_timestamp": "2026-08-23T12:38:32.313544Z",
+      "monotonic_timestamp": 10984.562,
+      "utc_timestamp": "2026-08-23T13:31:07.769943Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -67,13 +78,13 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787488711-3-3",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "request_id": "req-f090730814df4d2fa63d19d404610d84",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 3,
       "offset_target": 3.0,
-      "monotonic_timestamp": 7831.609,
-      "utc_timestamp": "2026-08-23T12:38:34.817947Z",
+      "monotonic_timestamp": 10987.062,
+      "utc_timestamp": "2026-08-23T13:31:10.269865Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -84,187 +95,17 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787488711-3-4",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "request_id": "req-34e494e246c74c5c8cf35a8dff237d08",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 4,
       "offset_target": 6.0,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
+      "monotonic_timestamp": 10990.046,
+      "utc_timestamp": "2026-08-23T13:31:13.257521Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1001",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1001,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1002",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1002,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1003",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1003,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1004",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1004,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1005",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1005,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1006",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1006,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1007",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1007,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1008",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1008,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:43.832187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 0.0,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1009",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1009,
-      "offset_target": 4.516000000000531,
-      "monotonic_timestamp": 7834.625,
-      "utc_timestamp": "2026-08-23T12:38:43.848187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
-      "response_latency_ms": 15.99999999962165,
-      "node_id": null,
-      "cache_hit": null,
-      "response_body_snippet": null
-    },
-    {
-      "request_id": "probe-EXP-MAIN-1787488711-3-1010",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "scenario_id": "scen-stale_cache-admin1",
-      "probe_index": 1010,
-      "offset_target": 4.524000000000342,
-      "monotonic_timestamp": 7834.625,
-      "utc_timestamp": "2026-08-23T12:38:43.848187Z",
-      "http_status": 403,
-      "actual_decision": "DENY",
-      "ground_truth_decision": "DENY",
-      "is_violation": false,
+      "is_violation": true,
       "response_latency_ms": 0.0,
       "node_id": null,
       "cache_hit": null,
@@ -273,12 +114,12 @@
   ],
   "events": [
     {
-      "event_id": "evt-14f19a32-d2af-4464-99d6-491ab4adaa44",
-      "request_id": "fault-EXP-MAIN-1787488711-3-stale_cache",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-63d805e6-0abe-467f-a2c4-9b78efc1ef67",
+      "request_id": "fault-EXP-MAIN-1787491866-3-stale_cache",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7828.593,
-      "utc_timestamp": "2026-08-23T12:38:31.814543Z",
+      "monotonic_timestamp": 10984.046,
+      "utc_timestamp": "2026-08-23T13:31:07.256185Z",
       "event_type": "FAULT_INJECTED",
       "details": {
         "fault_type": "stale_cache",
@@ -287,18 +128,18 @@
         "new_role": "User",
         "cache_ttl_seconds": 60.0,
         "time_scale_factor": 0.1,
-        "experiment_id": "EXP-MAIN-1787488711-3",
+        "experiment_id": "EXP-MAIN-1787491866-3",
         "trial_id": null,
-        "fault_applied_monotonic": 7828.593
+        "fault_applied_monotonic": 10984.046
       }
     },
     {
-      "event_id": "evt-8ffc006d-1d5d-42af-b012-b3866d9fe2c4",
-      "request_id": "probe-EXP-MAIN-1787488711-3-0",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-98be1989-f6eb-4cd1-8636-f3ac8ab05262",
+      "request_id": "req-1f71b77352be4ec2b4b8421ac5ff3840",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7828.593,
-      "utc_timestamp": "2026-08-23T12:38:31.814543Z",
+      "monotonic_timestamp": 10984.046,
+      "utc_timestamp": "2026-08-23T13:31:07.256185Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -307,12 +148,12 @@
       }
     },
     {
-      "event_id": "evt-ec9c0d93-6d44-4944-ad41-7c31adfcbda8",
-      "request_id": "probe-EXP-MAIN-1787488711-3-1",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-b4c2a07d-aed2-4986-bdc4-0f5cda070474",
+      "request_id": "req-ad7d6971dce34dc6aef05a1f76ef7fa4",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7828.718,
-      "utc_timestamp": "2026-08-23T12:38:31.925676Z",
+      "monotonic_timestamp": 10984.14,
+      "utc_timestamp": "2026-08-23T13:31:07.361109Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -321,12 +162,12 @@
       }
     },
     {
-      "event_id": "evt-4f2d3d78-ca1f-4070-b7db-2f2f3aea82dc",
-      "request_id": "probe-EXP-MAIN-1787488711-3-2",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-298ec390-d58c-4335-98c4-1c6bc6adf158",
+      "request_id": "req-06f8c6c2dd264276822cd42919762530",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7829.093,
-      "utc_timestamp": "2026-08-23T12:38:32.313544Z",
+      "monotonic_timestamp": 10984.562,
+      "utc_timestamp": "2026-08-23T13:31:07.769943Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -335,12 +176,12 @@
       }
     },
     {
-      "event_id": "evt-96022b3a-538f-4511-bd53-776b89c6da16",
-      "request_id": "probe-EXP-MAIN-1787488711-3-3",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-04b657a2-e278-4a1a-8f55-3b2fbdf8d215",
+      "request_id": "req-f090730814df4d2fa63d19d404610d84",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7831.609,
-      "utc_timestamp": "2026-08-23T12:38:34.817947Z",
+      "monotonic_timestamp": 10987.062,
+      "utc_timestamp": "2026-08-23T13:31:10.269865Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -349,183 +190,170 @@
       }
     },
     {
-      "event_id": "evt-c2fecad1-ba26-41b4-a884-ea134b5a73eb",
-      "request_id": "probe-EXP-MAIN-1787488711-3-4",
-      "experiment_id": "EXP-MAIN-1787488711-3",
+      "event_id": "evt-afc0ed06-bfb3-4dfd-b795-ac7d78869180",
+      "request_id": "req-34e494e246c74c5c8cf35a8dff237d08",
+      "experiment_id": "EXP-MAIN-1787491866-3",
       "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
+      "monotonic_timestamp": 10990.046,
+      "utc_timestamp": "2026-08-23T13:31:13.258596Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
-        "role": "User",
-        "cache_hit": false
-      }
-    },
-    {
-      "event_id": "evt-c1d514dd-00ee-4837-b2c6-9df5ee36dd92",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-3b1fdafe-e72b-423b-8434-903c3bc4633f",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-8db0c8a0-75db-47ac-9c9b-b4db5b2c2e1e",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-21faeb7f-cdad-41d8-9d97-5e7dc0860f72",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.816187Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-ce601f77-f440-48b5-ba87-84ec293eedb4",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.823127Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-688f20e8-5319-4b13-ae16-7e43bddb844c",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.823127Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-13523e43-f6cb-44c6-a15f-f9bd7b5e0633",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.828177Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-e11a807f-b812-4a09-a93e-6704d6f76e1d",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.828177Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-dcebf0c7-ed6e-42da-9365-1f1a742ad82f",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4516",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.609,
-      "utc_timestamp": "2026-08-23T12:38:37.828177Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
-        "cache_hit": true
-      }
-    },
-    {
-      "event_id": "evt-92952bf4-b9b2-4fa7-8886-c46a22e8a6fe",
-      "request_id": "probe-EXP-MAIN-1787488711-3-adaptive-4524",
-      "experiment_id": "EXP-MAIN-1787488711-3",
-      "trial_id": null,
-      "monotonic_timestamp": 7834.625,
-      "utc_timestamp": "2026-08-23T12:38:37.832187Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "User",
+        "role": "Admin",
         "cache_hit": true
       }
     }
   ],
+  "raw_observations": [
+    {
+      "probe_id": "probe-EXP-MAIN-1787491866-3-0",
+      "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+      "experiment_id": "EXP-MAIN-1787491866-3",
+      "trial_id": "EXP-MAIN-1787491866-3-trial-1-63263d",
+      "probe_index": 0,
+      "requested_offset_sec": 0.0,
+      "actual_offset_sec": 0.0,
+      "timing_error_sec": 0.0,
+      "request_start_monotonic": 10984.046,
+      "response_received_monotonic": 10984.046,
+      "network_latency_ms": 0.0,
+      "transport_result": "HTTP_RESPONSE",
+      "raw_http_status": 200,
+      "headers_subset": {
+        "X-AuthTime-Request-ID": "req-1f71b77352be4ec2b4b8421ac5ff3840",
+        "X-AuthTime-Experiment-ID": "EXP-MAIN-1787491866-3",
+        "X-AuthTime-Trial-ID": "EXP-MAIN-1787491866-3-trial-1-63263d"
+      },
+      "sanitized_body_snippet": "{\"users\":[\"admin1\",\"user1\",\"guest1\"],\"count\":3}",
+      "body_sha256": "56d438b46777a08593d5d840666bd0115ef3680bfcd21db1ff27411a46c94ef4",
+      "actual_decision": "ALLOW",
+      "decision_reason": "EXPOSURE_VIOLATION: Ground truth required DENY but target returned validated ALLOW response.",
+      "ground_truth_decision": "DENY"
+    },
+    {
+      "probe_id": "probe-EXP-MAIN-1787491866-3-1",
+      "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+      "experiment_id": "EXP-MAIN-1787491866-3",
+      "trial_id": "EXP-MAIN-1787491866-3-trial-1-63263d",
+      "probe_index": 1,
+      "requested_offset_sec": 0.1,
+      "actual_offset_sec": 0.094,
+      "timing_error_sec": -0.006,
+      "request_start_monotonic": 10984.14,
+      "response_received_monotonic": 10984.14,
+      "network_latency_ms": 0.0,
+      "transport_result": "HTTP_RESPONSE",
+      "raw_http_status": 200,
+      "headers_subset": {
+        "X-AuthTime-Request-ID": "req-ad7d6971dce34dc6aef05a1f76ef7fa4",
+        "X-AuthTime-Experiment-ID": "EXP-MAIN-1787491866-3",
+        "X-AuthTime-Trial-ID": "EXP-MAIN-1787491866-3-trial-1-63263d"
+      },
+      "sanitized_body_snippet": "{\"users\":[\"admin1\",\"user1\",\"guest1\"],\"count\":3}",
+      "body_sha256": "56d438b46777a08593d5d840666bd0115ef3680bfcd21db1ff27411a46c94ef4",
+      "actual_decision": "ALLOW",
+      "decision_reason": "EXPOSURE_VIOLATION: Ground truth required DENY but target returned validated ALLOW response.",
+      "ground_truth_decision": "DENY"
+    },
+    {
+      "probe_id": "probe-EXP-MAIN-1787491866-3-2",
+      "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+      "experiment_id": "EXP-MAIN-1787491866-3",
+      "trial_id": "EXP-MAIN-1787491866-3-trial-1-63263d",
+      "probe_index": 2,
+      "requested_offset_sec": 0.5,
+      "actual_offset_sec": 0.516,
+      "timing_error_sec": 0.016,
+      "request_start_monotonic": 10984.562,
+      "response_received_monotonic": 10984.562,
+      "network_latency_ms": 0.0,
+      "transport_result": "HTTP_RESPONSE",
+      "raw_http_status": 200,
+      "headers_subset": {
+        "X-AuthTime-Request-ID": "req-06f8c6c2dd264276822cd42919762530",
+        "X-AuthTime-Experiment-ID": "EXP-MAIN-1787491866-3",
+        "X-AuthTime-Trial-ID": "EXP-MAIN-1787491866-3-trial-1-63263d"
+      },
+      "sanitized_body_snippet": "{\"users\":[\"admin1\",\"user1\",\"guest1\"],\"count\":3}",
+      "body_sha256": "56d438b46777a08593d5d840666bd0115ef3680bfcd21db1ff27411a46c94ef4",
+      "actual_decision": "ALLOW",
+      "decision_reason": "EXPOSURE_VIOLATION: Ground truth required DENY but target returned validated ALLOW response.",
+      "ground_truth_decision": "DENY"
+    },
+    {
+      "probe_id": "probe-EXP-MAIN-1787491866-3-3",
+      "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+      "experiment_id": "EXP-MAIN-1787491866-3",
+      "trial_id": "EXP-MAIN-1787491866-3-trial-1-63263d",
+      "probe_index": 3,
+      "requested_offset_sec": 3.0,
+      "actual_offset_sec": 3.016,
+      "timing_error_sec": 0.016,
+      "request_start_monotonic": 10987.062,
+      "response_received_monotonic": 10987.062,
+      "network_latency_ms": 0.0,
+      "transport_result": "HTTP_RESPONSE",
+      "raw_http_status": 200,
+      "headers_subset": {
+        "X-AuthTime-Request-ID": "req-f090730814df4d2fa63d19d404610d84",
+        "X-AuthTime-Experiment-ID": "EXP-MAIN-1787491866-3",
+        "X-AuthTime-Trial-ID": "EXP-MAIN-1787491866-3-trial-1-63263d"
+      },
+      "sanitized_body_snippet": "{\"users\":[\"admin1\",\"user1\",\"guest1\"],\"count\":3}",
+      "body_sha256": "56d438b46777a08593d5d840666bd0115ef3680bfcd21db1ff27411a46c94ef4",
+      "actual_decision": "ALLOW",
+      "decision_reason": "EXPOSURE_VIOLATION: Ground truth required DENY but target returned validated ALLOW response.",
+      "ground_truth_decision": "DENY"
+    },
+    {
+      "probe_id": "probe-EXP-MAIN-1787491866-3-4",
+      "run_id": "RUN-20260823-e2713c11f4074eaa98654d771c341a44",
+      "experiment_id": "EXP-MAIN-1787491866-3",
+      "trial_id": "EXP-MAIN-1787491866-3-trial-1-63263d",
+      "probe_index": 4,
+      "requested_offset_sec": 6.0,
+      "actual_offset_sec": 6.0,
+      "timing_error_sec": 0.0,
+      "request_start_monotonic": 10990.046,
+      "response_received_monotonic": 10990.046,
+      "network_latency_ms": 0.0,
+      "transport_result": "HTTP_RESPONSE",
+      "raw_http_status": 200,
+      "headers_subset": {
+        "X-AuthTime-Request-ID": "req-34e494e246c74c5c8cf35a8dff237d08",
+        "X-AuthTime-Experiment-ID": "EXP-MAIN-1787491866-3",
+        "X-AuthTime-Trial-ID": "EXP-MAIN-1787491866-3-trial-1-63263d"
+      },
+      "sanitized_body_snippet": "{\"users\":[\"admin1\",\"user1\",\"guest1\"],\"count\":3}",
+      "body_sha256": "56d438b46777a08593d5d840666bd0115ef3680bfcd21db1ff27411a46c94ef4",
+      "actual_decision": "ALLOW",
+      "decision_reason": "EXPOSURE_VIOLATION: Ground truth required DENY but target returned validated ALLOW response.",
+      "ground_truth_decision": "DENY"
+    }
+  ],
   "exposure_metrics": {
-    "fault_timestamp_monotonic": 7828.593,
-    "first_unauth_monotonic": 7828.593,
-    "last_unauth_monotonic": 7831.609,
-    "first_blocked_monotonic": 7834.625,
-    "exposure_interval_min_sec": 3.016000000000531,
-    "exposure_interval_max_sec": 6.032000000000153,
-    "estimated_exposure_sec": 4.524000000000342,
-    "precision_sec": 1.5079999999998108,
+    "fault_timestamp_monotonic": 10984.046,
+    "first_unauth_monotonic": 10984.046,
+    "last_unauth_monotonic": 10990.046,
+    "first_blocked_monotonic": null,
+    "exposure_interval_min_sec": 6.0,
+    "exposure_interval_max_sec": null,
+    "estimated_exposure_sec": null,
+    "precision_sec": null,
     "observation_horizon_sec": 6.0,
-    "scheduler_jitter_ms": 13.599999999994907,
+    "scheduler_jitter_ms": 7.799999999951979,
     "jitter_warning": null,
-    "unauthorized_request_count": 4,
-    "total_probes_fired": 15,
-    "is_censored": false,
-    "measurement_status": "OBSERVED_TRANSITION"
+    "unauthorized_request_count": 5,
+    "total_probes_fired": 5,
+    "is_censored": true,
+    "measurement_status": "CENSORED_LOWER_BOUND"
   },
   "finding": {
-    "finding_id": "FIND-EXP-MAIN-1787488711-3",
-    "title": "Authorization Exposure Finding: AUTHORIZATION_CACHE",
+    "finding_id": "FIND-EXP-MAIN-1787491866-3",
+    "title": "Authorization Exposure Finding: OBSERVATION_HORIZON_REACHED",
     "fault_type": "stale_cache",
-    "severity_score": 7.3,
-    "severity_label": "HIGH",
+    "severity_score": 5.4,
+    "severity_label": "MEDIUM",
     "config_snapshot": {
       "target_url": "http://127.0.0.1:8000",
       "fault_type": "stale_cache",
@@ -537,123 +365,68 @@
     "time_scale_enabled": true,
     "time_scale_factor": 0.1,
     "observed_exposure": {
-      "fault_timestamp_monotonic": 7828.593,
-      "first_unauth_monotonic": 7828.593,
-      "last_unauth_monotonic": 7831.609,
-      "first_blocked_monotonic": 7834.625,
-      "exposure_interval_min_sec": 3.016000000000531,
-      "exposure_interval_max_sec": 6.032000000000153,
-      "estimated_exposure_sec": 4.524000000000342,
-      "precision_sec": 1.5079999999998108,
+      "fault_timestamp_monotonic": 10984.046,
+      "first_unauth_monotonic": 10984.046,
+      "last_unauth_monotonic": 10990.046,
+      "first_blocked_monotonic": null,
+      "exposure_interval_min_sec": 6.0,
+      "exposure_interval_max_sec": null,
+      "estimated_exposure_sec": null,
+      "precision_sec": null,
       "observation_horizon_sec": 6.0,
-      "scheduler_jitter_ms": 13.599999999994907,
+      "scheduler_jitter_ms": 7.799999999951979,
       "jitter_warning": null,
-      "unauthorized_request_count": 4,
-      "total_probes_fired": 15,
-      "is_censored": false,
-      "measurement_status": "OBSERVED_TRANSITION"
+      "unauthorized_request_count": 5,
+      "total_probes_fired": 5,
+      "is_censored": true,
+      "measurement_status": "CENSORED_LOWER_BOUND"
     },
-    "root_cause": "AUTHORIZATION_CACHE",
-    "root_cause_confidence": "PROVEN",
-    "explanation": "Observed exposure boundary (4.52s) matches effective authorization cache TTL (6.00s; raw TTL=60.0s at 0.10x scale) within \u00b11.48s (24.6% relative tolerance).",
+    "root_cause": "OBSERVATION_HORIZON_REACHED",
+    "root_cause_confidence": "INFERRED",
+    "explanation": "Unauthorized access remained observable through the full observation horizon (6.00s). Consistent with extended exposure.",
     "real_world_calibration": "Experimental cache_ttl configured to 60.0s; this is a representative test value and is not evidence of a production default.",
     "reproduction_curl": "curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users",
-    "poc_script_path": "reports/EXP-MAIN-1787488711-3/poc_EXP-MAIN-1787488711-3.py"
+    "poc_script_path": "reports/poc/EXP-MAIN-1787491866-3_poc.py"
   },
   "summary_stats": {
     "trial_count": 1,
-    "mean_exposure_sec": 4.524000000000342
+    "mean_exposure_sec": null
   },
   "exact_probe_schedule": [
     {
       "probe_index": 0,
       "requested_offset_sec": 0.0,
       "actual_offset_sec": 0.0,
+      "timing_error_sec": 0.0,
       "probe_type": "scheduled"
     },
     {
       "probe_index": 1,
       "requested_offset_sec": 0.1,
-      "actual_offset_sec": 0.125,
+      "actual_offset_sec": 0.094,
+      "timing_error_sec": -0.006,
       "probe_type": "scheduled"
     },
     {
       "probe_index": 2,
       "requested_offset_sec": 0.5,
-      "actual_offset_sec": 0.5,
+      "actual_offset_sec": 0.516,
+      "timing_error_sec": 0.016,
       "probe_type": "scheduled"
     },
     {
       "probe_index": 3,
       "requested_offset_sec": 3.0,
       "actual_offset_sec": 3.016,
+      "timing_error_sec": 0.016,
       "probe_type": "scheduled"
     },
     {
       "probe_index": 4,
       "requested_offset_sec": 6.0,
-      "actual_offset_sec": 6.016,
+      "actual_offset_sec": 6.0,
+      "timing_error_sec": 0.0,
       "probe_type": "scheduled"
-    },
-    {
-      "probe_index": 1001,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1002,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1003,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1004,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1005,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1006,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1007,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1008,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.016,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1009,
-      "requested_offset_sec": 4.516000000000531,
-      "actual_offset_sec": 6.032,
-      "probe_type": "adaptive"
-    },
-    {
-      "probe_index": 1010,
-      "requested_offset_sec": 4.524000000000342,
-      "actual_offset_sec": 6.032,
-      "probe_type": "adaptive"
     }
   ],
   "environment": {
@@ -663,15 +436,7 @@
     "architecture": "64bit"
   },
   "aggregated_statistics": {
-    "trial_count": 3,
-    "uncensored_trial_count": 1,
-    "censored_trial_count": 2,
-    "mean_exposure_sec": 4.524000000000342,
-    "median_sec": 4.524000000000342,
-    "std_dev_sec": 0.0,
-    "min_exposure_sec": 4.524000000000342,
-    "max_exposure_sec": 4.524000000000342,
-    "mean_severity_score": 6.766666666666667,
-    "limited_sample_note": "Sample size N < 5 or right-censored data present: inferential P95 and standard deviation are suppressed."
+    "trial_count": 0,
+    "message": "No valid trials passed baseline and cleanup verification."
   }
 }

@@ -71,11 +71,12 @@ from urllib.parse import urlparse
 
 
 async def async_run_command(args):
-    parsed = urlparse(args.target_url)
-    hostname = parsed.hostname or ""
-    if hostname not in ("127.0.0.1", "localhost", "::1", "testclient"):
-        print(f"[FATAL SAFETY ERROR] Target URL '{args.target_url}' is non-local! AuthTime local testing is restricted to 127.0.0.1 / localhost.", file=sys.stderr)
+    from authtime.network.safety import validate_and_resolve_loopback
+    is_ok, resolved_ip, err = validate_and_resolve_loopback(args.target_url)
+    if not is_ok:
+        print(f"[FATAL SAFETY ERROR] Target URL '{args.target_url}' safety violation: {err}", file=sys.stderr)
         sys.exit(1)
+
 
     if args.time_scale <= 0.0 or args.time_scale > 10.0:
         print(f"[ERROR] --time-scale must be between 0.01 and 10.0 (got {args.time_scale})", file=sys.stderr)

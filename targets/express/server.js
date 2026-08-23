@@ -9,7 +9,7 @@ const jwt = require('jsonwebtoken');
 const app = express();
 app.use(express.json());
 
-const JWT_SECRET = 'authtime-secret-key-32-bytes-long!';
+const JWT_SECRET = process.env.JWT_SECRET || 'authtime-secret-key-32-bytes-long!';
 const HOST = '127.0.0.1';
 const PORT = 8001;
 
@@ -28,6 +28,28 @@ app.use((req, res, next) => {
         return res.status(403).json({ error: "Access Restricted to 127.0.0.1" });
     }
     next();
+});
+
+// Target Identity Endpoint
+app.get('/target/identity', (req, res) => {
+    res.json({
+        product: "AuthTime",
+        target: "authtime-express-target",
+        target_type: "reference-target",
+        protocol_version: "1.0",
+        target_version: "1.0.0",
+        capabilities: ["stale_cache", "token_expiry", "rbac_re-eval", "cross_user_isolation"],
+        framework: "Express.js Native"
+    });
+});
+
+// Audit Events Endpoint
+app.get('/events', (req, res) => {
+    const experimentId = req.query.experiment_id || "";
+    res.json({
+        experiment_id: experimentId,
+        events: auditEvents
+    });
 });
 
 // Login
@@ -60,10 +82,13 @@ app.get('/admin/users', (req, res) => {
     }
 
     auditEvents.push({
-        timestamp: now,
-        user_id: userId,
-        action: 'GET /admin/users',
-        decision: role === 'Admin' ? 'ALLOW' : 'DENY'
+        event_id: `evt-exp-${auditEvents.length + 1}`,
+        request_id: req.headers['x-authtime-request-id'] || 'req-unknown',
+        experiment_id: req.headers['x-authtime-experiment-id'] || 'exp-unknown',
+        monotonic_timestamp: now,
+        utc_timestamp: new Date().toISOString(),
+        event_type: "AUTHORIZATION_EVALUATION",
+        details: { user_id: userId, action: 'GET /admin/users', decision: role === 'Admin' ? 'ALLOW' : 'DENY' }
     });
 
     if (role !== 'Admin') {
@@ -94,9 +119,9 @@ app.post('/faults/inject', (req, res) => {
 app.post('/faults/reset', (req, res) => {
     userRoles = { 'admin1': 'Admin', 'user1': 'User' };
     authCache = {};
-    auditEvents = [];
-    res.json({ status: "reset_complete" });
+    res.json({ status: "reset_complete", preserved_events_count: auditEvents.length });
 });
+
 
 app.listen(PORT, HOST, () => {
     console.log(`[*] Express.js Auth Target running on http://${HOST}:${PORT}`);

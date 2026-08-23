@@ -12,3 +12,13 @@ build/
 env/
 venv/
 .DS_Store
+
+# Generated Runtime Experiment Outputs
+reports/*.json
+reports/*.html
+reports/*.md
+reports/poc/*.py
+history/exposure_history.jsonl
+!reports/sample_report.md
+!reports/sample_report.html
+!reports/results.json

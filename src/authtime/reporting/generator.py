@@ -1,5 +1,7 @@
 """
-Report Generator, Response Sanitizer, and Standalone PoC Script Engine.
+Report Generator, Response Sanitizer, and Dynamic Standalone PoC Script Engine.
+Generates fully dynamic, self-contained PoC scripts with IP-bound loopback transport,
+generic scenario parameterization, and thorough post-cleanup authorization state re-verification.
 """
 
 import html
@@ -10,7 +12,8 @@ import re
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from authtime.models.schemas import ExperimentResult, SecurityFinding, ExposureMetric
-from authtime.verification.predicate import evaluate_authorization_violation, evaluate_http_decision
+from authtime.adapters.contract import DEFAULT_ADMIN_USERS_CONTRACT, ResourceContract
+from authtime.statistics.censoring import calculate_kaplan_meier_survival, format_uncertainty_interval
 
 
 def compute_severity_score(
@@ -21,7 +24,7 @@ def compute_severity_score(
     """
     Computes transparent severity score (0.0 to 10.0) based on formula in docs/severity-scoring.md:
     Severity Score = min(10.0, S_exposure * W_endpoint * C_confidence)
-    For right-censored metrics, uses lower_bound exposure.
+    For right-censored metrics, uses lower_bound exposure and marks estimate as conservative.
     """
     if isinstance(metrics, (int, float)):
         exposure_sec = float(metrics)
@@ -43,11 +46,11 @@ def compute_severity_score(
         w_endpoint = 1.0
 
     conf_str = str(confidence).upper()
-    if conf_str == "PROVEN":
+    if conf_str == "PROVEN" or conf_str == "CONFIRMED":
         c_conf = 1.0
     elif conf_str == "SUPPORTED":
         c_conf = 0.85
-    elif conf_str == "INDICATIVE":
+    elif conf_str == "INDICATIVE" or conf_str == "INFERRED":
         c_conf = 0.70
     else:
         c_conf = 0.50
@@ -66,7 +69,7 @@ def compute_severity_score(
     return raw_score, label
 
 
-def sanitize_response_snippet(snippet: Optional[str], enabled: bool = False) -> Optional[str]:
+def sanitize_response_snippet(snippet: Optional[str], enabled: bool = True) -> Optional[str]:
     if not enabled or not snippet:
         return None
 
@@ -88,15 +91,14 @@ class ReportGenerator:
         stats_section = ""
         if stats:
             rep_note = f"\n> **Note**: {stats['limited_sample_note']}\n" if stats.get("limited_sample_note") else ""
+            mean_str = f"`{stats['mean_exposure_sec']:.2f}s`" if stats.get("mean_exposure_sec") is not None else "`NOT ESTIMABLE (Right-Censored Data Present)`"
             stats_section = f"""
-## Aggregate Trial Statistics (N={stats.get('repetitions', 1)})
+## Aggregate Trial Statistics (N={stats.get('trial_count', 1)})
 {rep_note}
-- **Minimum Exposure**: `{stats.get('min_sec', 0.0):.2f}s`
-- **Maximum Exposure**: `{stats.get('max_sec', 0.0):.2f}s`
-- **Mean Exposure (µ)**: `{stats.get('mean_sec', 0.0):.2f}s`
+- **Minimum Exposure**: `{stats.get('min_exposure_sec', 0.0):.2f}s`
+- **Maximum Exposure**: `{stats.get('max_exposure_sec', 0.0):.2f}s`
+- **Mean Exposure (µ)**: {mean_str}
 - **Median Exposure (x̃)**: `{stats.get('median_sec', 0.0):.2f}s`
-- **Standard Deviation (σ)**: `{stats.get('stddev_sec', 0.0):.2f}s`
-- **95th Percentile (P95)**: `{stats.get('p95_sec', 0.0):.2f}s`
 """
 
         jitter_warn_str = f"\n> ⚠️ **Jitter Warning**: {metrics.jitter_warning}\n" if metrics.jitter_warning else ""
@@ -106,7 +108,7 @@ class ReportGenerator:
             if metrics.exposure_interval_max_sec is not None
             else f"`[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED at horizon {metrics.observation_horizon_sec:.2f}s)`"
         )
-        est_exp_str = f"`{metrics.estimated_exposure_sec:.2f}s`" if metrics.estimated_exposure_sec is not None else f"`≥ {metrics.exposure_interval_min_sec:.2f}s (Censored)`"
+        est_exp_str = f"`{metrics.estimated_exposure_sec:.2f}s`" if metrics.estimated_exposure_sec is not None else f"`≥ {metrics.exposure_interval_min_sec:.2f}s (Conservative Lower Bound)`"
         precision_str = f"`±{metrics.precision_sec:.2f}s`" if metrics.precision_sec is not None else "`UNBOUNDED (Censored Observation)`"
 
         md = f"""# AuthTime Security Verification Report: {finding.finding_id}
@@ -114,16 +116,18 @@ class ReportGenerator:
 ## Executive Summary
 - **Protocol Version**: `{result.protocol_version}`
 - **Schema Version**: `{result.schema_version}`
+- **Run Identifier**: `{result.run_id or 'N/A'}`
 - **Finding Title**: {finding.title}
 - **Fault Type**: `{finding.fault_type}`
 - **Severity Score**: `{finding.severity_score:.1f} / 10.0` (**{finding.severity_label}**)
 - **Root Cause**: `{finding.root_cause}` (Confidence: **{finding.root_cause_confidence}**)
 - **Measurement Status**: `{metrics.measurement_status}`
 - **Baseline Verification**: `{'PASSED' if result.baseline_passed else 'FAILED'}`
+- **Cleanup Verification**: `{result.cleanup_status}`
 
 ---
 
-## Exposure Window Metrics
+## Exposure Window Metrics & Timing Methodology
 - **Revocation Timestamp (t_fault)**: `{metrics.fault_timestamp_monotonic:.3f}s`
 - **First Unauthorized Access (t_first_unauth)**: `{metrics.first_unauth_monotonic or 0.0:.3f}s`
 - **Last Unauthorized Access (t_last_unauth)**: `{metrics.last_unauth_monotonic or 0.0:.3f}s`
@@ -161,16 +165,15 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
         stats_html = ""
         if stats:
             rep_note = f"<p class='note'><strong>Note:</strong> {html.escape(str(stats['limited_sample_note']))}</p>" if stats.get("limited_sample_note") else ""
+            mean_str = f"{stats['mean_exposure_sec']:.2f}s" if stats.get("mean_exposure_sec") is not None else "NOT ESTIMABLE (Right-Censored Data Present)"
             stats_html = f"""
-            <h2>Aggregate Trial Statistics (N={stats.get('repetitions', 1)})</h2>
+            <h2>Aggregate Trial Statistics (N={stats.get('trial_count', 1)})</h2>
             {rep_note}
             <ul>
-                <li><strong>Minimum Exposure:</strong> <code>{stats.get('min_sec', 0.0):.2f}s</code></li>
-                <li><strong>Maximum Exposure:</strong> <code>{stats.get('max_sec', 0.0):.2f}s</code></li>
-                <li><strong>Mean Exposure (µ):</strong> <code>{stats.get('mean_sec', 0.0):.2f}s</code></li>
+                <li><strong>Minimum Exposure:</strong> <code>{stats.get('min_exposure_sec', 0.0):.2f}s</code></li>
+                <li><strong>Maximum Exposure:</strong> <code>{stats.get('max_exposure_sec', 0.0):.2f}s</code></li>
+                <li><strong>Mean Exposure (µ):</strong> <code>{html.escape(mean_str)}</code></li>
                 <li><strong>Median Exposure (x̃):</strong> <code>{stats.get('median_sec', 0.0):.2f}s</code></li>
-                <li><strong>Standard Deviation (σ):</strong> <code>{stats.get('stddev_sec', 0.0):.2f}s</code></li>
-                <li><strong>95th Percentile (P95):</strong> <code>{stats.get('p95_sec', 0.0):.2f}s</code></li>
             </ul>
             """
 
@@ -182,7 +185,7 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
             if metrics.exposure_interval_max_sec is not None
             else f"[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED at horizon {metrics.observation_horizon_sec:.2f}s)"
         )
-        est_exp_str = f"{metrics.estimated_exposure_sec:.2f}s" if metrics.estimated_exposure_sec is not None else f"≥ {metrics.exposure_interval_min_sec:.2f}s (Censored)"
+        est_exp_str = f"{metrics.estimated_exposure_sec:.2f}s" if metrics.estimated_exposure_sec is not None else f"≥ {metrics.exposure_interval_min_sec:.2f}s (Conservative Lower Bound)"
         precision_str = f"±{metrics.precision_sec:.2f}s" if metrics.precision_sec is not None else "UNBOUNDED (Censored Observation)"
 
         html_doc = f"""<!DOCTYPE html>
@@ -212,12 +215,14 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
         <h2>Executive Summary</h2>
         <table>
             <tr><th>Protocol Version</th><td><code>{html.escape(result.protocol_version)}</code></td></tr>
+            <tr><th>Run Identifier</th><td><code>{html.escape(result.run_id or 'N/A')}</code></td></tr>
             <tr><th>Finding Title</th><td>{html.escape(finding.title)}</td></tr>
             <tr><th>Fault Type</th><td><code>{html.escape(finding.fault_type)}</code></td></tr>
             <tr><th>Severity Score</th><td><code>{finding.severity_score:.1f} / 10.0</code> <span class="badge {badge_class}">{html.escape(finding.severity_label)}</span></td></tr>
             <tr><th>Root Cause</th><td><code>{html.escape(finding.root_cause)}</code> (Confidence: <strong>{html.escape(str(finding.root_cause_confidence))}</strong>)</td></tr>
             <tr><th>Measurement Status</th><td><code>{html.escape(metrics.measurement_status)}</code></td></tr>
             <tr><th>Baseline Status</th><td><strong>{'PASSED' if result.baseline_passed else 'FAILED'}</strong></td></tr>
+            <tr><th>Cleanup Status</th><td><strong>{html.escape(result.cleanup_status)}</strong></td></tr>
         </table>
     </div>
 
@@ -269,35 +274,43 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
         target_url = result.config.get("target_url", "http://127.0.0.1:8000")
         fault_type = result.config.get("fault_type", "stale_cache")
-        
-        # Exact probe schedule offsets
+        target_user = result.config.get("target_user_id", "admin1")
+        resource_path = result.config.get("resource_path", "/admin/users")
+
         if result.exact_probe_schedule:
             probe_offsets = [item["requested_offset_sec"] if isinstance(item, dict) else item for item in result.exact_probe_schedule]
         else:
             offsets = [p.offset_target for p in result.probes]
-            probe_offsets = offsets if offsets else [0.0, 1.0, 5.0]
+            probe_offsets = offsets if offsets else [0.0, 0.1, 0.5, 3.0, 6.0]
 
-        script_code = f"""# Standalone Reproduction Script for AuthTime Finding: {finding.finding_id}
-# Target: {target_url}
+        contract_json = json.dumps(DEFAULT_ADMIN_USERS_CONTRACT.model_dump(), indent=2)
+
+        script_code = f"""# Dynamic Standalone Reproduction Script for AuthTime Finding: {finding.finding_id}
+# Target URL: {target_url}
 # Fault Type: {fault_type}
+# Target User: {target_user}
+# Resource Path: {resource_path}
 # Protocol Version: {result.protocol_version}
-# Generated: {datetime.now().isoformat()}
+# NOTE: Zero external dependencies beyond standard Python 3.8+ library and httpx.
 
 import sys
 import json
 import time
 import uuid
+import socket
+import ipaddress
 import argparse
+from urllib.parse import urlparse
 import httpx
-
-from authtime.network.safety import validate_and_resolve_loopback
-from authtime.verification.predicate import evaluate_http_decision, evaluate_authorization_violation
-from authtime.adapters.contract import DEFAULT_ADMIN_USERS_CONTRACT
 
 TARGET_URL = "{target_url}"
 EXP_ID = "{result.experiment_id}"
 PROTOCOL_VERSION = "{result.protocol_version}"
+TARGET_USER = "{target_user}"
+RESOURCE_PATH = "{resource_path}"
+FAULT_TYPE = "{fault_type}"
 PROBE_OFFSETS = {probe_offsets}
+RESOURCE_CONTRACT = {contract_json}
 
 # Exit Code Contract
 EXIT_NO_VIOLATION = 0
@@ -308,14 +321,82 @@ EXIT_EXPERIMENT_FAILURE = 4
 EXIT_CLEANUP_FAILURE = 5
 
 
+def validate_and_bind_loopback(target_url: str):
+    # Validates target URL loopback safety and binds HTTP transport directly to the validated IP.
+    if not target_url or not isinstance(target_url, str):
+        return False, None, "URL must be a non-empty string"
+    try:
+        parsed = urlparse(target_url)
+    except Exception as e:
+        return False, None, f"URL parse error: {{e}}"
+
+    if parsed.scheme not in ("http", "https"):
+        return False, None, f"Invalid scheme '{{parsed.scheme}}'. Only 'http' and 'https' are allowed."
+
+    if parsed.username or parsed.password:
+        return False, None, "Embedded credentials in URL are prohibited."
+
+    hostname = parsed.hostname
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    if not hostname or hostname not in ("127.0.0.1", "localhost", "::1"):
+        return False, None, f"SAFETY VIOLATION: Hostname '{{hostname}}' is non-local loopback!"
+
+    try:
+        addr_info = socket.getaddrinfo(hostname, port, socket.AF_UNSPEC, socket.SOCK_STREAM)
+        if not addr_info:
+            return False, None, f"DNS resolution returned no addresses for hostname '{{hostname}}'"
+
+        bound_ip = None
+        for family, socktype, proto, canonname, sockaddr in addr_info:
+            ip_str = sockaddr[0]
+            ip_obj = ipaddress.ip_address(ip_str)
+            if not ip_obj.is_loopback:
+                return False, None, f"SAFETY VIOLATION: Resolved IP '{{ip_str}}' is not loopback!"
+            if not bound_ip:
+                bound_ip = f"[{{ip_str}}]" if ":" in ip_str else ip_str
+
+        bound_url = f"{{parsed.scheme}}://{{bound_ip}}:{{port}}"
+        return True, bound_url, ""
+    except Exception as e:
+        return False, None, f"DNS resolution failure for '{{hostname}}': {{e}}"
+
+
+def evaluate_contract_response(status_code: int, response_body: str, contract: dict) -> str:
+    if status_code in contract.get("denial_status_codes", [401, 403]):
+        return "DENY"
+    if status_code in (500, 502, 503, 504):
+        return "HTTP_ERROR"
+    if status_code not in contract.get("accepted_status_codes", [200]):
+        return "UNKNOWN"
+    if not response_body:
+        return "UNKNOWN"
+
+    try:
+        body_json = json.loads(response_body) if isinstance(response_body, str) else response_body
+        if isinstance(body_json, dict):
+            detail_val = str(body_json.get("detail", "") or body_json.get("error", "") or body_json.get("message", "")).lower()
+            for d_val in contract.get("denial_json_values", []):
+                if d_val in detail_val:
+                    return "DENY"
+
+            for req_key in contract.get("required_json_keys", []):
+                val = body_json.get(req_key)
+                if isinstance(val, (list, dict)) and len(val) > 0:
+                    return "ALLOW"
+            return "UNKNOWN"
+    except Exception:
+        return "UNKNOWN"
+    return "UNKNOWN"
+
+
 def run_poc(json_output: bool = False) -> int:
-    is_ok, resolved_ip, err = validate_and_resolve_loopback(TARGET_URL)
+    is_ok, bound_url, err = validate_and_bind_loopback(TARGET_URL)
     if not is_ok:
         if not json_output:
             print(f"[!] SAFETY ERROR: {{err}}")
         return EXIT_INVALID_TARGET
 
-    poc_run_id = f"run-poc-{{uuid.uuid4().hex[:8]}}"
+    poc_run_id = f"RUN-POC-{{uuid.uuid4()}}"
     
     if not json_output:
         print(f"[+] Starting AuthTime PoC Execution for {{EXP_ID}} (Run ID: {{poc_run_id}})...")
@@ -325,34 +406,39 @@ def run_poc(json_output: bool = False) -> int:
     cleanup_success = False
 
     try:
-        with httpx.Client(timeout=5.0, follow_redirects=False, trust_env=False) as client:
+        with httpx.Client(base_url=bound_url, headers={{"Host": "127.0.0.1"}}, timeout=5.0, follow_redirects=False, trust_env=False) as client:
             try:
-                # 1. Full Target Identity Handshake Verification
+                # 1. Complete Target Identity Handshake Verification
                 try:
-                    r_id = client.get(f"{{TARGET_URL}}/target/identity")
+                    r_id = client.get("/target/identity")
                     if r_id.status_code != 200:
                         if not json_output:
-                            print(f"[!] ERROR: Target at {{TARGET_URL}} returned status {{r_id.status_code}} on identity endpoint.")
+                            print(f"[!] ERROR: Target returned status {{r_id.status_code}} on identity endpoint.")
                         return EXIT_INVALID_TARGET
                     id_data = r_id.json() if r_id.text else {{}}
-                    if id_data.get("product") != "AuthTime" or id_data.get("protocol_version") != PROTOCOL_VERSION:
+                    if (
+                        id_data.get("product") != "AuthTime"
+                        or id_data.get("protocol_version") != PROTOCOL_VERSION
+                        or "reference-target" not in str(id_data.get("target_type", ""))
+                        or not isinstance(id_data.get("capabilities"), list)
+                    ):
                         if not json_output:
-                            print(f"[!] ERROR: Target product/protocol identity mismatch: {{id_data}}")
+                            print(f"[!] ERROR: Target identity verification failed: {{id_data}}")
                         return EXIT_INVALID_TARGET
                 except Exception as e:
                     if not json_output:
                         print(f"[!] ERROR: Unable to reach target identity endpoint: {{e}}")
                     return EXIT_TARGET_UNAVAILABLE
 
-                # 2. State Reset
+                # 2. Target Reset
                 res_reset = client.post(
-                    f"{{TARGET_URL}}/faults/reset",
+                    "/faults/reset",
                     headers={{"X-AuthTime-Request-ID": f"poc-reset-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
                 )
                 res_reset.raise_for_status()
 
                 # 3. Login
-                resp = client.post(f"{{TARGET_URL}}/auth/login", json={{"user_id": "admin1"}})
+                resp = client.post("/auth/login", json={{"user_id": TARGET_USER}})
                 resp.raise_for_status()
                 token = resp.json()["access_token"]
                 
@@ -363,9 +449,9 @@ def run_poc(json_output: bool = False) -> int:
                     "X-AuthTime-Run-ID": poc_run_id,
                 }}
 
-                # 4. Baseline Verification using ResourceContract
-                r_base = client.get(f"{{TARGET_URL}}/admin/users", headers=headers)
-                base_dec = evaluate_http_decision(r_base.status_code, r_base.text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
+                # 4. Baseline Authorized Access Verification
+                r_base = client.get(RESOURCE_PATH, headers=headers)
+                base_dec = evaluate_contract_response(r_base.status_code, r_base.text, RESOURCE_CONTRACT)
                 if base_dec != "ALLOW":
                     if not json_output:
                         print(f"[!] ERROR: Baseline check failed with decision '{{base_dec}}' (status {{r_base.status_code}})")
@@ -373,16 +459,16 @@ def run_poc(json_output: bool = False) -> int:
 
                 # 5. Fault Injection
                 if not json_output:
-                    print(f"[*] Injecting Fault: {fault_type}...")
+                    print(f"[*] Injecting Fault: {{FAULT_TYPE}}...")
                 t_start = time.monotonic()
                 r_fault = client.post(
-                    f"{{TARGET_URL}}/faults/inject",
-                    json={{"fault_type": "{fault_type}", "user_id": "admin1", "new_role": "User", "experiment_id": EXP_ID}},
+                    "/faults/inject",
+                    json={{"fault_type": FAULT_TYPE, "user_id": TARGET_USER, "new_role": "User", "experiment_id": EXP_ID}},
                     headers={{"X-AuthTime-Request-ID": f"poc-fault-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
                 )
                 r_fault.raise_for_status()
 
-                # 6. Multi-probe schedule execution
+                # 6. Probe Schedule Execution
                 for idx, offset in enumerate(PROBE_OFFSETS):
                     t_req_start = time.monotonic()
                     elapsed = t_req_start - t_start
@@ -391,27 +477,35 @@ def run_poc(json_output: bool = False) -> int:
                     
                     probe_t = time.monotonic()
                     actual_offset_sec = round(probe_t - t_start, 4)
+                    timing_error_sec = round(actual_offset_sec - offset, 4)
                     
                     probe_headers = dict(headers)
                     probe_headers["X-AuthTime-Request-ID"] = f"poc-probe-{{poc_run_id}}-{{idx+1}}"
                     
+                    error_cat = "HTTP_RESPONSE"
                     try:
-                        r_probe = client.get(f"{{TARGET_URL}}/admin/users", headers=probe_headers)
+                        r_probe = client.get(RESOURCE_PATH, headers=probe_headers)
                         st_code = r_probe.status_code
                         body_text = r_probe.text
                     except httpx.TimeoutException:
-                        st_code = 408
+                        st_code = 0
                         body_text = ""
+                        error_cat = "NETWORK_TIMEOUT"
                     except httpx.NetworkError:
-                        st_code = 502
+                        st_code = 0
                         body_text = ""
-                    except Exception:
-                        st_code = 500
-                        body_text = ""
+                        error_cat = "CONNECTION_ERROR"
+                    except Exception as ex_err:
+                        st_code = 0
+                        body_text = str(ex_err)
+                        error_cat = "CLIENT_ERROR"
 
-                    act_dec = evaluate_http_decision(st_code, body_text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
-                    is_viol, _ = evaluate_authorization_violation(act_dec, "DENY", st_code, body_text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
-                    
+                    if error_cat == "HTTP_RESPONSE":
+                        act_dec = evaluate_contract_response(st_code, body_text, RESOURCE_CONTRACT)
+                    else:
+                        act_dec = error_cat
+
+                    is_viol = (act_dec == "ALLOW")
                     if is_viol:
                         has_violation = True
 
@@ -420,23 +514,34 @@ def run_poc(json_output: bool = False) -> int:
                         "probe_index": idx + 1,
                         "requested_offset_sec": offset,
                         "actual_offset_sec": actual_offset_sec,
-                        "status_code": st_code,
+                        "timing_error_sec": timing_error_sec,
+                        "raw_http_status": st_code,
+                        "error_category": error_cat,
                         "actual_decision": act_dec,
-                        "is_violation": is_viol
+                        "is_violation": is_viol,
                     }})
 
                     if not json_output:
-                        print(f"  [+] Probe {{idx+1}} at requested {{offset:.2f}}s (actual {{actual_offset_sec:.2f}}s) -> {{status_str}}")
+                        print(f"  [+] Probe {{idx+1}} at requested {{offset:.2f}}s (actual {{actual_offset_sec:.2f}}s, error {{timing_error_sec:.3f}}s) -> {{status_str}}")
 
             finally:
-                # Guaranteed Cleanup and Post-Reset State Verification
+                # 7. Guaranteed Post-Reset State & Authorization Re-Verification
                 try:
                     res_c = client.post(
-                        f"{{TARGET_URL}}/faults/reset",
+                        "/faults/reset",
                         headers={{"X-AuthTime-Request-ID": f"poc-cleanup-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
                     )
                     if res_c.status_code == 200:
-                        cleanup_success = True
+                        # Re-verify target identity
+                        res_v = client.get("/target/identity")
+                        # Re-verify protected endpoint returns 401/403 DENY without valid token
+                        res_unauth = client.get(RESOURCE_PATH)
+                        if (
+                            res_v.status_code == 200
+                            and res_v.json().get("product") == "AuthTime"
+                            and res_unauth.status_code in (401, 403)
+                        ):
+                            cleanup_success = True
                 except Exception as e:
                     if not json_output:
                         print(f"[!] CLEANUP ERROR: Target state reset failed: {{e}}")
@@ -449,7 +554,7 @@ def run_poc(json_output: bool = False) -> int:
 
     if not cleanup_success:
         if not json_output:
-            print(f"[!] CRITICAL: State cleanup failed! Experiment marked INVALID.")
+            print(f"[!] CRITICAL: Post-reset authorization cleanup verification failed! Target state not verified clean.")
         return EXIT_CLEANUP_FAILURE
 
     if json_output:
@@ -466,7 +571,6 @@ def run_poc(json_output: bool = False) -> int:
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser(description="Standalone AuthTime Reproduction PoC")
     parser.add_argument("--json", action="store_true", help="Output machine-readable JSON results")
     args = parser.parse_args()

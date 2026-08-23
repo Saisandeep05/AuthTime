@@ -52,19 +52,23 @@ class ExposureHistoryTracker:
         return entry
 
     def load_history(self) -> List[Dict[str, Any]]:
-        """Loads all historical run records."""
+        """Loads all historical run records safely, skipping malformed lines."""
         if not os.path.exists(self.history_file):
             return []
 
         entries = []
         with open(self.history_file, "r", encoding="utf-8") as f:
             for line in f:
-                if line.strip():
-                    entries.append(json.loads(line))
+                stripped = line.strip()
+                if stripped:
+                    try:
+                        entries.append(json.loads(stripped))
+                    except Exception:
+                        continue
         return entries
 
     def compare_runs(self, latest_exposure: float, fault_type: str = "stale_cache", threshold_sec: float = 0.5) -> Dict[str, Any]:
-        """Compares current exposure against baseline history for matching fault_type."""
+        """Compares current exposure against baseline history for matching fault_type using censoring-aware metrics."""
         all_history = self.load_history()
         history = [e for e in all_history if e.get("fault_type") == fault_type]
 
@@ -76,13 +80,17 @@ class ExposureHistoryTracker:
                 "message": f"No historical data for fault_type '{fault_type}'. Current run established as baseline.",
             }
 
-        valid_exposures = [
-            (e["estimated_exposure_sec"] if e.get("estimated_exposure_sec") is not None else e.get("exposure_interval_min_sec", 0.0))
-            for e in history
+        uncensored_exposures = [
+            e["estimated_exposure_sec"] for e in history if e.get("estimated_exposure_sec") is not None and not e.get("is_censored", False)
         ]
-        avg_prev = sum(valid_exposures) / len(valid_exposures) if valid_exposures else latest_exposure
-        diff = latest_exposure - avg_prev
+        
+        if uncensored_exposures:
+            avg_prev = sum(uncensored_exposures) / len(uncensored_exposures)
+        else:
+            mins = [e.get("exposure_interval_min_sec", 0.0) for e in history]
+            avg_prev = sorted(mins)[len(mins) // 2] if mins else latest_exposure
 
+        diff = latest_exposure - avg_prev
         is_regression = diff > threshold_sec
 
         return {
@@ -90,8 +98,9 @@ class ExposureHistoryTracker:
             "diff_sec": diff,
             "historical_avg_sec": avg_prev,
             "message": (
-                f"🚨 REGRESSION DETECTED! '{fault_type}' exposure increased by +{diff:.2f}s above historical average ({avg_prev:.2f}s)."
+                f"🚨 REGRESSION DETECTED! '{fault_type}' exposure increased by +{diff:.2f}s above historical baseline ({avg_prev:.2f}s)."
                 if is_regression
                 else f"✅ NO REGRESSION. '{fault_type}' exposure is within acceptable threshold (diff: {diff:+.2f}s)."
             ),
         }
+

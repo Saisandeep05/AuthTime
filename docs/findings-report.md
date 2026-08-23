@@ -40,7 +40,9 @@ Testing against reference authorization targets yielded the following baseline m
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **Stale Cache (10s)** | 10.0s | **10.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **6.2 (MEDIUM)** |
 | **Stale Cache (30s)** | 30.0s | **30.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.5 (HIGH)** |
+| **Stale Cache (60s)** | 60.0s | **60.00s** (Accelerated 4.52s ± 0.05s) | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.3 (HIGH)** |
 | **Cross-User Isolation** | N/A | **0.00s** | $\pm 0.01\text{s}$ | `NONE` | **0.0 (NONE)** |
+
 
 ### Headline Observation:
 Without explicit cache invalidation mechanisms, access revocation latency is **100% bound to the configured cache TTL**. Revoked credentials remain fully functional for the entire duration of the TTL.

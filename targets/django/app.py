@@ -36,6 +36,7 @@ if not settings.configured:
 USER_ROLES_DB = {"admin1": "Admin", "user1": "User", "guest1": "Guest", "svc1": "ServiceAccount"}
 ALLOWED_ROLES = {"Admin", "User", "Guest", "ServiceAccount"}
 AUTH_CACHE = {}
+AUDIT_EVENTS = []
 
 
 def enforce_loopback_security(request) -> bool:
@@ -75,6 +76,16 @@ def get_admin_users_view(request):
     else:
         role = USER_ROLES_DB.get(user_id, "User")
 
+    AUDIT_EVENTS.append({
+        "event_id": f"evt-django-{len(AUDIT_EVENTS)+1}",
+        "request_id": request.headers.get("X-AuthTime-Request-ID", "req-unknown"),
+        "experiment_id": request.headers.get("X-AuthTime-Experiment-ID", "exp-unknown"),
+        "monotonic_timestamp": now,
+        "utc_timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        "event_type": "AUTHORIZATION_EVALUATION",
+        "details": {"user_id": user_id, "action": "GET /admin/users", "decision": "ALLOW" if role == "Admin" else "DENY"}
+    })
+
     if role != "Admin":
         return JsonResponse({"detail": "Permission Denied"}, status=403)
 
@@ -110,23 +121,31 @@ def reset_state_view(request):
     global USER_ROLES_DB, AUTH_CACHE
     USER_ROLES_DB = {"admin1": "Admin", "user1": "User", "guest1": "Guest", "svc1": "ServiceAccount"}
     AUTH_CACHE = {}
-    return JsonResponse({"status": "RESET_COMPLETE"})
+    return JsonResponse({"status": "RESET_COMPLETE", "preserved_events_count": len(AUDIT_EVENTS)})
+
 
 
 def target_identity_view(request):
     return JsonResponse({
         "product": "AuthTime",
         "target": "authtime-django-target",
-        "target_type": "django-reference-target",
+        "target_type": "reference-target",
         "protocol_version": "1.0",
         "target_version": "1.0.0",
-        "capabilities": ["fault_injection", "reset", "audit_events"],
+        "capabilities": ["stale_cache", "token_expiry", "rbac_re-eval", "cross_user_isolation"],
         "framework": "Django Native",
     })
 
 
+def get_events_view(request):
+    exp_id = request.GET.get("experiment_id", "")
+    matching = [e for e in AUDIT_EVENTS if not exp_id or e.get("experiment_id") == exp_id]
+    return JsonResponse({"experiment_id": exp_id, "events": matching})
+
+
 urlpatterns = [
     path("target/identity", target_identity_view),
+    path("events", get_events_view),
     path("auth/login", login_view),
     path("admin/users", get_admin_users_view),
     path("faults/inject", inject_fault_view),

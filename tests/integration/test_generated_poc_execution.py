@@ -76,9 +76,16 @@ async def test_generated_poc_script_execution(tmp_path):
     with open(poc_path, "r", encoding="utf-8") as f:
         code = f.read()
 
-    assert "validate_and_resolve_loopback" in code
-    assert "evaluate_authorization_violation" in code
-    assert "DEFAULT_ADMIN_USERS_CONTRACT" in code
+    assert "import authtime" not in code
+    assert "from authtime" not in code
+    assert "validate_and_bind_loopback" in code
+    assert "gethostbyname" not in code
+    assert "evaluate_contract_response" in code
+    assert "RESOURCE_CONTRACT" in code
     assert "EXIT_CLEANUP_FAILURE" in code
+    assert "error_cat" in code
     assert "trust_env=False" in code
+
+
+
 

@@ -26,20 +26,21 @@ However, because web applications store user permissions in fast temporary memor
 
 In our reference web application setup:
 - **What happened**: An admin user's role was changed to a standard `User`.
-- **The flaw**: The application continued accepting admin requests for **60.0 seconds** (or **4.5s ± 1.5s** in accelerated test mode) because the authorization cache was stale.
-- **Security Score**: Received a **Severity Score of 6.2 / 10.0 (MEDIUM)**.
+- **The flaw**: The application continued accepting admin requests for **60.0 seconds** of configured TTL (or **4.52s ± 0.05s** in accelerated 0.1x experimental mode) because the authorization cache was stale.
+- **Security Score**: Assigned a **Severity Score of 7.3 / 10.0 (HIGH)** per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
 
 ---
 
 ## 💡 Why Does This Problem Exist?
 
-Modern websites (built with FastAPI, Node.js, Django, React, microservices, or API Gateways) use caching to run fast:
+Modern web applications (built with FastAPI, Node.js, Django, React, microservices, or API Gateways) use caching to run fast:
 
 1. **Database**: Updates instantly when access is revoked (`DENY`).
 2. **Application Cache / Token**: Stores the user's old role in memory for 30–300 seconds (`ALLOW`).
 3. **The Risk**: Until that cache expires, the application trusts the stale memory instead of the database.
 
-AuthTime simulates controlled access revocations and fires background requests to narrow the observed transition interval to approximately 100 ms under controlled local test conditions.
+AuthTime simulates controlled access revocations and fires background probes to pinpoint the revocation boundary. High-precision monotonic local clock measurements achieve probe schedule resolution down to $\le 100\text{ms}$, while accounting for HTTP request dispatch ($t_{\text{start}}$) and application processing latency.
+
 
 ---
 
@@ -272,11 +273,12 @@ To maintain clarity and ethical alignment, AuthTime **does NOT**:
 
 ## 🧪 Running the Test Suite
 
-Run the 22-test automated verification and property-based fuzzing suite:
+Run the full automated verification and property-based fuzzing suite across unit, integration, property, scenario, system, and multi-framework equivalence tests:
 
 ```bash
 pytest --verbose
 ```
+
 
 ---
 

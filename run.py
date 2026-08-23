@@ -46,7 +46,7 @@ def start_server_in_thread(host: str = "127.0.0.1", port: int = 8000):
     url = f"http://{host}:{port}"
     if httpx_mod is not None:
         try:
-            r = httpx_mod.post(f"{url}/faults/reset", timeout=1.0)
+            r = httpx_mod.get(f"{url}/target/identity", timeout=1.0)
             if r.status_code == 200:
                 print(f"[*] Target server & Web Control Center active on {url}", flush=True)
                 return None
@@ -59,13 +59,20 @@ def start_server_in_thread(host: str = "127.0.0.1", port: int = 8000):
         server = uvicorn_mod.Server(config)
         thread = threading.Thread(target=server.run, daemon=True)
         thread.start()
-        time.sleep(1.5)
-        try:
-            webbrowser.open(url)
-        except Exception:
-            pass
+        
+        # Exponential backoff readiness polling
+        for _ in range(15):
+            time.sleep(0.2)
+            if httpx_mod is not None:
+                try:
+                    r = httpx_mod.get(f"{url}/target/identity", timeout=0.5)
+                    if r.status_code == 200:
+                        break
+                except Exception:
+                    pass
         return server
     return None
+
 
 
 
@@ -75,15 +82,19 @@ async def run_experiment(
     time_scale: float = 1.0,
     repetitions: int = 3,
     target_url: str = "http://127.0.0.1:8000",
+    no_wait: bool = False,
 ):
+
     print("=" * 70, flush=True)
     print(" [AuthTime Main Temporal Authorization Verification Engine]", flush=True)
     print("=" * 70, flush=True)
 
-    parsed_url = urlparse(target_url)
-    if parsed_url.hostname not in ("127.0.0.1", "localhost", "::1", "testclient"):
-        print(f"[FATAL SAFETY ERROR] Target URL '{target_url}' is non-local!", file=sys.stderr)
+    from authtime.network.safety import validate_and_resolve_loopback
+    is_ok, resolved_ip, err = validate_and_resolve_loopback(target_url)
+    if not is_ok:
+        print(f"[FATAL SAFETY ERROR] Target URL '{target_url}' safety violation: {err}", file=sys.stderr)
         sys.exit(1)
+
 
     start_server_in_thread()
 
@@ -162,15 +173,16 @@ async def run_experiment(
 
     print("=" * 70, flush=True)
 
-    print("[🌐] Web Control Center is ACTIVE and LISTENING at http://127.0.0.1:8000", flush=True)
-    print("[*] You can test endpoints, run live experiments, and view history directly in your browser.", flush=True)
-    print("[*] Press Ctrl+C in this terminal to stop the server.\n", flush=True)
+    if not no_wait:
+        print("[🌐] Web Control Center is ACTIVE and LISTENING at http://127.0.0.1:8000", flush=True)
+        print("[*] You can test endpoints, run live experiments, and view history directly in your browser.", flush=True)
+        print("[*] Press Ctrl+C in this terminal to stop the server.\n", flush=True)
 
-    try:
-        while True:
-            await asyncio.sleep(1)
-    except (KeyboardInterrupt, asyncio.CancelledError):
-        print("\n[*] Shutting down AuthTime Web Control Center.", flush=True)
+        try:
+            while True:
+                await asyncio.sleep(1)
+        except (KeyboardInterrupt, asyncio.CancelledError):
+            print("\n[*] Shutting down AuthTime Web Control Center.", flush=True)
 
 
 def main():
@@ -181,6 +193,7 @@ def main():
     parser.add_argument("--time-scale", type=float, default=None, help="Custom time scale factor")
     parser.add_argument("--repetitions", type=int, default=3, help="Number of trial repetitions")
     parser.add_argument("--target-url", type=str, default="http://127.0.0.1:8000", help="Target server URL")
+    parser.add_argument("--no-wait", action="store_true", help="Exit immediately after experiment execution without keeping server process alive")
 
     args = parser.parse_args()
 
@@ -198,8 +211,10 @@ def main():
             time_scale=time_scale,
             repetitions=args.repetitions,
             target_url=args.target_url,
+            no_wait=args.no_wait,
         )
     )
+
 
 
 if __name__ == "__main__":

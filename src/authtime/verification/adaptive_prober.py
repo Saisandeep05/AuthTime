@@ -76,11 +76,12 @@ class AdaptiveProber:
             })
 
             if dec_str == "ALLOW":
-                left = actual_t
+                left = mid_t
             elif dec_str == "DENY":
-                right = actual_t
+                right = mid_t
             else:
-                # ERROR state: Abort refinement immediately to prevent corrupted boundary math
-                break
+                # Non-decision/error state: Abort refinement immediately and return uncorrupted initial boundaries
+                return t_last_unauth, t_first_block, adaptive_records
 
         return left, right, adaptive_records
+

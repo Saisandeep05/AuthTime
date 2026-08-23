@@ -15,11 +15,12 @@ class RoleEnum(str, Enum):
     SERVICE_ACCOUNT = "ServiceAccount"
 
 
-DecisionType = Literal["ALLOW", "DENY", "ERROR", "TIMEOUT", "UNKNOWN"]
-GroundTruthDecision = Literal["ALLOW", "DENY"]
+DecisionType = Literal["ALLOW", "DENY", "UNKNOWN"]
+GroundTruthDecision = Literal["ALLOW", "DENY", "UNKNOWN", "UNAVAILABLE"]
 MeasurementStatus = Literal["OBSERVED_TRANSITION", "CENSORED_LOWER_BOUND", "NO_EXPOSURE", "INVALID_BASELINE", "INCONCLUSIVE", "NON_MONOTONIC"]
 SeverityLabel = Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-ConfidenceLevel = Literal["PROVEN", "SUPPORTED", "INDICATIVE", "UNDETERMINED"]
+ConfidenceLevel = Literal["CONFIRMED", "PROVEN", "SUPPORTED", "INDICATIVE", "INFERRED", "UNDETERMINED"]
+
 
 
 class GroundTruthState(BaseModel):
@@ -39,9 +40,8 @@ class ProbeResult(BaseModel):
     offset_target: float = Field(ge=0.0)
     monotonic_timestamp: float = Field(ge=0.0)
     utc_timestamp: datetime
-    http_status: int = Field(ge=100, le=599)
+    http_status: int = Field(ge=0, le=599)
     actual_decision: DecisionType
-
     ground_truth_decision: GroundTruthDecision
     is_violation: bool
     response_latency_ms: float = Field(ge=0.0)
@@ -117,18 +117,22 @@ class ExperimentResult(BaseModel):
     schema_version: str = "1.1"
     protocol_version: str = "1.0"
     experiment_id: str
+    run_id: Optional[str] = None
     created_at_utc: datetime
     config: Dict[str, Any]
     config_hash: Optional[str] = None
     baseline_passed: bool
-    cleanup_status: Literal["SUCCESS", "FAILED", "NOT_ATTEMPTED"] = "SUCCESS"
+    cleanup_status: Literal["VERIFIED", "FAILED", "NOT_ATTEMPTED"] = "VERIFIED"
+    state_history: Optional[List[str]] = None
     probes: List[ProbeResult]
     events: List[EvidenceEvent]
+    raw_observations: Optional[List[Dict[str, Any]]] = None
     exposure_metrics: ExposureMetric
     finding: SecurityFinding
     summary_stats: Dict[str, Any]
     exact_probe_schedule: Optional[List[Dict[str, Any]]] = None
     environment: Optional[Dict[str, Any]] = None
+
 
 
 

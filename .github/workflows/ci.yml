@@ -1,4 +1,4 @@
-name: AuthTime CI & Verification Pipeline
+name: AuthTime Comprehensive CI & Security Verification Pipeline
 
 on:
   push:
@@ -9,15 +9,18 @@ on:
 jobs:
   test-and-verify:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: ${{ matrix.python-version }}
           cache: 'pip'
 
       - name: Install Dependencies
@@ -25,13 +28,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Pytest Automated Suite
+      - name: Run Pytest Automated Suite & Invariants
         run: |
-          pytest --verbose
+          pytest -v
 
-      - name: Run AuthTime Demonstration Experiment
+      - name: Run AuthTime Accelerated Verification Demonstration
         run: |
-          python run.py
+          python run.py --demo --no-wait
+
 
       - name: Verify Report Artifact Generation
         run: |

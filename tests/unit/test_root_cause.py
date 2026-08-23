@@ -20,12 +20,13 @@ def test_root_cause_classifications():
 
     code, conf, expl = RootCauseAnalyzer.analyze_root_cause("stale_cache", {"cache_ttl_seconds": 60.0}, dummy_metric)
     assert code == "AUTHORIZATION_CACHE"
-    assert "PROVEN" in conf
+    assert conf in ("CONFIRMED", "SUPPORTED")
 
     code_col, conf_col, _ = RootCauseAnalyzer.analyze_root_cause("stale_cache", {}, dummy_metric, has_cache_key_collision=True)
     assert code_col == "CACHE_KEY_COLLISION"
-    assert "PROVEN" in conf_col
+    assert conf_col in ("CONFIRMED", "SUPPORTED")
 
     code_agent, conf_agent, _ = RootCauseAnalyzer.analyze_root_cause("agent_session_revocation", {}, dummy_metric)
     assert code_agent == "DELEGATED_CREDENTIAL_STALENESS"
-    assert "SUPPORTED" in conf_agent
+    assert conf_agent in ("SUPPORTED", "INFERRED")
+

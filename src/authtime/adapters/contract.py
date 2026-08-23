@@ -62,10 +62,12 @@ class ResourceContract(BaseModel):
 
                 # 2. Strict required key matching for contract
                 for req_key in self.required_json_keys:
-                    if req_key in body_json and body_json[req_key] is not None and len(body_json[req_key]) > 0:
+                    val = body_json.get(req_key)
+                    if isinstance(val, (list, dict)) and len(val) > 0:
                         return "ALLOW"
 
                 return "UNKNOWN"
+
         except Exception:
             return "UNKNOWN"
 

@@ -60,9 +60,16 @@ class GroundTruthStateManager:
 
     def get_expected_decision(self, user_id: str, resource_path: str, timestamp_monotonic: float) -> str:
         role = self.get_expected_role(user_id, timestamp_monotonic)
-        req_perm = "admin:read" if resource_path.startswith("/admin") else "invoices:read"
+        if resource_path.startswith("/admin"):
+            req_perm = "admin:read"
+        elif resource_path.startswith("/invoices") or resource_path.startswith("/data"):
+            req_perm = "invoices:read"
+        else:
+            return "UNKNOWN"
+
         granted_perms = INDEPENDENT_POLICY_MAP.get(role, set())
         return "ALLOW" if req_perm in granted_perms else "DENY"
+
 
     def get_ground_truth_state(self, user_id: str, resource_path: str, timestamp_monotonic: float) -> GroundTruthState:
         role_str = self.get_expected_role(user_id, timestamp_monotonic)
