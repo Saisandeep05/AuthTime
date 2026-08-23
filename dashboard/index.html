@@ -147,14 +147,14 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
             <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem;">
                 <div class="metric-label" style="color: #f87171;">Vulnerable Baseline Exposure</div>
-                <div class="metric-value" style="color: #ef4444;">4.05s</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">API-3 retained stale cache until TTL fallback</div>
+                <div class="metric-value" style="color: #ef4444;">4.25s</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">5-Run Max Avg (Std Dev: 0.16s | Mean Replica Exp: 4.22s)</div>
             </div>
 
             <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem;">
                 <div class="metric-label" style="color: #34d399;">Mitigated State Exposure</div>
                 <div class="metric-value" style="color: #10b981;">0.00s</div>
-                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Authorization Versioning & Version-Aware Cache Validation</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">No ALLOW observed within 100ms probe resolution</div>
             </div>
 
             <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 1rem;">
@@ -171,7 +171,7 @@
                     t0 Revocation (DB)<br>
                     ├── API-1 (8010): [0.00s] DENY (403)<br>
                     ├── API-2 (8011): [2.30s] ALLOW (200) → Delayed Sync<br>
-                    └── API-3 (8012): [4.05s] ALLOW (200) → Stale Cache
+                    └── API-3 (8012): [4.25s] ALLOW (200) → Stale Cache (5-Run Avg)
                 </div>
             </div>
 

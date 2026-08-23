@@ -52,21 +52,23 @@ AuthTime includes an end-to-end enterprise case study modeling a real-world auth
 ### Enterprise Scenario: Employee Offboarding (Alice)
 - **Business Context**: Employee `alice` holds the `Finance Admin` role with access to `/finance/payroll`, `/finance/payments`, and `/finance/reports`.
 - **Revocation Event**: HR demotes `alice` to `Employee` at $t_0$ in the central database.
-- **Vulnerable Baseline**: Due to asynchronous cache invalidation lag and dropped pub/sub events, `API-3` continues allowing access for **`4.05s`** post-revocation.
+- **Vulnerable Baseline**: Due to asynchronous cache invalidation lag and dropped pub/sub events, `API-3` continues allowing access for **`4.25s`** post-revocation (5-run average; range: 3.97s - 4.34s).
 - **Engineering Mitigation**: Implemented **Authorization Versioning & Version-Aware Cache Validation** (`auth_version`). Replicas detect version mismatch and evict stale cache immediately.
-- **Experimental Re-Validation**: Re-running the experiment under mitigated mode demonstrates a **`100.0% reduction in exposure` (`0.00s` exposure)**.
+- **Experimental Re-Validation**: Re-running the experiment across 5 runs under mitigated mode demonstrates a **`100.0% reduction in observed exposure`** (no post-revocation ALLOW decisions observed within the 100ms measurement resolution).
 
-| Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Exposure | Engineering Outcome |
+| Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Replica Exposure | Engineering Outcome |
 | :--- | :---: | :---: | :--- |
-| **Vulnerable Baseline** | `4.05s` | `4.05s` | Stale cache exposure on Replica API-3 |
-| **Mitigated State** | **`0.00s`** | **`0.00s`** | **100.0% Reduction (0.00s Exposure)** |
+| **Vulnerable Baseline (5 Runs)** | `4.25s` (Std Dev: 0.16s) | `4.22s` | Stale cache exposure on Replica API-3 |
+| **Mitigated State (5 Runs)** | **`0.00s`** | **`0.00s`** | **100.0% Reduction (No ALLOW @ 100ms Res)** |
+
+> **Validation Level**: Level B — Multi-Process Distributed Application Validation (3 independent FastAPI process replicas over HTTP).
 
 ### Case Study Links & Artifacts
 
 - 📘 [**Full Case Study Documentation**](docs/real-world-case-study.md) — Comprehensive technical write-up & root cause analysis
 - 🧪 [**Vulnerable Evidence JSON**](experiments/employee_offboarding_case_study/vulnerable-results.json) — Per-replica probe logs & metrics under baseline
 - 🛡️ [**Mitigated Evidence JSON**](experiments/employee_offboarding_case_study/mitigated-results.json) — Per-replica timing logs under Authorization Versioning
-- 📊 [**Before vs After Comparison JSON**](experiments/employee_offboarding_case_study/comparison.json) — Structured before/after metrics summary
+- 📊 [**Before vs After Comparison JSON**](experiments/employee_offboarding_case_study/comparison.json) — Structured before/after metrics summary with reproducibility metadata
 
 ---
 

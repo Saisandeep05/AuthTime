@@ -87,6 +87,21 @@ def create_lab_replica_app(
     mitigation_state = {"enabled": False}
 
     async def _authorize_request(authorization: Optional[str], required_roles: List[str], resource_path: str) -> Dict[str, Any]:
+        """
+        Evaluates authorization for an incoming request against required roles.
+        
+        Token Semantics vs Authorization State:
+        - Cryptographic Authentication: `verify_access_token` verifies token signature, expiration (exp),
+          and structure. A cryptographically valid JWT proves WHO the caller is, but DOES NOT guarantee
+          their CURRENT authorization state.
+        - Dynamic Authorization: Checks current user role assignments and authorization version counters.
+        
+        Mitigation & Performance Tradeoffs:
+        - In Mitigation Mode (Authorization Versioning), token claims embed `auth_ver`. The replica validates
+          `token_auth_ver < auth_db_ver`. If a version mismatch occurs, stale cache entries are evicted instantly.
+        - Tradeoff Note: In high-scale production systems, authoritative version lookups are cached in a short-lived
+          version cache (1-5s TTL) or backed by low-latency version broadcast buses to preserve cache throughput.
+        """
         if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,

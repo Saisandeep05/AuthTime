@@ -1,11 +1,64 @@
 {
+  "experiment_metadata": {
+    "experiment_id": "exp-employee-offboarding-case-study",
+    "timestamp_utc": "2026-08-23T20:51:04.572528+00:00",
+    "git_commit": "df5c6e22ad875677aebaf70c3b6b366c7ba0a992",
+    "python_version": "3.12.10",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "probe_interval_ms": 100,
+    "replica_count": 3,
+    "measurement_resolution_ms": 100,
+    "validation_mode": "Level B \u2014 Multi-Process Distributed Application Validation",
+    "num_runs": 5
+  },
   "case_study": "Employee Offboarding Temporal Authorization Exposure",
   "user_id": "alice",
-  "vulnerable_max_exposure_sec": 4.046999999998661,
-  "vulnerable_mean_exposure_sec": 4.046999999998661,
-  "mitigated_max_exposure_sec": 0.0,
-  "mitigated_mean_exposure_sec": 0.0,
-  "exposure_reduction_percent": 100.0,
+  "revocation_trigger": "Demotion from Finance Admin to Employee",
+  "protected_endpoints": [
+    "/finance/payroll",
+    "/finance/payments",
+    "/finance/reports"
+  ],
+  "metrics": {
+    "vulnerable_max_exposure_sec": 4.247,
+    "vulnerable_mean_exposure_sec": 4.223,
+    "vulnerable_max_stats": {
+      "min": 3.968,
+      "max": 4.344,
+      "mean": 4.247,
+      "median": 4.312,
+      "std_dev": 0.157
+    },
+    "vulnerable_mean_stats": {
+      "min": 3.968,
+      "max": 4.328,
+      "mean": 4.223,
+      "median": 4.281,
+      "std_dev": 0.148
+    },
+    "mitigated_max_exposure_sec": 0.0,
+    "mitigated_mean_exposure_sec": 0.0,
+    "mitigated_max_stats": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "std_dev": 0.0
+    },
+    "mitigated_mean_stats": {
+      "min": 0.0,
+      "max": 0.0,
+      "mean": 0.0,
+      "median": 0.0,
+      "std_dev": 0.0
+    },
+    "exposure_reduction_percent": 100.0
+  },
+  "scientific_qualification": {
+    "observed_exposure_mitigated_sec": 0.0,
+    "measurement_resolution_ms": 100,
+    "qualification": "No post-revocation ALLOW decision was observed within the configured measurement resolution (100ms probe interval)."
+  },
   "mitigation_technique": "Authorization Versioning & Version-Aware Cache Validation",
   "validation_level": "Level B \u2014 Multi-Process Distributed Application Validation"
 }

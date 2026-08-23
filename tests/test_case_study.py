@@ -156,7 +156,56 @@ def test_scenario_generator_offboarding_scenario():
 
 def test_exposure_reduction_calculation():
     """Test before/after exposure reduction calculation logic."""
-    vuln_max = 4.05
+    vuln_max = 4.25
     mit_max = 0.00
     pct = ((vuln_max - mit_max) / vuln_max) * 100.0
     assert pct == 100.0
+
+
+@pytest.mark.asyncio
+async def test_mitigation_failure_modes(lab_components):
+    """Test mitigation behavior when token claims are missing or malformed."""
+    client = lab_components["client"]
+
+    # 1. Missing Authorization header
+    r_missing = client.get("/finance/payroll")
+    assert r_missing.status_code == 401
+    assert "Missing or malformed Authorization header" in r_missing.json()["detail"]
+
+    # 2. Malformed token string
+    r_malformed = client.get("/finance/payroll", headers={"Authorization": "Bearer invalid_token_str"})
+    assert r_malformed.status_code == 401
+
+
+def test_doc_and_json_metric_consistency():
+    """Verify that documentation markdown files contain metrics consistent with comparison.json."""
+    import json
+    import os
+
+    comp_path = "experiments/employee_offboarding_case_study/comparison.json"
+    doc_path = "docs/real-world-case-study.md"
+    readme_path = "README.md"
+
+    if not os.path.exists(comp_path):
+        pytest.skip("comparison.json evidence artifact not found.")
+
+    with open(comp_path, "r", encoding="utf-8") as f:
+        comp_data = json.load(f)
+
+    metrics = comp_data.get("metrics", {})
+    vuln_max = metrics.get("vulnerable_max_exposure_sec", 0.0)
+
+    # Read case study doc
+    with open(doc_path, "r", encoding="utf-8") as f:
+        doc_text = f.read()
+
+    # Verify that rounded vuln max exposure appears in documentation
+    vuln_str = f"{vuln_max:.2f}s"
+    assert vuln_str in doc_text, f"Expected {vuln_str} in {doc_path}"
+
+    # Read README
+    with open(readme_path, "r", encoding="utf-8") as f:
+        readme_text = f.read()
+
+    assert vuln_str in readme_text, f"Expected {vuln_str} in {readme_path}"
+
