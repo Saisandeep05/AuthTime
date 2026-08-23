@@ -1,0 +1,11 @@
+{
+  "case_study": "Employee Offboarding Temporal Authorization Exposure",
+  "user_id": "alice",
+  "vulnerable_max_exposure_sec": 4.046999999998661,
+  "vulnerable_mean_exposure_sec": 4.046999999998661,
+  "mitigated_max_exposure_sec": 0.0,
+  "mitigated_mean_exposure_sec": 0.0,
+  "exposure_reduction_percent": 100.0,
+  "mitigation_technique": "Authorization Versioning & Version-Aware Cache Validation",
+  "validation_level": "Level B \u2014 Multi-Process Distributed Application Validation"
+}

@@ -11,7 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
   <a href="#-safety-boundary--constraints"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
-  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-64%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
+  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-70%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
 </p>
 
 **Tech Stack**: `Python 3.12` • `FastAPI` • `PostgreSQL` • `Redis` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
@@ -20,6 +20,7 @@
 <summary><strong>📚 Table of Contents</strong> (Click to Expand)</summary>
 
 - [⚡ What You Get](#-what-you-get)
+- [💼 Real-World Case Study](#-real-world-problem-solving-case-study)
 - [📊 Explore Results](#-explore-results--sample-artifacts)
 - [🌐 Distributed Validation Lab](#-distributed-authorization-validation-laboratory)
 - [🎯 The Security Exposure Problem](#-the-security-exposure-problem)
@@ -44,8 +45,34 @@
 
 ---
 
+## 💼 Real-World Problem-Solving Case Study
+
+AuthTime includes an end-to-end enterprise case study modeling a real-world authorization failure during **Employee Offboarding**:
+
+### Enterprise Scenario: Employee Offboarding (Alice)
+- **Business Context**: Employee `alice` holds the `Finance Admin` role with access to `/finance/payroll`, `/finance/payments`, and `/finance/reports`.
+- **Revocation Event**: HR demotes `alice` to `Employee` at $t_0$ in the central database.
+- **Vulnerable Baseline**: Due to asynchronous cache invalidation lag and dropped pub/sub events, `API-3` continues allowing access for **`4.05s`** post-revocation.
+- **Engineering Mitigation**: Implemented **Authorization Versioning & Version-Aware Cache Validation** (`auth_version`). Replicas detect version mismatch and evict stale cache immediately.
+- **Experimental Re-Validation**: Re-running the experiment under mitigated mode demonstrates a **`100.0% reduction in exposure` (`0.00s` exposure)**.
+
+| Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Exposure | Engineering Outcome |
+| :--- | :---: | :---: | :--- |
+| **Vulnerable Baseline** | `4.05s` | `4.05s` | Stale cache exposure on Replica API-3 |
+| **Mitigated State** | **`0.00s`** | **`0.00s`** | **100.0% Reduction (0.00s Exposure)** |
+
+### Case Study Links & Artifacts
+
+- 📘 [**Full Case Study Documentation**](docs/real-world-case-study.md) — Comprehensive technical write-up & root cause analysis
+- 🧪 [**Vulnerable Evidence JSON**](experiments/employee_offboarding_case_study/vulnerable-results.json) — Per-replica probe logs & metrics under baseline
+- 🛡️ [**Mitigated Evidence JSON**](experiments/employee_offboarding_case_study/mitigated-results.json) — Per-replica timing logs under Authorization Versioning
+- 📊 [**Before vs After Comparison JSON**](experiments/employee_offboarding_case_study/comparison.json) — Structured before/after metrics summary
+
+---
+
 ## 📊 Explore Results & Sample Artifacts
 
+- 📘 [**Real-World Offboarding Case Study**](docs/real-world-case-study.md) — End-to-end offboarding failure & versioning fix
 - 📈 [**Interactive Visual Dashboard**](dashboard/index.html) — Timeline charts, probe markers, and audit logs
 - 🧪 [**Live Multi-Process Validation Results**](docs/distributed-validation-results.md) — Empirical evidence & scenario metrics
 - 📄 [**Sample Security Report (Markdown)**](reports/examples/sample_report.md) — Generated audit write-up
@@ -116,7 +143,7 @@ In our reference web application benchmark setup:
 
 ## ✅ Verified Project Status
 
-- **58 Automated Tests Passing (58 passed, 1 skipped cleanly)** across unit, integration, property fuzzing, and system CLI test suites.
+- **70 Automated Tests Passing (70 passed, 1 skipped cleanly)** across unit, integration, property fuzzing, system CLI, and case study test suites.
 - **Target Adapter Abstraction Layer** (`BaseTargetAdapter` / `HTTPTargetAdapter`) decoupling measurement orchestration from target web frameworks.
 - **Cryptographically Hardened SSF/CAEP Implementation** (HMAC-SHA256 & RS256 token verification, `jti` replay resistance with 300s TTL eviction).
 - **Forensic Audit Log Preservation** (`AUDIT_EVENTS` preserved across state reset cycles).

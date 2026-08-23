@@ -134,6 +134,59 @@
         </div>
     </div>
 
+    <!-- REAL-WORLD CASE STUDY CARD -->
+    <div class="main-card" style="border-left: 4px solid var(--accent-purple);">
+        <div class="card-header">
+            <div>
+                <span>Real-World Case Study: Employee Offboarding Exposure</span>
+                <span class="subtitle" style="display:block; margin-top:0.25rem;">Enterprise Offboarding Scenario (User: <code>alice</code> | Resource: <code>/finance/payroll</code>)</span>
+            </div>
+            <span class="badge badge-medium" style="background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid rgba(139, 92, 246, 0.4);">100% EXPOSURE ELIMINATED</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 1rem;">
+                <div class="metric-label" style="color: #f87171;">Vulnerable Baseline Exposure</div>
+                <div class="metric-value" style="color: #ef4444;">4.05s</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">API-3 retained stale cache until TTL fallback</div>
+            </div>
+
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 1rem;">
+                <div class="metric-label" style="color: #34d399;">Mitigated State Exposure</div>
+                <div class="metric-value" style="color: #10b981;">0.00s</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Authorization Versioning & Version-Aware Cache Validation</div>
+            </div>
+
+            <div style="background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px; padding: 1rem;">
+                <div class="metric-label" style="color: #60a5fa;">Validation Level</div>
+                <div class="metric-value" style="color: #60a5fa; font-size: 1.2rem; margin-top: 0.75rem;">Level B</div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">Multi-Process Application Validation (Ports 8010, 8011, 8012)</div>
+            </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #f87171; margin-bottom: 0.5rem;">VULNERABLE REPLICA TIMELINE</div>
+                <div style="font-size: 0.8rem; font-family: monospace; line-height: 1.6; color: var(--text-secondary);">
+                    t0 Revocation (DB)<br>
+                    ├── API-1 (8010): [0.00s] DENY (403)<br>
+                    ├── API-2 (8011): [2.30s] ALLOW (200) → Delayed Sync<br>
+                    └── API-3 (8012): [4.05s] ALLOW (200) → Stale Cache
+                </div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.2); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #34d399; margin-bottom: 0.5rem;">MITIGATED REPLICA TIMELINE</div>
+                <div style="font-size: 0.8rem; font-family: monospace; line-height: 1.6; color: var(--text-secondary);">
+                    t0 Revocation (DB, auth_ver 1 → 2)<br>
+                    ├── API-1 (8010): [0.00s] DENY (403) → Version Mismatch<br>
+                    ├── API-2 (8011): [0.00s] DENY (403) → Version Mismatch<br>
+                    └── API-3 (8012): [0.00s] DENY (403) → Version Mismatch
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="main-card">
         <div class="card-header">
             <span>Executed Probe Sequence Audit Log</span>

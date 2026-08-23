@@ -187,6 +187,7 @@ async def run_experiment(
 
 def main():
     parser = argparse.ArgumentParser(description="AuthTime — Main Engine Launcher")
+    parser.add_argument("--case-study", action="store_true", help="Run the real-world employee offboarding case study (vulnerable vs mitigated)")
     parser.add_argument("--demo", action="store_true", help="Run fast 10x accelerated demonstration mode (time_scale=0.1)")
     parser.add_argument("--main", action="store_true", help="Run full main engine mode (time_scale=1.0, default)")
     parser.add_argument("--fault-type", type=str, default="stale_cache", help="Fault scenario type")
@@ -196,6 +197,11 @@ def main():
     parser.add_argument("--no-wait", action="store_true", help="Exit immediately after experiment execution without keeping server process alive")
 
     args = parser.parse_args()
+
+    if args.case_study:
+        from scripts.run_case_study import main_async as run_cs
+        asyncio.run(run_cs())
+        return
 
     if args.demo:
         mode = "demo"

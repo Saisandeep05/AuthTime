@@ -18,8 +18,18 @@ class LabDatabase:
 
     def __init__(self, dsn: Optional[str] = None):
         self.dsn = dsn or os.getenv("POSTGRES_DSN", "postgresql://authtime:authtime123@127.0.0.1:5432/authtimedb")
-        self._users: Dict[str, str] = {"admin1": "Admin", "user1": "User", "svc1": "ServiceAccount"}
-        self._auth_versions: Dict[str, int] = {"admin1": 1, "user1": 1, "svc1": 1}
+        self._users: Dict[str, str] = {
+            "admin1": "Admin",
+            "alice": "Finance Admin",
+            "user1": "User",
+            "svc1": "ServiceAccount",
+        }
+        self._auth_versions: Dict[str, int] = {
+            "admin1": 1,
+            "alice": 1,
+            "user1": 1,
+            "svc1": 1,
+        }
         self._revocation_events: List[Dict[str, Any]] = []
         self._lock = asyncio.Lock()
         self._use_real_postgres = False
@@ -123,6 +133,16 @@ class LabDatabase:
     async def reset_database(self) -> None:
         """Reset database state to initial baseline."""
         async with self._lock:
-            self._users = {"admin1": "Admin", "user1": "User", "svc1": "ServiceAccount"}
-            self._auth_versions = {"admin1": 1, "user1": 1, "svc1": 1}
+            self._users = {
+                "admin1": "Admin",
+                "alice": "Finance Admin",
+                "user1": "User",
+                "svc1": "ServiceAccount",
+            }
+            self._auth_versions = {
+                "admin1": 1,
+                "alice": 1,
+                "user1": 1,
+                "svc1": 1,
+            }
             # Preserves _revocation_events for forensic audit trail

@@ -292,6 +292,20 @@ class DistributedLabAdapter(BaseTargetAdapter):
             if should_close:
                 await client.aclose()
 
+    async def configure_mitigation(self, enabled: bool = True) -> Dict[str, Any]:
+        client, should_close = await self._get_client()
+        try:
+            resp = await client.post(f"{self.target_url}/faults/configure-mitigation", json={"enabled": enabled})
+            if resp.status_code in (200, 201):
+                return resp.json()
+            return {"status": "MITIGATION_CONFIGURED", "enabled": enabled}
+        except Exception:
+            return {"status": "MITIGATION_SKIPPED"}
+        finally:
+            if should_close:
+                await client.aclose()
+
+
     async def probe_endpoint(
         self,
         resource_path: str,

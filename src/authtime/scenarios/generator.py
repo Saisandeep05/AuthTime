@@ -198,4 +198,24 @@ class ScenarioGenerator:
             )
             for ft in fault_types
         ]
+    @classmethod
+    def generate_employee_offboarding_scenario(
+        cls,
+        target_user_id: str = "alice",
+        resource_path: str = "/finance/payroll",
+        time_scale_factor: float = 1.0,
+    ) -> Scenario:
+        """
+        Generates realistic enterprise employee offboarding scenario for user 'alice'
+        probing protected finance resources after role demotion from Finance Admin to Employee.
+        """
+        scen = cls.generate_single_fault_scenario(
+            fault_type="stale_cache",
+            target_user_id=target_user_id,
+            resource_path=resource_path,
+            time_scale_factor=time_scale_factor,
+        )
+        scen.scenario_id = f"offboarding-{target_user_id}-{resource_path.strip('/').replace('/', '_')}"
+        return scen
+
 

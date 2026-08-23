@@ -84,8 +84,9 @@ def create_lab_replica_app(
             "replica_id": replica_id,
         }
 
-    @app.get("/admin/users")
-    async def get_admin_users(authorization: Optional[str] = Header(None)):
+    mitigation_state = {"enabled": False}
+
+    async def _authorize_request(authorization: Optional[str], required_roles: List[str], resource_path: str) -> Dict[str, Any]:
         if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -102,33 +103,70 @@ def create_lab_replica_app(
             )
 
         user_id = payload.get("sub", "admin1")
+        token_auth_ver = payload.get("auth_ver", 1)
 
-        # Step 1: Check Redis cache for this user and replica
-        cached = await cache_instance.get_cached_authorization(user_id, replica_id)
-        if cached:
-            role = cached["role"]
-            is_stale = cached.get("is_stale", False)
+        # In Mitigation Mode: Version-Aware Cache Validation
+        if mitigation_state["enabled"]:
+            auth_db_ver = await db_instance.get_auth_version(user_id)
+            cached = await cache_instance.get_cached_authorization(user_id, replica_id)
+            cached_ver = cached.get("auth_version", 1) if cached else 1
+
+            if token_auth_ver < auth_db_ver or cached_ver < auth_db_ver:
+                # Version mismatch detected -> Evict stale cache entry immediately
+                await cache_instance.invalidate_user(user_id, "Evicted", auth_db_ver, [replica_id])
+                role = await db_instance.get_user_role(user_id)
+                await cache_instance.set_cached_authorization(user_id, role, auth_db_ver, replica_id)
+                is_stale = False
+            elif cached:
+                role = cached["role"]
+                is_stale = False
+            else:
+                role = await db_instance.get_user_role(user_id)
+                await cache_instance.set_cached_authorization(user_id, role, auth_db_ver, replica_id)
+                is_stale = False
         else:
-            # Step 2: Cache miss -> Query authoritative PostgreSQL database
-            role = await db_instance.get_user_role(user_id)
-            auth_ver = await db_instance.get_auth_version(user_id)
-            await cache_instance.set_cached_authorization(user_id, role, auth_ver, replica_id)
-            is_stale = False
+            # Vulnerable Mode: Normal cache lookup (subject to stale cache / delayed propagation / dropped events)
+            cached = await cache_instance.get_cached_authorization(user_id, replica_id)
+            if cached:
+                role = cached["role"]
+                is_stale = cached.get("is_stale", False)
+            else:
+                role = await db_instance.get_user_role(user_id)
+                auth_ver = await db_instance.get_auth_version(user_id)
+                await cache_instance.set_cached_authorization(user_id, role, auth_ver, replica_id)
+                is_stale = False
 
-        if role == "Admin":
+        if role in required_roles:
             return {
                 "status": "ALLOW",
                 "user_id": user_id,
                 "role": role,
                 "is_stale": is_stale,
                 "replica_id": replica_id,
+                "resource_path": resource_path,
                 "timestamp_monotonic": time.monotonic(),
             }
         else:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Forbidden: Requires Admin role (current role: {role})",
+                detail=f"Forbidden: Requires {required_roles} role (current role: {role})",
             )
+
+    @app.get("/admin/users")
+    async def get_admin_users(authorization: Optional[str] = Header(None)):
+        return await _authorize_request(authorization, ["Admin"], "/admin/users")
+
+    @app.get("/finance/payroll")
+    async def get_finance_payroll(authorization: Optional[str] = Header(None)):
+        return await _authorize_request(authorization, ["Finance Admin", "Admin"], "/finance/payroll")
+
+    @app.get("/finance/payments")
+    async def get_finance_payments(authorization: Optional[str] = Header(None)):
+        return await _authorize_request(authorization, ["Finance Admin", "Admin"], "/finance/payments")
+
+    @app.get("/finance/reports")
+    async def get_finance_reports(authorization: Optional[str] = Header(None)):
+        return await _authorize_request(authorization, ["Finance Admin", "Admin"], "/finance/reports")
 
     peer_ports = [8010, 8011, 8012]
 
@@ -176,10 +214,24 @@ def create_lab_replica_app(
             "ttl_sec": req.ttl_sec,
         }
 
+    @app.post("/faults/configure-mitigation")
+    async def configure_mitigation(req: Dict[str, Any], broadcast: bool = True):
+        mitigation_state["enabled"] = req.get("enabled", True)
+
+        if broadcast:
+            await _broadcast_to_peers("/faults/configure-mitigation", req)
+
+        return {
+            "status": "MITIGATION_CONFIGURED",
+            "enabled": mitigation_state["enabled"],
+            "replica_id": replica_id,
+        }
+
     @app.post("/reset")
     async def reset(broadcast: bool = True):
         await db_instance.reset_database()
         await cache_instance.clear_cache()
+        mitigation_state["enabled"] = False
 
         if broadcast:
             import httpx

@@ -1,0 +1,1202 @@
+[
+  {
+    "probe_index": 0,
+    "timestamp_monotonic": 36498.671,
+    "dt_since_revocation_sec": 0.28100000000267755,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 0,
+    "timestamp_monotonic": 36498.671,
+    "dt_since_revocation_sec": 0.28100000000267755,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 0,
+    "timestamp_monotonic": 36498.671,
+    "dt_since_revocation_sec": 0.28100000000267755,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 1,
+    "timestamp_monotonic": 36499.031,
+    "dt_since_revocation_sec": 0.6410000000032596,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 1,
+    "timestamp_monotonic": 36499.031,
+    "dt_since_revocation_sec": 0.6410000000032596,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 1,
+    "timestamp_monotonic": 36499.031,
+    "dt_since_revocation_sec": 0.6410000000032596,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 2,
+    "timestamp_monotonic": 36499.406,
+    "dt_since_revocation_sec": 1.0160000000032596,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 2,
+    "timestamp_monotonic": 36499.406,
+    "dt_since_revocation_sec": 1.0160000000032596,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 2,
+    "timestamp_monotonic": 36499.406,
+    "dt_since_revocation_sec": 1.0160000000032596,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 3,
+    "timestamp_monotonic": 36499.796,
+    "dt_since_revocation_sec": 1.4060000000026776,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 3,
+    "timestamp_monotonic": 36499.796,
+    "dt_since_revocation_sec": 1.4060000000026776,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 3,
+    "timestamp_monotonic": 36499.796,
+    "dt_since_revocation_sec": 1.4060000000026776,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 4,
+    "timestamp_monotonic": 36500.171,
+    "dt_since_revocation_sec": 1.7810000000026776,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 4,
+    "timestamp_monotonic": 36500.171,
+    "dt_since_revocation_sec": 1.7810000000026776,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 4,
+    "timestamp_monotonic": 36500.171,
+    "dt_since_revocation_sec": 1.7810000000026776,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 5,
+    "timestamp_monotonic": 36500.546,
+    "dt_since_revocation_sec": 2.1560000000026776,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 5,
+    "timestamp_monotonic": 36500.546,
+    "dt_since_revocation_sec": 2.1560000000026776,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 5,
+    "timestamp_monotonic": 36500.546,
+    "dt_since_revocation_sec": 2.1560000000026776,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 6,
+    "timestamp_monotonic": 36500.906,
+    "dt_since_revocation_sec": 2.5160000000032596,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 6,
+    "timestamp_monotonic": 36500.906,
+    "dt_since_revocation_sec": 2.5160000000032596,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 6,
+    "timestamp_monotonic": 36500.906,
+    "dt_since_revocation_sec": 2.5160000000032596,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 7,
+    "timestamp_monotonic": 36501.281,
+    "dt_since_revocation_sec": 2.8910000000032596,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 7,
+    "timestamp_monotonic": 36501.281,
+    "dt_since_revocation_sec": 2.8910000000032596,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 7,
+    "timestamp_monotonic": 36501.281,
+    "dt_since_revocation_sec": 2.8910000000032596,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 8,
+    "timestamp_monotonic": 36501.656,
+    "dt_since_revocation_sec": 3.2660000000032596,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 8,
+    "timestamp_monotonic": 36501.656,
+    "dt_since_revocation_sec": 3.2660000000032596,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 8,
+    "timestamp_monotonic": 36501.656,
+    "dt_since_revocation_sec": 3.2660000000032596,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 9,
+    "timestamp_monotonic": 36502.046,
+    "dt_since_revocation_sec": 3.6560000000026776,
+    "replica_id": "api-1",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 9,
+    "timestamp_monotonic": 36502.046,
+    "dt_since_revocation_sec": 3.6560000000026776,
+    "replica_id": "api-2",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 9,
+    "timestamp_monotonic": 36502.046,
+    "dt_since_revocation_sec": 3.6560000000026776,
+    "replica_id": "api-3",
+    "status_code": 200,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 10,
+    "timestamp_monotonic": 36502.437,
+    "dt_since_revocation_sec": 4.046999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 10,
+    "timestamp_monotonic": 36502.437,
+    "dt_since_revocation_sec": 4.046999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 10,
+    "timestamp_monotonic": 36502.437,
+    "dt_since_revocation_sec": 4.046999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 11,
+    "timestamp_monotonic": 36502.812,
+    "dt_since_revocation_sec": 4.421999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 11,
+    "timestamp_monotonic": 36502.812,
+    "dt_since_revocation_sec": 4.421999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 11,
+    "timestamp_monotonic": 36502.812,
+    "dt_since_revocation_sec": 4.421999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 12,
+    "timestamp_monotonic": 36503.187,
+    "dt_since_revocation_sec": 4.796999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 12,
+    "timestamp_monotonic": 36503.187,
+    "dt_since_revocation_sec": 4.796999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 12,
+    "timestamp_monotonic": 36503.187,
+    "dt_since_revocation_sec": 4.796999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 13,
+    "timestamp_monotonic": 36503.562,
+    "dt_since_revocation_sec": 5.171999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 13,
+    "timestamp_monotonic": 36503.562,
+    "dt_since_revocation_sec": 5.171999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 13,
+    "timestamp_monotonic": 36503.562,
+    "dt_since_revocation_sec": 5.171999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 14,
+    "timestamp_monotonic": 36503.937,
+    "dt_since_revocation_sec": 5.546999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 14,
+    "timestamp_monotonic": 36503.937,
+    "dt_since_revocation_sec": 5.546999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 14,
+    "timestamp_monotonic": 36503.937,
+    "dt_since_revocation_sec": 5.546999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 15,
+    "timestamp_monotonic": 36504.312,
+    "dt_since_revocation_sec": 5.921999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 15,
+    "timestamp_monotonic": 36504.312,
+    "dt_since_revocation_sec": 5.921999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 15,
+    "timestamp_monotonic": 36504.312,
+    "dt_since_revocation_sec": 5.921999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 16,
+    "timestamp_monotonic": 36504.687,
+    "dt_since_revocation_sec": 6.296999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 16,
+    "timestamp_monotonic": 36504.687,
+    "dt_since_revocation_sec": 6.296999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 16,
+    "timestamp_monotonic": 36504.687,
+    "dt_since_revocation_sec": 6.296999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 17,
+    "timestamp_monotonic": 36505.062,
+    "dt_since_revocation_sec": 6.671999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 17,
+    "timestamp_monotonic": 36505.062,
+    "dt_since_revocation_sec": 6.671999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 17,
+    "timestamp_monotonic": 36505.062,
+    "dt_since_revocation_sec": 6.671999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 18,
+    "timestamp_monotonic": 36505.437,
+    "dt_since_revocation_sec": 7.046999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 18,
+    "timestamp_monotonic": 36505.437,
+    "dt_since_revocation_sec": 7.046999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 18,
+    "timestamp_monotonic": 36505.437,
+    "dt_since_revocation_sec": 7.046999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 19,
+    "timestamp_monotonic": 36505.812,
+    "dt_since_revocation_sec": 7.421999999998661,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 19,
+    "timestamp_monotonic": 36505.812,
+    "dt_since_revocation_sec": 7.421999999998661,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 19,
+    "timestamp_monotonic": 36505.812,
+    "dt_since_revocation_sec": 7.421999999998661,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 20,
+    "timestamp_monotonic": 36506.203,
+    "dt_since_revocation_sec": 7.813000000001921,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 20,
+    "timestamp_monotonic": 36506.203,
+    "dt_since_revocation_sec": 7.813000000001921,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 20,
+    "timestamp_monotonic": 36506.203,
+    "dt_since_revocation_sec": 7.813000000001921,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 21,
+    "timestamp_monotonic": 36506.578,
+    "dt_since_revocation_sec": 8.18800000000192,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 21,
+    "timestamp_monotonic": 36506.578,
+    "dt_since_revocation_sec": 8.18800000000192,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 21,
+    "timestamp_monotonic": 36506.578,
+    "dt_since_revocation_sec": 8.18800000000192,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 22,
+    "timestamp_monotonic": 36506.953,
+    "dt_since_revocation_sec": 8.56300000000192,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 22,
+    "timestamp_monotonic": 36506.953,
+    "dt_since_revocation_sec": 8.56300000000192,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 22,
+    "timestamp_monotonic": 36506.953,
+    "dt_since_revocation_sec": 8.56300000000192,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 23,
+    "timestamp_monotonic": 36507.328,
+    "dt_since_revocation_sec": 8.93800000000192,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 23,
+    "timestamp_monotonic": 36507.328,
+    "dt_since_revocation_sec": 8.93800000000192,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 23,
+    "timestamp_monotonic": 36507.328,
+    "dt_since_revocation_sec": 8.93800000000192,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 24,
+    "timestamp_monotonic": 36507.703,
+    "dt_since_revocation_sec": 9.31300000000192,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 24,
+    "timestamp_monotonic": 36507.703,
+    "dt_since_revocation_sec": 9.31300000000192,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 24,
+    "timestamp_monotonic": 36507.703,
+    "dt_since_revocation_sec": 9.31300000000192,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 25,
+    "timestamp_monotonic": 36508.109,
+    "dt_since_revocation_sec": 9.718999999997322,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 25,
+    "timestamp_monotonic": 36508.109,
+    "dt_since_revocation_sec": 9.718999999997322,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 25,
+    "timestamp_monotonic": 36508.109,
+    "dt_since_revocation_sec": 9.718999999997322,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 26,
+    "timestamp_monotonic": 36508.484,
+    "dt_since_revocation_sec": 10.093999999997322,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 26,
+    "timestamp_monotonic": 36508.484,
+    "dt_since_revocation_sec": 10.093999999997322,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 26,
+    "timestamp_monotonic": 36508.484,
+    "dt_since_revocation_sec": 10.093999999997322,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 27,
+    "timestamp_monotonic": 36508.859,
+    "dt_since_revocation_sec": 10.468999999997322,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 27,
+    "timestamp_monotonic": 36508.859,
+    "dt_since_revocation_sec": 10.468999999997322,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 27,
+    "timestamp_monotonic": 36508.859,
+    "dt_since_revocation_sec": 10.468999999997322,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 28,
+    "timestamp_monotonic": 36509.25,
+    "dt_since_revocation_sec": 10.860000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 28,
+    "timestamp_monotonic": 36509.25,
+    "dt_since_revocation_sec": 10.860000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 28,
+    "timestamp_monotonic": 36509.25,
+    "dt_since_revocation_sec": 10.860000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 29,
+    "timestamp_monotonic": 36509.625,
+    "dt_since_revocation_sec": 11.235000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 29,
+    "timestamp_monotonic": 36509.625,
+    "dt_since_revocation_sec": 11.235000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 29,
+    "timestamp_monotonic": 36509.625,
+    "dt_since_revocation_sec": 11.235000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 30,
+    "timestamp_monotonic": 36510.0,
+    "dt_since_revocation_sec": 11.610000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 30,
+    "timestamp_monotonic": 36510.0,
+    "dt_since_revocation_sec": 11.610000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 30,
+    "timestamp_monotonic": 36510.0,
+    "dt_since_revocation_sec": 11.610000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 31,
+    "timestamp_monotonic": 36510.375,
+    "dt_since_revocation_sec": 11.985000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 31,
+    "timestamp_monotonic": 36510.375,
+    "dt_since_revocation_sec": 11.985000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 31,
+    "timestamp_monotonic": 36510.375,
+    "dt_since_revocation_sec": 11.985000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 32,
+    "timestamp_monotonic": 36510.75,
+    "dt_since_revocation_sec": 12.360000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 32,
+    "timestamp_monotonic": 36510.75,
+    "dt_since_revocation_sec": 12.360000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 32,
+    "timestamp_monotonic": 36510.75,
+    "dt_since_revocation_sec": 12.360000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 33,
+    "timestamp_monotonic": 36511.125,
+    "dt_since_revocation_sec": 12.735000000000582,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 33,
+    "timestamp_monotonic": 36511.125,
+    "dt_since_revocation_sec": 12.735000000000582,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 33,
+    "timestamp_monotonic": 36511.125,
+    "dt_since_revocation_sec": 12.735000000000582,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 34,
+    "timestamp_monotonic": 36511.515,
+    "dt_since_revocation_sec": 13.125,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 34,
+    "timestamp_monotonic": 36511.515,
+    "dt_since_revocation_sec": 13.125,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 34,
+    "timestamp_monotonic": 36511.515,
+    "dt_since_revocation_sec": 13.125,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 35,
+    "timestamp_monotonic": 36511.89,
+    "dt_since_revocation_sec": 13.5,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 35,
+    "timestamp_monotonic": 36511.89,
+    "dt_since_revocation_sec": 13.5,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 35,
+    "timestamp_monotonic": 36511.89,
+    "dt_since_revocation_sec": 13.5,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 36,
+    "timestamp_monotonic": 36512.265,
+    "dt_since_revocation_sec": 13.875,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 36,
+    "timestamp_monotonic": 36512.265,
+    "dt_since_revocation_sec": 13.875,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 36,
+    "timestamp_monotonic": 36512.265,
+    "dt_since_revocation_sec": 13.875,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 37,
+    "timestamp_monotonic": 36512.64,
+    "dt_since_revocation_sec": 14.25,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 37,
+    "timestamp_monotonic": 36512.64,
+    "dt_since_revocation_sec": 14.25,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 37,
+    "timestamp_monotonic": 36512.64,
+    "dt_since_revocation_sec": 14.25,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 38,
+    "timestamp_monotonic": 36513.031,
+    "dt_since_revocation_sec": 14.64100000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 38,
+    "timestamp_monotonic": 36513.031,
+    "dt_since_revocation_sec": 14.64100000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 38,
+    "timestamp_monotonic": 36513.031,
+    "dt_since_revocation_sec": 14.64100000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 39,
+    "timestamp_monotonic": 36513.406,
+    "dt_since_revocation_sec": 15.01600000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 39,
+    "timestamp_monotonic": 36513.406,
+    "dt_since_revocation_sec": 15.01600000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 39,
+    "timestamp_monotonic": 36513.406,
+    "dt_since_revocation_sec": 15.01600000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 40,
+    "timestamp_monotonic": 36513.781,
+    "dt_since_revocation_sec": 15.39100000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 40,
+    "timestamp_monotonic": 36513.781,
+    "dt_since_revocation_sec": 15.39100000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 40,
+    "timestamp_monotonic": 36513.781,
+    "dt_since_revocation_sec": 15.39100000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 41,
+    "timestamp_monotonic": 36514.156,
+    "dt_since_revocation_sec": 15.76600000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 41,
+    "timestamp_monotonic": 36514.156,
+    "dt_since_revocation_sec": 15.76600000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 41,
+    "timestamp_monotonic": 36514.156,
+    "dt_since_revocation_sec": 15.76600000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 42,
+    "timestamp_monotonic": 36514.531,
+    "dt_since_revocation_sec": 16.14100000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 42,
+    "timestamp_monotonic": 36514.531,
+    "dt_since_revocation_sec": 16.14100000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 42,
+    "timestamp_monotonic": 36514.531,
+    "dt_since_revocation_sec": 16.14100000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 43,
+    "timestamp_monotonic": 36514.906,
+    "dt_since_revocation_sec": 16.51600000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 43,
+    "timestamp_monotonic": 36514.906,
+    "dt_since_revocation_sec": 16.51600000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 43,
+    "timestamp_monotonic": 36514.906,
+    "dt_since_revocation_sec": 16.51600000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 44,
+    "timestamp_monotonic": 36515.281,
+    "dt_since_revocation_sec": 16.89100000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 44,
+    "timestamp_monotonic": 36515.281,
+    "dt_since_revocation_sec": 16.89100000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 44,
+    "timestamp_monotonic": 36515.281,
+    "dt_since_revocation_sec": 16.89100000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 45,
+    "timestamp_monotonic": 36515.656,
+    "dt_since_revocation_sec": 17.26600000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 45,
+    "timestamp_monotonic": 36515.656,
+    "dt_since_revocation_sec": 17.26600000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 45,
+    "timestamp_monotonic": 36515.656,
+    "dt_since_revocation_sec": 17.26600000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 46,
+    "timestamp_monotonic": 36516.031,
+    "dt_since_revocation_sec": 17.64100000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 46,
+    "timestamp_monotonic": 36516.031,
+    "dt_since_revocation_sec": 17.64100000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 16.0
+  },
+  {
+    "probe_index": 46,
+    "timestamp_monotonic": 36516.031,
+    "dt_since_revocation_sec": 17.64100000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 47,
+    "timestamp_monotonic": 36516.406,
+    "dt_since_revocation_sec": 18.01600000000326,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 47,
+    "timestamp_monotonic": 36516.406,
+    "dt_since_revocation_sec": 18.01600000000326,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 47,
+    "timestamp_monotonic": 36516.406,
+    "dt_since_revocation_sec": 18.01600000000326,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 48,
+    "timestamp_monotonic": 36516.812,
+    "dt_since_revocation_sec": 18.42199999999866,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 48,
+    "timestamp_monotonic": 36516.812,
+    "dt_since_revocation_sec": 18.42199999999866,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 48,
+    "timestamp_monotonic": 36516.812,
+    "dt_since_revocation_sec": 18.42199999999866,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 49,
+    "timestamp_monotonic": 36517.203,
+    "dt_since_revocation_sec": 18.81300000000192,
+    "replica_id": "api-1",
+    "status_code": 403,
+    "latency_ms": 15.0
+  },
+  {
+    "probe_index": 49,
+    "timestamp_monotonic": 36517.203,
+    "dt_since_revocation_sec": 18.81300000000192,
+    "replica_id": "api-2",
+    "status_code": 403,
+    "latency_ms": 0.0
+  },
+  {
+    "probe_index": 49,
+    "timestamp_monotonic": 36517.203,
+    "dt_since_revocation_sec": 18.81300000000192,
+    "replica_id": "api-3",
+    "status_code": 403,
+    "latency_ms": 0.0
+  }
+]
