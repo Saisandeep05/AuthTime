@@ -155,3 +155,47 @@ class ScenarioGenerator:
             probes=probes,
             time_scale_factor=time_scale_factor,
         )
+
+    @classmethod
+    def generate_distributed_lab_scenario(
+        cls,
+        fault_type: str = "DELAYED_INVALIDATION",
+        target_user_id: str = "admin1",
+        resource_path: str = "/admin/users",
+        time_scale_factor: float = 1.0,
+    ) -> Scenario:
+        """
+        Generates distributed multi-replica authorization validation laboratory scenario.
+        Scenarios: 'NO_FAULT', 'STALE_CACHE', 'DELAYED_INVALIDATION', 'PARTIAL_PROPAGATION', 'DROPPED_EVENT', 'REDIS_UNAVAILABLE'
+        """
+        scen = cls.generate_single_fault_scenario(
+            fault_type=fault_type.lower(),
+            target_user_id=target_user_id,
+            resource_path=resource_path,
+            time_scale_factor=time_scale_factor,
+        )
+        scen.scenario_id = f"dist-lab-{fault_type.lower()}-{target_user_id}"
+        return scen
+
+    @classmethod
+    def generate_all_distributed_lab_scenarios(
+        cls,
+        target_user_id: str = "admin1",
+    ) -> List[Scenario]:
+        """Returns suite of all 6 real-world distributed authorization laboratory scenarios."""
+        fault_types = [
+            "NO_FAULT",
+            "STALE_CACHE",
+            "DELAYED_INVALIDATION",
+            "PARTIAL_PROPAGATION",
+            "DROPPED_EVENT",
+            "REDIS_UNAVAILABLE",
+        ]
+        return [
+            cls.generate_distributed_lab_scenario(
+                fault_type=ft,
+                target_user_id=target_user_id,
+            )
+            for ft in fault_types
+        ]
+

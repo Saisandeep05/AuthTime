@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  lab-postgres:
+    image: postgres:16-alpine
+    container_name: authtime-lab-postgres
+    environment:
+      POSTGRES_USER: authtime
+      POSTGRES_PASSWORD: authtime123
+      POSTGRES_DB: authtimedb
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - ./targets/distributed_lab/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authtime -d authtimedb"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  lab-redis:
+    image: redis:7-alpine
+    container_name: authtime-lab-redis
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  lab-api-1:
+    build:
+      context: .
+      dockerfile: Dockerfile.lab
+    container_name: authtime-lab-api-1
+    environment:
+      REPLICA_ID: api-1
+      PORT: 8010
+      HOST: "0.0.0.0"
+      POSTGRES_DSN: "postgresql://authtime:authtime123@lab-postgres:5432/authtimedb"
+      REDIS_HOST: "lab-redis"
+      REDIS_PORT: 6379
+      JWT_SECRET: "authtime-lab-shared-jwt-secret-key-32bytes!"
+    ports:
+      - "127.0.0.1:8010:8010"
+    depends_on:
+      lab-postgres:
+        condition: service_healthy
+      lab-redis:
+        condition: service_healthy
+
+  lab-api-2:
+    build:
+      context: .
+      dockerfile: Dockerfile.lab
+    container_name: authtime-lab-api-2
+    environment:
+      REPLICA_ID: api-2
+      PORT: 8011
+      HOST: "0.0.0.0"
+      POSTGRES_DSN: "postgresql://authtime:authtime123@lab-postgres:5432/authtimedb"
+      REDIS_HOST: "lab-redis"
+      REDIS_PORT: 6379
+      JWT_SECRET: "authtime-lab-shared-jwt-secret-key-32bytes!"
+    ports:
+      - "127.0.0.1:8011:8011"
+    depends_on:
+      lab-postgres:
+        condition: service_healthy
+      lab-redis:
+        condition: service_healthy
+
+  lab-api-3:
+    build:
+      context: .
+      dockerfile: Dockerfile.lab
+    container_name: authtime-lab-api-3
+    environment:
+      REPLICA_ID: api-3
+      PORT: 8012
+      HOST: "0.0.0.0"
+      POSTGRES_DSN: "postgresql://authtime:authtime123@lab-postgres:5432/authtimedb"
+      REDIS_HOST: "lab-redis"
+      REDIS_PORT: 6379
+      JWT_SECRET: "authtime-lab-shared-jwt-secret-key-32bytes!"
+    ports:
+      - "127.0.0.1:8012:8012"
+    depends_on:
+      lab-postgres:
+        condition: service_healthy
+      lab-redis:
+        condition: service_healthy
