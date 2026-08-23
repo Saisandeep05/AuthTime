@@ -112,7 +112,7 @@ def create_lab_replica_app(
             # Step 2: Cache miss -> Query authoritative PostgreSQL database
             role = await db_instance.get_user_role(user_id)
             auth_ver = await db_instance.get_auth_version(user_id)
-            await cache_instance.set_cached_authorization(user_id, role, auth_ver)
+            await cache_instance.set_cached_authorization(user_id, role, auth_ver, replica_id)
             is_stale = False
 
         if role == "Admin":
