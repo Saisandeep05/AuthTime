@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuthTime Security Verification Report - FIND-EXP-DEMO-1787410614-3</title>
+    <title>AuthTime Security Verification Report - FIND-EXP-MAIN-1787422312-3</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 900px; margin: 0 auto; padding: 2rem 1rem; background-color: #f8f9fa; }
         .card { background: #ffffff; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); margin-bottom: 1.5rem; border: 1px solid #e9ecef; }
@@ -36,14 +36,14 @@
     <div class="card">
         <h2>Exposure Window Metrics</h2>
         <table>
-            <tr><th>Revocation Timestamp (t_fault)</th><td><code>17503.671s</code></td></tr>
-            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>17503.671s</code></td></tr>
-            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>17509.671s</code></td></tr>
+            <tr><th>Revocation Timestamp (t_fault)</th><td><code>29201.921s</code></td></tr>
+            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>29201.921s</code></td></tr>
+            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>29207.921s</code></td></tr>
             <tr><th>First Blocked Access (t_first_block)</th><td><code>0.000s</code></td></tr>
             <tr><th>Exposure Interval</th><td><code>[6.00s, 6.00s]</code></td></tr>
             <tr><th>Estimated Exposure Window</th><td><strong><code>6.00s</code></strong></td></tr>
             <tr><th>Measurement Precision</th><td><code>±0.00s</code></td></tr>
-            <tr><th>Scheduler Jitter</th><td><code>13.60ms</code></td></tr>
+            <tr><th>Scheduler Jitter</th><td><code>12.80ms</code></td></tr>
         </table>
         
         
@@ -52,8 +52,8 @@
             <ul>
                 <li><strong>Minimum Exposure:</strong> <code>4.51s</code></li>
                 <li><strong>Maximum Exposure:</strong> <code>6.00s</code></li>
-                <li><strong>Mean Exposure (µ):</strong> <code>5.50s</code></li>
-                <li><strong>Median Exposure (x̃):</strong> <code>6.00s</code></li>
+                <li><strong>Mean Exposure (µ):</strong> <code>5.00s</code></li>
+                <li><strong>Median Exposure (x̃):</strong> <code>4.51s</code></li>
                 <li><strong>Standard Deviation (σ):</strong> <code>0.86s</code></li>
                 <li><strong>95th Percentile (P95):</strong> <code>6.00s</code></li>
             </ul>
@@ -70,7 +70,7 @@
     <div class="card">
         <h2>Reproduction & PoC Script</h2>
         <pre><code>curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users</code></pre>
-        <p>Standalone Python PoC: <code>reports/poc/EXP-DEMO-1787410614-3_poc.py</code></p>
+        <p>Standalone Python PoC: <code>reports/poc/EXP-MAIN-1787422312-3_poc.py</code></p>
     </div>
 </body>
 </html>

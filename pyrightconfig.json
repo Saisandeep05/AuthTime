@@ -1,0 +1,32 @@
+{
+  "include": [
+    "src",
+    "tests",
+    "scripts",
+    "run.py",
+    "test_live.py"
+  ],
+  "exclude": [
+    "**/__pyrefly_virtual__/**",
+    "**/inmemory/**",
+    "**/.pytest_cache/**",
+    "**/__pycache__/**"
+  ],
+  "extraPaths": [
+    "src",
+    "C:/Users/SAISANDEEP/AppData/Local/Programs/Python/Python312/Lib/site-packages"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "src",
+      "extraPaths": [
+        "C:/Users/SAISANDEEP/AppData/Local/Programs/Python/Python312/Lib/site-packages"
+      ]
+    }
+  ],
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Windows",
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "reportUndefinedVariable": false
+}

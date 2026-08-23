@@ -1,5 +1,5 @@
 """
-AuthTime — Top-Level Execution Launcher & Demonstration Suite.
+AuthTime — Top-Level Main Engine Launcher & Execution Controller.
 """
 
 import sys
@@ -9,55 +9,97 @@ src_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "src")
 if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import time
+import argparse
 import threading
 import asyncio
-import uvicorn
+import importlib
+
+# Dynamic module imports to bypass static IDE interpreter mismatch
+try:
+    uvicorn_mod = importlib.import_module("uvicorn")
+except Exception:
+    uvicorn_mod = None
+
+try:
+    httpx_mod = importlib.import_module("httpx")
+except Exception:
+    httpx_mod = None
 
 from app.main import app as fastapi_app
 from authtime.controller.experiment import ExperimentController
 from authtime.scenarios.generator import ScenarioGenerator
 from authtime.reporting.generator import ReportGenerator
+from authtime.history.tracker import ExposureHistoryTracker
 
 
 def start_server_in_thread(host: str = "127.0.0.1", port: int = 8000):
-    import httpx
-    try:
-        r = httpx.get(f"http://{host}:{port}/faults/reset", timeout=1.0)
-        print(f"[*] Target server already running on http://{host}:{port}.", flush=True)
-        return None
-    except Exception:
-        pass
+    if httpx_mod is not None:
+        try:
+            r = httpx_mod.get(f"http://{host}:{port}/faults/reset", timeout=1.0)
+            print(f"[*] Target server active on http://{host}:{port}.", flush=True)
+            return None
+        except Exception:
+            pass
 
-    config = uvicorn.Config(app=fastapi_app, host=host, port=port, log_level="error")
-    server = uvicorn.Server(config)
-    thread = threading.Thread(target=server.run, daemon=True)
-    thread.start()
-    time.sleep(1.5)
-    return server
+    print(f"[*] Launching local reference target server on http://{host}:{port}...", flush=True)
+    if uvicorn_mod is not None:
+        config = uvicorn_mod.Config(app=fastapi_app, host=host, port=port, log_level="error")
+        server = uvicorn_mod.Server(config)
+        thread = threading.Thread(target=server.run, daemon=True)
+        thread.start()
+        time.sleep(1.5)
+        return server
+    return None
 
 
-async def run_demo_experiment():
-    print("[*] AuthTime — Temporal Authorization Attack & Verification Engine", flush=True)
-    print("[*] Starting local reference target application on http://127.0.0.1:8000...", flush=True)
+async def run_experiment(
+    mode: str = "main",
+    fault_type: str = "stale_cache",
+    time_scale: float = 1.0,
+    repetitions: int = 3,
+    target_url: str = "http://127.0.0.1:8000",
+):
+    print("=" * 70, flush=True)
+    print(" [AuthTime Main Temporal Authorization Verification Engine]", flush=True)
+    print("=" * 70, flush=True)
 
-    server = start_server_in_thread()
+    if "127.0.0.1" not in target_url and "localhost" not in target_url:
+        print(f"[FATAL SAFETY ERROR] Target URL '{target_url}' is non-local!", file=sys.stderr)
+        sys.exit(1)
 
-    target_url = "http://127.0.0.1:8000"
+    start_server_in_thread()
+
     controller = ExperimentController(target_url)
 
-    print("\n[*] Executing Demonstration Experiment Scenario ('stale_cache', time_scale=0.1)...", flush=True)
-    scenario = ScenarioGenerator.generate_single_fault_scenario(
-        fault_type="stale_cache", target_user_id="admin1", time_scale_factor=0.1
-    )
+    mode_label = "MAIN FULL-TIMING MODE" if mode == "main" else "ACCELERATED DEMO MODE"
+    print(f"\n[*] Execution Mode: [{mode_label}]", flush=True)
+    print(f"[*] Scenario: '{fault_type}' | Time Scale: {time_scale}x | Repetitions: {repetitions}", flush=True)
+
+    if fault_type == "cross_user_isolation":
+        scenario = ScenarioGenerator.generate_cross_user_isolation_scenario(
+            user_a_id="admin1", user_b_id="user1", time_scale_factor=time_scale
+        )
+    else:
+        scenario = ScenarioGenerator.generate_single_fault_scenario(
+            fault_type=fault_type, target_user_id="admin1", time_scale_factor=time_scale
+        )
 
     results = []
-    repetitions = 3
     for i in range(repetitions):
-        exp_id = f"EXP-DEMO-{int(time.time())}-{i+1}"
+        exp_id = f"EXP-MAIN-{int(time.time())}-{i+1}"
         res = await controller.run_single_trial(exp_id, scenario)
         results.append(res)
-        print(f"  [+] Trial {i+1}/{repetitions} Complete: Exposure={res.exposure_metrics.estimated_exposure_sec:.2f}s, Severity={res.finding.severity_score:.1f} ({res.finding.severity_label})", flush=True)
+        print(
+            f"  [+] Trial {i+1}/{repetitions} Complete: Exposure={res.exposure_metrics.estimated_exposure_sec:.2f}s, "
+            f"Severity={res.finding.severity_score:.1f} ({res.finding.severity_label})",
+            flush=True,
+        )
 
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
@@ -81,24 +123,52 @@ async def run_demo_experiment():
     with open(results_json, "w", encoding="utf-8") as f:
         f.write(json_content)
 
-    print("\n[+] Demonstration Complete! Reports successfully generated:", flush=True)
-    print(f"    - Sample Markdown: {sample_md}", flush=True)
-    print(f"    - Sample HTML:     {sample_html}", flush=True)
+    tracker = ExposureHistoryTracker()
+    tracker.record_run(last_res)
+
+    print("\n[+] Verification Engine Complete! Output files generated:", flush=True)
+    print(f"    - Markdown Report: {sample_md}", flush=True)
+    print(f"    - HTML Report:     {sample_html}", flush=True)
     print(f"    - Machine JSON:    {results_json}", flush=True)
     print(f"    - Standalone PoC:  {poc_path}\n", flush=True)
 
-    print(f"Headline Finding:", flush=True)
-    print(f"  Revoked admin access remained exploitable for {last_res.exposure_metrics.estimated_exposure_sec:.1f}s ± {last_res.exposure_metrics.precision_sec:.1f}s due to authorization cache staleness.", flush=True)
-    print(f"  Severity Score: {last_res.finding.severity_score:.1f} / 10.0 ({last_res.finding.severity_label})", flush=True)
+    print("Headline Finding:", flush=True)
+    print(
+        f"  Revoked admin access remained exploitable for "
+        f"{last_res.exposure_metrics.estimated_exposure_sec:.1f}s ± {last_res.exposure_metrics.precision_sec:.1f}s due to authorization cache staleness.",
+        flush=True,
+    )
+    print(f"  Severity Score: {last_res.finding.severity_score:.1f} / 10.0 ({last_res.finding.severity_label})\n", flush=True)
+    print("=" * 70, flush=True)
 
 
 def main():
-    if len(sys.argv) > 1 and sys.argv[1] == "--help":
-        print("Usage: python run.py")
-        print("Executes local target server and runs standard AuthTime demonstration experiment.")
-        sys.exit(0)
+    parser = argparse.ArgumentParser(description="AuthTime — Main Engine Launcher")
+    parser.add_argument("--demo", action="store_true", help="Run fast 10x accelerated demonstration mode (time_scale=0.1)")
+    parser.add_argument("--main", action="store_true", help="Run full main engine mode (time_scale=1.0, default)")
+    parser.add_argument("--fault-type", type=str, default="stale_cache", help="Fault scenario type")
+    parser.add_argument("--time-scale", type=float, default=None, help="Custom time scale factor")
+    parser.add_argument("--repetitions", type=int, default=3, help="Number of trial repetitions")
+    parser.add_argument("--target-url", type=str, default="http://127.0.0.1:8000", help="Target server URL")
 
-    asyncio.run(run_demo_experiment())
+    args = parser.parse_args()
+
+    if args.demo:
+        mode = "demo"
+        time_scale = args.time_scale if args.time_scale is not None else 0.1
+    else:
+        mode = "main"
+        time_scale = args.time_scale if args.time_scale is not None else 1.0
+
+    asyncio.run(
+        run_experiment(
+            mode=mode,
+            fault_type=args.fault_type,
+            time_scale=time_scale,
+            repetitions=args.repetitions,
+            target_url=args.target_url,
+        )
+    )
 
 
 if __name__ == "__main__":

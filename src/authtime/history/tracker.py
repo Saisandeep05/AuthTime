@@ -22,7 +22,7 @@ class ExposureHistoryTracker:
             "timestamp": time.time(),
             "commit_hash": commit_hash,
             "experiment_id": result.experiment_id,
-            "fault_type": result.scenario.fault_directive.fault_type,
+            "fault_type": result.finding.fault_type,
             "estimated_exposure_sec": result.exposure_metrics.estimated_exposure_sec,
             "precision_sec": result.exposure_metrics.precision_sec,
             "severity_score": result.finding.severity_score,
