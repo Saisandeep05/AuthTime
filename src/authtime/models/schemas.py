@@ -33,7 +33,8 @@ class ProbeResult(BaseModel):
     monotonic_timestamp: float
     utc_timestamp: datetime
     http_status: int
-    actual_decision: str  # "ALLOW" or "DENY"
+    actual_decision: str  # "ALLOW", "DENY", or "ERROR"
+
     ground_truth_decision: str  # "ALLOW" or "DENY"
     is_violation: bool
     response_latency_ms: float
@@ -58,13 +59,19 @@ class ExposureMetric(BaseModel):
     last_unauth_monotonic: Optional[float] = None
     first_blocked_monotonic: Optional[float] = None
     exposure_interval_min_sec: float
-    exposure_interval_max_sec: float
-    estimated_exposure_sec: float
-    precision_sec: float
+    exposure_interval_max_sec: Optional[float] = None
+    estimated_exposure_sec: Optional[float] = None
+    precision_sec: Optional[float] = None
+    observation_horizon_sec: float = 60.0
     scheduler_jitter_ms: float
     jitter_warning: Optional[str] = None
     unauthorized_request_count: int
     total_probes_fired: int
+    is_censored: bool = False
+    measurement_status: str = "OBSERVED_TRANSITION"  # "OBSERVED_TRANSITION", "CENSORED_LOWER_BOUND", "NO_EXPOSURE"
+
+
+
 
 
 class SecurityFinding(BaseModel):

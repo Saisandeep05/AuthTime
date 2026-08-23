@@ -25,7 +25,8 @@ class Scenario(BaseModel):
 
 
 class ScenarioGenerator:
-    DEFAULT_OFFSETS = [0.0, 1.0, 5.0, 30.0, 60.0]
+    DEFAULT_CACHE_OFFSETS = [0.0, 1.0, 5.0, 30.0, 60.0]
+    DEFAULT_TOKEN_OFFSETS = [0.0, 1.0, 5.0, 30.0, 100.0, 300.0]
 
     @classmethod
     def generate_single_fault_scenario(
@@ -36,7 +37,13 @@ class ScenarioGenerator:
         coarse_offsets: Optional[List[float]] = None,
         time_scale_factor: float = 1.0,
     ) -> Scenario:
-        offsets = coarse_offsets if coarse_offsets is not None else cls.DEFAULT_OFFSETS
+        if coarse_offsets is not None:
+            offsets = coarse_offsets
+        elif fault_type == "token_expiry":
+            offsets = cls.DEFAULT_TOKEN_OFFSETS
+        else:
+            offsets = cls.DEFAULT_CACHE_OFFSETS
+
         scaled_offsets = [o * time_scale_factor for o in offsets]
 
         probes = []
@@ -70,7 +77,7 @@ class ScenarioGenerator:
         coarse_offsets: Optional[List[float]] = None,
         time_scale_factor: float = 1.0,
     ) -> Scenario:
-        offsets = coarse_offsets if coarse_offsets is not None else cls.DEFAULT_OFFSETS
+        offsets = coarse_offsets if coarse_offsets is not None else cls.DEFAULT_CACHE_OFFSETS
         scaled_offsets = [o * time_scale_factor for o in offsets]
 
         probes = []
@@ -92,8 +99,8 @@ class ScenarioGenerator:
                     probe_index=probe_idx,
                     offset_seconds=offset,
                     user_id=user_b_id,
-                    resource_path=user_b_resource,
-                    expected_decision="ALLOW",
+                    resource_path=user_a_resource,  # Probes protected admin endpoint!
+                    expected_decision="DENY",
                 )
             )
             probe_idx += 1

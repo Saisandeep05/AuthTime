@@ -2,30 +2,40 @@
 Report Generator, Response Sanitizer, and Standalone PoC Script Engine.
 """
 
+import html
 import json
 import math
 import os
 import re
 from typing import Dict, Any, Optional, List
 from datetime import datetime
-from authtime.models.schemas import ExperimentResult, SecurityFinding
+from authtime.models.schemas import ExperimentResult, SecurityFinding, ExposureMetric
 
 
 def compute_severity_score(
-    estimated_exposure_sec: float,
+    metrics: Any,
     resource_path: str,
     confidence: str,
 ) -> tuple[float, str]:
     """
     Computes transparent severity score (0.0 to 10.0) based on formula in docs/severity-scoring.md:
     Severity Score = min(10.0, S_exposure * W_endpoint * C_confidence)
+    For right-censored metrics, uses lower_bound exposure.
     """
-    if estimated_exposure_sec <= 0:
+    if isinstance(metrics, (int, float)):
+        exposure_sec = float(metrics)
+    elif hasattr(metrics, "estimated_exposure_sec"):
+        exposure_sec = metrics.estimated_exposure_sec if metrics.estimated_exposure_sec is not None else metrics.exposure_interval_min_sec
+    else:
+        exposure_sec = 0.0
+
+    if exposure_sec <= 0:
         return 0.0, "LOW"
 
-    s_exposure = 3.0 + 2.5 * math.log10(estimated_exposure_sec + 1.0)
+
+    s_exposure = 3.0 + 2.5 * math.log10(exposure_sec + 1.0)
     w_endpoint = 1.5 if resource_path.startswith("/admin") else 1.0
-    c_conf = 1.0 if confidence == "High" else (0.85 if confidence == "Likely" else 0.70)
+    c_conf = 1.0 if "PROVEN" in confidence else (0.85 if "SUPPORTED" in confidence else 0.70)
 
     raw_score = min(10.0, round(s_exposure * w_endpoint * c_conf, 1))
 
@@ -75,6 +85,14 @@ class ReportGenerator:
 """
 
         jitter_warn_str = f"\n> ⚠️ **Jitter Warning**: {metrics.jitter_warning}\n" if metrics.jitter_warning else ""
+        first_blocked_str = f"`{metrics.first_blocked_monotonic:.3f}s`" if metrics.first_blocked_monotonic is not None else "`NOT OBSERVED`"
+        interval_str = (
+            f"`[{metrics.exposure_interval_min_sec:.2f}s, {metrics.exposure_interval_max_sec:.2f}s]`"
+            if metrics.exposure_interval_max_sec is not None
+            else f"`[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED at horizon {metrics.observation_horizon_sec:.2f}s)`"
+        )
+        est_exp_str = f"`{metrics.estimated_exposure_sec:.2f}s`" if metrics.estimated_exposure_sec is not None else f"`≥ {metrics.exposure_interval_min_sec:.2f}s (Censored)`"
+        precision_str = f"`±{metrics.precision_sec:.2f}s`" if metrics.precision_sec is not None else "`UNBOUNDED (Censored Observation)`"
 
         md = f"""# AuthTime Security Verification Report: {finding.finding_id}
 
@@ -83,6 +101,7 @@ class ReportGenerator:
 - **Fault Type**: `{finding.fault_type}`
 - **Severity Score**: `{finding.severity_score:.1f} / 10.0` (**{finding.severity_label}**)
 - **Root Cause**: `{finding.root_cause}` (Confidence: **{finding.root_cause_confidence}**)
+- **Measurement Status**: `{metrics.measurement_status}`
 - **Baseline Verification**: `{'PASSED' if result.baseline_passed else 'FAILED'}`
 
 ---
@@ -91,10 +110,10 @@ class ReportGenerator:
 - **Revocation Timestamp (t_fault)**: `{metrics.fault_timestamp_monotonic:.3f}s`
 - **First Unauthorized Access (t_first_unauth)**: `{metrics.first_unauth_monotonic or 0.0:.3f}s`
 - **Last Unauthorized Access (t_last_unauth)**: `{metrics.last_unauth_monotonic or 0.0:.3f}s`
-- **First Blocked Access (t_first_block)**: `{metrics.first_blocked_monotonic or 0.0:.3f}s`
-- **Exposure Interval**: `[{metrics.exposure_interval_min_sec:.2f}s, {metrics.exposure_interval_max_sec:.2f}s]`
-- **Estimated Exposure**: `{metrics.estimated_exposure_sec:.2f}s`
-- **Measurement Precision (±)**: `{metrics.precision_sec:.2f}s`
+- **First Blocked Access (t_first_block)**: {first_blocked_str}
+- **Exposure Interval**: {interval_str}
+- **Estimated Exposure**: {est_exp_str}
+- **Measurement Precision**: {precision_str}
 - **Scheduler Jitter**: `{metrics.scheduler_jitter_ms:.2f}ms`
 {jitter_warn_str}
 {stats_section}
@@ -140,6 +159,14 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
         jitter_warn_html = f"<div class='warning'><strong>⚠️ Jitter Warning:</strong> {metrics.jitter_warning}</div>" if metrics.jitter_warning else ""
         badge_class = finding.severity_label.lower()
+        first_blocked_str = f"{metrics.first_blocked_monotonic:.3f}s" if metrics.first_blocked_monotonic is not None else "NOT OBSERVED"
+        interval_str = (
+            f"[{metrics.exposure_interval_min_sec:.2f}s, {metrics.exposure_interval_max_sec:.2f}s]"
+            if metrics.exposure_interval_max_sec is not None
+            else f"[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED)"
+        )
+        est_exp_str = f"{metrics.estimated_exposure_sec:.2f}s" if metrics.estimated_exposure_sec is not None else f"≥ {metrics.exposure_interval_min_sec:.2f}s (Censored)"
+        precision_str = f"±{metrics.precision_sec:.2f}s" if metrics.precision_sec is not None else "UNBOUNDED"
 
         html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -172,6 +199,7 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
             <tr><th>Fault Type</th><td><code>{finding.fault_type}</code></td></tr>
             <tr><th>Severity Score</th><td><code>{finding.severity_score:.1f} / 10.0</code> <span class="badge {badge_class}">{finding.severity_label}</span></td></tr>
             <tr><th>Root Cause</th><td><code>{finding.root_cause}</code> (Confidence: <strong>{finding.root_cause_confidence}</strong>)</td></tr>
+            <tr><th>Measurement Status</th><td><code>{metrics.measurement_status}</code></td></tr>
             <tr><th>Baseline Status</th><td><strong>{'PASSED' if result.baseline_passed else 'FAILED'}</strong></td></tr>
         </table>
     </div>
@@ -182,10 +210,10 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
             <tr><th>Revocation Timestamp (t_fault)</th><td><code>{metrics.fault_timestamp_monotonic:.3f}s</code></td></tr>
             <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>{metrics.first_unauth_monotonic or 0.0:.3f}s</code></td></tr>
             <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>{metrics.last_unauth_monotonic or 0.0:.3f}s</code></td></tr>
-            <tr><th>First Blocked Access (t_first_block)</th><td><code>{metrics.first_blocked_monotonic or 0.0:.3f}s</code></td></tr>
-            <tr><th>Exposure Interval</th><td><code>[{metrics.exposure_interval_min_sec:.2f}s, {metrics.exposure_interval_max_sec:.2f}s]</code></td></tr>
-            <tr><th>Estimated Exposure Window</th><td><strong><code>{metrics.estimated_exposure_sec:.2f}s</code></strong></td></tr>
-            <tr><th>Measurement Precision</th><td><code>±{metrics.precision_sec:.2f}s</code></td></tr>
+            <tr><th>First Blocked Access (t_first_block)</th><td><code>{first_blocked_str}</code></td></tr>
+            <tr><th>Exposure Interval</th><td><code>{interval_str}</code></td></tr>
+            <tr><th>Estimated Exposure Window</th><td><strong><code>{est_exp_str}</code></strong></td></tr>
+            <tr><th>Measurement Precision</th><td><code>{precision_str}</code></td></tr>
             <tr><th>Scheduler Jitter</th><td><code>{metrics.scheduler_jitter_ms:.2f}ms</code></td></tr>
         </table>
         {jitter_warn_html}
@@ -224,6 +252,9 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
         target_url = result.config.get("target_url", "http://127.0.0.1:8000")
         fault_type = result.config.get("fault_type", "stale_cache")
+        metrics = result.exposure_metrics
+        exp_min = metrics.exposure_interval_min_sec
+        exp_max = metrics.exposure_interval_max_sec or metrics.observation_horizon_sec
 
         script_code = f"""# Standalone Reproduction Script for AuthTime Finding: {finding.finding_id}
 # Target: {target_url}
@@ -236,7 +267,7 @@ import time
 TARGET_URL = "{target_url}"
 
 def run_poc():
-    print("[+] Starting AuthTime PoC Execution...")
+    print("[+] Starting AuthTime Multi-Probe Boundary PoC Execution...")
     httpx.post(f"{{TARGET_URL}}/faults/reset", headers={{"X-AuthTime-Request-ID": "poc-reset"}})
     resp = httpx.post(f"{{TARGET_URL}}/auth/login", json={{"user_id": "admin1"}})
     token = resp.json()["access_token"]
@@ -244,22 +275,29 @@ def run_poc():
 
     r_base = httpx.get(f"{{TARGET_URL}}/admin/users", headers=headers)
     print(f"[*] Baseline Access Status: {{r_base.status_code}} (Expected: 200)")
+    if r_base.status_code != 200:
+        raise RuntimeError("Baseline authorization failed!")
 
     print(f"[*] Injecting Fault: {fault_type}...")
-    httpx.post(
+    t_start = time.monotonic()
+    r_fault = httpx.post(
         f"{{TARGET_URL}}/faults/inject",
         json={{"fault_type": "{fault_type}", "user_id": "admin1", "new_role": "User"}},
         headers={{"X-AuthTime-Request-ID": "poc-fault"}}
     )
+    if r_fault.status_code != 200:
+        raise RuntimeError("Fault injection failed on target!")
 
-    time.sleep(0.1)
-    r_post = httpx.get(f"{{TARGET_URL}}/admin/users", headers=headers)
-    print(f"[!] Post-Revocation Access Status: {{r_post.status_code}}")
+    probe_offsets = [0.1, max(1.0, {exp_min:.2f} * 0.5), {exp_min:.2f}, {exp_max:.2f}]
+    for offset in sorted(list(set(probe_offsets))):
+        elapsed = time.monotonic() - t_start
+        if offset > elapsed:
+            time.sleep(offset - elapsed)
+        
+        r_probe = httpx.get(f"{{TARGET_URL}}/admin/users", headers=headers)
+        status = "VULNERABLE (200 ALLOW)" if r_probe.status_code == 200 else f"BLOCKED ({{r_probe.status_code}})"
+        print(f"  [+] Probe at offset {{offset:.2f}}s -> {{status}}")
 
-    if r_post.status_code == 200:
-        print("[VULNERABLE] Unauthorized access permitted after authorization should have been revoked!")
-    else:
-        print("[SECURE] Access reliably blocked.")
 
 if __name__ == "__main__":
     run_poc()

@@ -1,6 +1,6 @@
 {
-  "experiment_id": "EXP-MAIN-1787422312-3",
-  "created_at_utc": "2026-08-22T18:11:58.769326Z",
+  "experiment_id": "EXP-MAIN-1787435225-3",
+  "created_at_utc": "2026-08-22T21:47:11.853043Z",
   "config": {
     "target_url": "http://127.0.0.1:8000",
     "fault_type": "stale_cache",
@@ -9,13 +9,13 @@
   "baseline_passed": true,
   "probes": [
     {
-      "request_id": "probe-EXP-MAIN-1787422312-3-0",
-      "experiment_id": "EXP-MAIN-1787422312-3",
+      "request_id": "probe-EXP-MAIN-1787435225-3-0",
+      "experiment_id": "EXP-MAIN-1787435225-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 0,
       "offset_target": 0.0,
-      "monotonic_timestamp": 29201.921,
-      "utc_timestamp": "2026-08-22T18:11:52.762531Z",
+      "monotonic_timestamp": 42115.375,
+      "utc_timestamp": "2026-08-22T21:47:05.848982Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -26,13 +26,13 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787422312-3-1",
-      "experiment_id": "EXP-MAIN-1787422312-3",
+      "request_id": "probe-EXP-MAIN-1787435225-3-1",
+      "experiment_id": "EXP-MAIN-1787435225-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 1,
       "offset_target": 0.1,
-      "monotonic_timestamp": 29202.031,
-      "utc_timestamp": "2026-08-22T18:11:52.874202Z",
+      "monotonic_timestamp": 42115.484,
+      "utc_timestamp": "2026-08-22T21:47:05.961035Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -43,13 +43,13 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787422312-3-2",
-      "experiment_id": "EXP-MAIN-1787422312-3",
+      "request_id": "probe-EXP-MAIN-1787435225-3-2",
+      "experiment_id": "EXP-MAIN-1787435225-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 2,
       "offset_target": 0.5,
-      "monotonic_timestamp": 29202.437,
-      "utc_timestamp": "2026-08-22T18:11:53.275579Z",
+      "monotonic_timestamp": 42115.89,
+      "utc_timestamp": "2026-08-22T21:47:06.360790Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -60,30 +60,30 @@
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787422312-3-3",
-      "experiment_id": "EXP-MAIN-1787422312-3",
+      "request_id": "probe-EXP-MAIN-1787435225-3-3",
+      "experiment_id": "EXP-MAIN-1787435225-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 3,
       "offset_target": 3.0,
-      "monotonic_timestamp": 29204.921,
-      "utc_timestamp": "2026-08-22T18:11:55.774318Z",
+      "monotonic_timestamp": 42118.39,
+      "utc_timestamp": "2026-08-22T21:47:08.860656Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
       "is_violation": true,
-      "response_latency_ms": 16.00000000325963,
+      "response_latency_ms": 0.0,
       "node_id": null,
       "cache_hit": null,
       "response_body_snippet": null
     },
     {
-      "request_id": "probe-EXP-MAIN-1787422312-3-4",
-      "experiment_id": "EXP-MAIN-1787422312-3",
+      "request_id": "probe-EXP-MAIN-1787435225-3-4",
+      "experiment_id": "EXP-MAIN-1787435225-3",
       "scenario_id": "scen-stale_cache-admin1",
       "probe_index": 4,
       "offset_target": 6.0,
-      "monotonic_timestamp": 29207.921,
-      "utc_timestamp": "2026-08-22T18:11:58.768813Z",
+      "monotonic_timestamp": 42121.375,
+      "utc_timestamp": "2026-08-22T21:47:11.852036Z",
       "http_status": 200,
       "actual_decision": "ALLOW",
       "ground_truth_decision": "DENY",
@@ -96,50 +96,28 @@
   ],
   "events": [
     {
-      "event_id": "evt-1",
-      "request_id": "fault-reset",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29201.765,
-      "utc_timestamp": "2026-08-22T18:11:52.613369Z",
-      "event_type": "FAULT_RESET",
-      "details": {
-        "status": "RESET_COMPLETE"
-      }
-    },
-    {
-      "event_id": "evt-2",
-      "request_id": "baseline-probe",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29201.781,
-      "utc_timestamp": "2026-08-22T18:11:52.619926Z",
-      "event_type": "AUTH_CHECK",
-      "details": {
-        "user_id": "admin1",
-        "role": "Admin",
-        "cache_hit": false
-      }
-    },
-    {
       "event_id": "evt-3",
-      "request_id": "fault-stale_cache",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29201.921,
-      "utc_timestamp": "2026-08-22T18:11:52.762531Z",
+      "request_id": "fault-EXP-MAIN-1787435225-3-stale_cache",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42115.375,
+      "utc_timestamp": "2026-08-22T21:47:05.848982Z",
       "event_type": "FAULT_INJECTED",
       "details": {
         "fault_type": "stale_cache",
         "user_id": "admin1",
+        "secondary_user_id": null,
         "new_role": "User",
         "cache_ttl_seconds": 60.0,
-        "time_scale_factor": 0.1
+        "time_scale_factor": 0.1,
+        "fault_applied_monotonic": 42115.375
       }
     },
     {
       "event_id": "evt-4",
-      "request_id": "probe-EXP-MAIN-1787422312-3-0",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29201.921,
-      "utc_timestamp": "2026-08-22T18:11:52.764127Z",
+      "request_id": "probe-EXP-MAIN-1787435225-3-0",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42115.375,
+      "utc_timestamp": "2026-08-22T21:47:05.848982Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -149,10 +127,10 @@
     },
     {
       "event_id": "evt-5",
-      "request_id": "probe-EXP-MAIN-1787422312-3-1",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29202.031,
-      "utc_timestamp": "2026-08-22T18:11:52.876789Z",
+      "request_id": "probe-EXP-MAIN-1787435225-3-1",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42115.484,
+      "utc_timestamp": "2026-08-22T21:47:05.962998Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -162,10 +140,10 @@
     },
     {
       "event_id": "evt-6",
-      "request_id": "probe-EXP-MAIN-1787422312-3-2",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29202.437,
-      "utc_timestamp": "2026-08-22T18:11:53.276931Z",
+      "request_id": "probe-EXP-MAIN-1787435225-3-2",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42115.89,
+      "utc_timestamp": "2026-08-22T21:47:06.361973Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -175,10 +153,10 @@
     },
     {
       "event_id": "evt-7",
-      "request_id": "probe-EXP-MAIN-1787422312-3-3",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29204.937,
-      "utc_timestamp": "2026-08-22T18:11:55.776006Z",
+      "request_id": "probe-EXP-MAIN-1787435225-3-3",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42118.39,
+      "utc_timestamp": "2026-08-22T21:47:08.861870Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -188,10 +166,10 @@
     },
     {
       "event_id": "evt-8",
-      "request_id": "probe-EXP-MAIN-1787422312-3-4",
-      "experiment_id": "EXP-MAIN-1787422312-3",
-      "monotonic_timestamp": 29207.921,
-      "utc_timestamp": "2026-08-22T18:11:58.769326Z",
+      "request_id": "probe-EXP-MAIN-1787435225-3-4",
+      "experiment_id": "EXP-MAIN-1787435225-3",
+      "monotonic_timestamp": 42121.375,
+      "utc_timestamp": "2026-08-22T21:47:11.853043Z",
       "event_type": "AUTH_CHECK",
       "details": {
         "user_id": "admin1",
@@ -201,22 +179,25 @@
     }
   ],
   "exposure_metrics": {
-    "fault_timestamp_monotonic": 29201.921,
-    "first_unauth_monotonic": 29201.921,
-    "last_unauth_monotonic": 29207.921,
+    "fault_timestamp_monotonic": 42115.375,
+    "first_unauth_monotonic": 42115.375,
+    "last_unauth_monotonic": 42121.375,
     "first_blocked_monotonic": null,
     "exposure_interval_min_sec": 6.0,
-    "exposure_interval_max_sec": 6.0,
-    "estimated_exposure_sec": 6.0,
-    "precision_sec": 0.0,
-    "scheduler_jitter_ms": 12.799999999941793,
+    "exposure_interval_max_sec": null,
+    "estimated_exposure_sec": null,
+    "precision_sec": null,
+    "observation_horizon_sec": 6.0,
+    "scheduler_jitter_ms": 15.199999999866122,
     "jitter_warning": null,
     "unauthorized_request_count": 5,
-    "total_probes_fired": 5
+    "total_probes_fired": 5,
+    "is_censored": true,
+    "measurement_status": "CENSORED_LOWER_BOUND"
   },
   "finding": {
-    "finding_id": "FIND-EXP-MAIN-1787422312-3",
-    "title": "Authorization Exposure Finding: AUTHORIZATION_CACHE",
+    "finding_id": "FIND-EXP-MAIN-1787435225-3",
+    "title": "Authorization Exposure Finding: OBSERVATION_HORIZON_REACHED",
     "fault_type": "stale_cache",
     "severity_score": 6.5,
     "severity_label": "MEDIUM",
@@ -227,38 +208,42 @@
     "time_scale_enabled": true,
     "time_scale_factor": 0.1,
     "observed_exposure": {
-      "fault_timestamp_monotonic": 29201.921,
-      "first_unauth_monotonic": 29201.921,
-      "last_unauth_monotonic": 29207.921,
+      "fault_timestamp_monotonic": 42115.375,
+      "first_unauth_monotonic": 42115.375,
+      "last_unauth_monotonic": 42121.375,
       "first_blocked_monotonic": null,
       "exposure_interval_min_sec": 6.0,
-      "exposure_interval_max_sec": 6.0,
-      "estimated_exposure_sec": 6.0,
-      "precision_sec": 0.0,
-      "scheduler_jitter_ms": 12.799999999941793,
+      "exposure_interval_max_sec": null,
+      "estimated_exposure_sec": null,
+      "precision_sec": null,
+      "observation_horizon_sec": 6.0,
+      "scheduler_jitter_ms": 15.199999999866122,
       "jitter_warning": null,
       "unauthorized_request_count": 5,
-      "total_probes_fired": 5
+      "total_probes_fired": 5,
+      "is_censored": true,
+      "measurement_status": "CENSORED_LOWER_BOUND"
     },
-    "root_cause": "AUTHORIZATION_CACHE",
-    "root_cause_confidence": "Likely",
-    "explanation": "Authorization cache retained stale role/permissions for up to 60.0 seconds.",
+    "root_cause": "OBSERVATION_HORIZON_REACHED",
+    "root_cause_confidence": "SUPPORTED (Observation Horizon Reached)",
+    "explanation": "Unauthorized access remained observable through the full observation horizon (6.00s). Consistent with extended exposure.",
     "real_world_calibration": "Tested cache_ttl=60.0s. Mirrors standard API gateway caching defaults.",
     "reproduction_curl": "curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users",
-    "poc_script_path": "reports/poc/EXP-MAIN-1787422312-3_poc.py"
+    "poc_script_path": "reports/EXP-MAIN-1787435225-3/poc_EXP-MAIN-1787435225-3.py"
   },
   "summary_stats": {
     "trial_count": 1,
     "mean_exposure_sec": 6.0
   },
   "aggregated_statistics": {
-    "repetitions": 3,
-    "min_sec": 4.507499999999709,
-    "max_sec": 6.0,
-    "mean_sec": 5.004999999999806,
-    "median_sec": 4.507499999999709,
-    "stddev_sec": 0.8616952767656845,
-    "p95_sec": 6.0,
-    "limited_sample_note": "If N < 5, the report must explicitly identify the result as a limited-sample observation and must avoid inferential statistical claims."
+    "trial_count": 3,
+    "uncensored_trial_count": 1,
+    "censored_trial_count": 2,
+    "mean_exposure_sec": 4.515500000001339,
+    "std_dev_sec": 0.0,
+    "min_exposure_sec": 4.515500000001339,
+    "max_exposure_sec": 4.515500000001339,
+    "mean_severity_score": 6.766666666666667,
+    "consistent_finding": false
   }
 }

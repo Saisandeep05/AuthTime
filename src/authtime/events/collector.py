@@ -25,7 +25,7 @@ class EventCollector:
             close_client = True
 
         try:
-            resp = await client.get(f"{self.target_url}/events")
+            resp = await client.get(f"{self.target_url}/events", params={"experiment_id": experiment_id})
             if resp.status_code != 200:
                 return []
 
@@ -33,7 +33,6 @@ class EventCollector:
             events: List[EvidenceEvent] = []
 
             for item in raw_events:
-                # Parse datetime ISO string into datetime object
                 utc_dt = datetime.fromisoformat(item["utc_timestamp"])
                 events.append(
                     EvidenceEvent(

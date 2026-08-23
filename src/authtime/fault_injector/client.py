@@ -28,9 +28,11 @@ class FaultInjectorClient:
         self,
         fault_type: str,
         user_id: str,
+        secondary_user_id: Optional[str] = None,
         new_role: str = "User",
         cache_ttl_seconds: float = 60.0,
         time_scale_factor: float = 1.0,
+        experiment_id: Optional[str] = None,
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> Dict[str, Any]:
         self._enforce_safety_boundary()
@@ -44,18 +46,29 @@ class FaultInjectorClient:
             payload = {
                 "fault_type": fault_type,
                 "user_id": user_id,
+                "secondary_user_id": secondary_user_id,
                 "new_role": new_role,
                 "cache_ttl_seconds": cache_ttl_seconds,
                 "time_scale_factor": time_scale_factor,
+                "experiment_id": experiment_id,
             }
+
+            req_id = f"fault-{experiment_id}-{fault_type}" if experiment_id else f"fault-{fault_type}"
+            headers = {"X-AuthTime-Request-ID": req_id}
+            if experiment_id:
+                headers["X-AuthTime-Experiment-ID"] = experiment_id
+                headers["X-AuthTime-Trial-ID"] = f"{experiment_id}-trial"
+
             resp = await client.post(
                 f"{self.target_url}/faults/inject",
                 json=payload,
-                headers={"X-AuthTime-Request-ID": f"fault-{fault_type}"},
+                headers=headers,
             )
+
             if resp.status_code != 200:
                 raise RuntimeError(f"Fault injection failed with status {resp.status_code}: {resp.text}")
             return resp.json()
+
         finally:
             if close_client and client:
                 await client.aclose()

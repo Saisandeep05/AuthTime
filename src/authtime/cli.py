@@ -14,6 +14,8 @@ from app.config import settings
 from authtime.controller.experiment import ExperimentController
 from authtime.scenarios.generator import ScenarioGenerator
 from authtime.reporting.generator import ReportGenerator
+from authtime.models.schemas import ExperimentResult
+from authtime.history.tracker import ExposureHistoryTracker
 
 
 def create_parser() -> argparse.ArgumentParser:
@@ -25,10 +27,16 @@ def create_parser() -> argparse.ArgumentParser:
 
     # Command: run
     run_parser = subparsers.add_parser("run", help="Run authorization exposure experiment scenario.")
-    run_parser.add_argument("--fault-type", type=str, default="stale_cache", help="Fault type (stale_cache, role_revocation, token_expiry, agent_session_revocation, cross_user_isolation).")
+    run_parser.add_argument(
+        "--fault-type",
+        type=str,
+        default="stale_cache",
+        choices=["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"],
+        help="Fault scenario type.",
+    )
     run_parser.add_argument("--target-url", type=str, default="http://127.0.0.1:8000", help="Target URL (must be 127.0.0.1 or localhost).")
-    run_parser.add_argument("--time-scale", type=float, default=1.0, help="Time scaling factor (e.g. 0.1 for 10x accelerated execution).")
-    run_parser.add_argument("--repetitions", type=int, default=1, help="Number of trial repetitions.")
+    run_parser.add_argument("--time-scale", type=float, default=1.0, help="Time scaling factor (0.01 to 10.0).")
+    run_parser.add_argument("--repetitions", type=int, default=1, help="Number of trial repetitions (>= 1).")
     run_parser.add_argument("--output-dir", type=str, default="reports", help="Directory to save generated reports.")
 
     # Command: report
@@ -39,6 +47,13 @@ def create_parser() -> argparse.ArgumentParser:
     # Command: compare
     compare_parser = subparsers.add_parser("compare", help="Compare current exposure metrics against historical baseline.")
     compare_parser.add_argument("--current-exposure", type=float, required=True, help="Current exposure window duration in seconds.")
+    compare_parser.add_argument(
+        "--fault-type",
+        type=str,
+        default="stale_cache",
+        choices=["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"],
+        help="Fault type to compare against.",
+    )
     compare_parser.add_argument("--threshold", type=float, default=0.5, help="Regression threshold in seconds.")
 
     # Command: target
@@ -46,9 +61,10 @@ def create_parser() -> argparse.ArgumentParser:
     target_sub = target_parser.add_subparsers(dest="target_action", required=True)
     start_parser = target_sub.add_parser("start", help="Start local reference target server.")
     start_parser.add_argument("--host", type=str, default="127.0.0.1", help="Host address (must be 127.0.0.1).")
-    start_parser.add_argument("--port", type=int, default=8000, help="Port number.")
+    start_parser.add_argument("--port", type=int, default=8000, help="Port number (1-65535).")
 
     return parser
+
 
 
 async def async_run_command(args):
@@ -74,7 +90,8 @@ async def async_run_command(args):
         exp_id = f"EXP-{int(asyncio.get_event_loop().time())}-{i+1}"
         res = await controller.run_single_trial(exp_id, scenario)
         results.append(res)
-        print(f"  [+] Trial {i+1}/{args.repetitions} Complete: Exposure={res.exposure_metrics.estimated_exposure_sec:.2f}s, Severity={res.finding.severity_score:.1f} ({res.finding.severity_label})")
+        exp_str = f"{res.exposure_metrics.estimated_exposure_sec:.2f}s" if res.exposure_metrics.estimated_exposure_sec is not None else f"≥{res.exposure_metrics.exposure_interval_min_sec:.2f}s (Censored)"
+        print(f"  [+] Trial {i+1}/{args.repetitions} Complete: Exposure={exp_str}, Severity={res.finding.severity_score:.1f} ({res.finding.severity_label})")
 
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
@@ -108,9 +125,6 @@ async def async_run_command(args):
     print(f"    - Standalone PoC:  {poc_path}")
 
 
-from authtime.history.tracker import ExposureHistoryTracker
-
-
 def main():
     parser = create_parser()
     args = parser.parse_args()
@@ -120,9 +134,10 @@ def main():
 
     elif args.command == "compare":
         tracker = ExposureHistoryTracker()
-        res = tracker.compare_runs(args.current_exposure, args.threshold)
+        res = tracker.compare_runs(args.current_exposure, fault_type=args.fault_type, threshold_sec=args.threshold)
         print("\n" + "=" * 60)
-        print(" [AuthTime Regression Comparison Analysis]")
+        print(f" [AuthTime Regression Comparison Analysis: '{args.fault_type}']")
+
         print("=" * 60)
         print(f" Current Exposure:     {args.current_exposure:.2f}s")
         print(f" Historical Average:   {res['historical_avg_sec']:.2f}s")
@@ -138,6 +153,17 @@ def main():
             sys.exit(1)
         with open(args.input, "r", encoding="utf-8") as f:
             data = json.load(f)
+        
+        try:
+            res = ExperimentResult.model_validate(data)
+            stats = data.get("aggregated_statistics")
+            if args.format == "markdown":
+                print(ReportGenerator.generate_markdown_report(res, stats))
+            elif args.format == "html":
+                print(ReportGenerator.generate_html_report(res, stats))
+            else:
+                print(ReportGenerator.generate_json_report(res, stats))
+        except Exception:
             print(json.dumps(data, indent=2))
 
     elif args.command == "target":

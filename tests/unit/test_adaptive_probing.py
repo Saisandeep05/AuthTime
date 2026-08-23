@@ -18,8 +18,8 @@ async def test_adaptive_binary_search():
         probe_t = t_fault + offset_sec
         return probe_t < 107.0
 
-    left, right, count = await prober.refine_boundary(t_fault, t_last_unauth, t_first_block, mock_probe_func)
+    left, right, records = await prober.refine_boundary(t_fault, t_last_unauth, t_first_block, mock_probe_func)
 
-    assert count <= 5
+    assert len(records) > 0
     assert left <= 107.0 <= right
-    assert (right - left) <= (110.0 - 105.0)
+    assert (right - left) <= 0.1

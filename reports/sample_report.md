@@ -1,41 +1,40 @@
-# AuthTime Security Verification Report: FIND-EXP-MAIN-1787422312-3
+# AuthTime Security Verification Report: FIND-EXP-MAIN-1787435225-3
 
 ## Executive Summary
-- **Finding Title**: Authorization Exposure Finding: AUTHORIZATION_CACHE
+- **Finding Title**: Authorization Exposure Finding: OBSERVATION_HORIZON_REACHED
 - **Fault Type**: `stale_cache`
 - **Severity Score**: `6.5 / 10.0` (**MEDIUM**)
-- **Root Cause**: `AUTHORIZATION_CACHE` (Confidence: **Likely**)
+- **Root Cause**: `OBSERVATION_HORIZON_REACHED` (Confidence: **SUPPORTED (Observation Horizon Reached)**)
+- **Measurement Status**: `CENSORED_LOWER_BOUND`
 - **Baseline Verification**: `PASSED`
 
 ---
 
 ## Exposure Window Metrics
-- **Revocation Timestamp (t_fault)**: `29201.921s`
-- **First Unauthorized Access (t_first_unauth)**: `29201.921s`
-- **Last Unauthorized Access (t_last_unauth)**: `29207.921s`
-- **First Blocked Access (t_first_block)**: `0.000s`
-- **Exposure Interval**: `[6.00s, 6.00s]`
-- **Estimated Exposure**: `6.00s`
-- **Measurement Precision (±)**: `0.00s`
-- **Scheduler Jitter**: `12.80ms`
+- **Revocation Timestamp (t_fault)**: `42115.375s`
+- **First Unauthorized Access (t_first_unauth)**: `42115.375s`
+- **Last Unauthorized Access (t_last_unauth)**: `42121.375s`
+- **First Blocked Access (t_first_block)**: `NOT OBSERVED`
+- **Exposure Interval**: `[6.00s, ∞] (RIGHT-CENSORED at horizon 6.00s)`
+- **Estimated Exposure**: `≥ 6.00s (Censored)`
+- **Measurement Precision**: `UNBOUNDED (Censored Observation)`
+- **Scheduler Jitter**: `15.20ms`
 
 
-## Aggregate Trial Statistics (N=3)
+## Aggregate Trial Statistics (N=1)
 
-> **Note**: If N < 5, the report must explicitly identify the result as a limited-sample observation and must avoid inferential statistical claims.
-
-- **Minimum Exposure**: `4.51s`
-- **Maximum Exposure**: `6.00s`
-- **Mean Exposure (µ)**: `5.00s`
-- **Median Exposure (x̃)**: `4.51s`
-- **Standard Deviation (σ)**: `0.86s`
-- **95th Percentile (P95)**: `6.00s`
+- **Minimum Exposure**: `0.00s`
+- **Maximum Exposure**: `0.00s`
+- **Mean Exposure (µ)**: `0.00s`
+- **Median Exposure (x̃)**: `0.00s`
+- **Standard Deviation (σ)**: `0.00s`
+- **95th Percentile (P95)**: `0.00s`
 
 
 ---
 
 ## Root Cause Explanation
-Authorization cache retained stale role/permissions for up to 60.0 seconds.
+Unauthorized access remained observable through the full observation horizon (6.00s). Consistent with extended exposure.
 
 ### Real-World System Calibration
 Tested cache_ttl=60.0s. Mirrors standard API gateway caching defaults.
@@ -46,4 +45,4 @@ Tested cache_ttl=60.0s. Mirrors standard API gateway caching defaults.
 ```bash
 curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users
 ```
-Standalone reproduction script generated at: [`reports/poc/EXP-MAIN-1787422312-3_poc.py`](reports/poc/EXP-MAIN-1787422312-3_poc.py)
+Standalone reproduction script generated at: [`reports/EXP-MAIN-1787435225-3/poc_EXP-MAIN-1787435225-3.py`](reports/EXP-MAIN-1787435225-3/poc_EXP-MAIN-1787435225-3.py)

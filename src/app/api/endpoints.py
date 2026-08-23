@@ -3,12 +3,14 @@ Reference Application API Routes & Fault Injection Controller.
 """
 
 import os
-from typing import Dict, Any, Optional, List
+import uuid
+import time
+from typing import Dict, Any, Optional, List, Literal
+from datetime import datetime, timezone
+
 from fastapi import APIRouter, Header, HTTPException, Request, Depends, status
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
-import time
-from datetime import datetime, timezone
+from pydantic import BaseModel, Field
 
 from app.auth.jwt import create_access_token, decode_access_token
 from app.rbac.roles import USER_ROLES_DB, has_permission, RoleEnum
@@ -16,7 +18,7 @@ from app.cache.ttl_cache import auth_cache
 
 router = APIRouter()
 
-# Structured Audit Event Store
+# Structured Audit Event Store (Immutable Audit Trail)
 EVENT_STORE: List[Dict[str, Any]] = []
 
 
@@ -29,18 +31,20 @@ def get_dashboard():
     return "<h1>AuthTime Control Center Target Server Active</h1>"
 
 
-
 class LoginRequest(BaseModel):
-    user_id: str
-    ttl_seconds: Optional[int] = None
+    user_id: str = Field(..., min_length=1, max_length=128)
+    ttl_seconds: Optional[int] = Field(None, gt=0)
 
 
 class FaultInjectRequest(BaseModel):
-    fault_type: str  # "stale_cache", "role_revocation", "token_expiry", "agent_session_revocation"
-    user_id: str
+    fault_type: Literal["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"]
+    user_id: str = Field(..., min_length=1, max_length=128)
+    secondary_user_id: Optional[str] = Field(None, min_length=1, max_length=128)
     new_role: Optional[str] = "User"
-    cache_ttl_seconds: Optional[float] = 60.0
-    time_scale_factor: Optional[float] = 1.0
+    cache_ttl_seconds: float = Field(60.0, gt=0.0)
+    time_scale_factor: float = Field(1.0, gt=0.0, le=10.0)
+    experiment_id: Optional[str] = None
+    trial_id: Optional[str] = None
 
 
 def enforce_local_client(request: Request):
@@ -48,14 +52,23 @@ def enforce_local_client(request: Request):
     if client_host not in ("127.0.0.1", "localhost", "::1", "testclient"):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="SAFETY ERROR: Fault injection endpoints are strictly restricted to local loopback 127.0.0.1.",
+            detail="SAFETY ERROR: Control plane and evidence endpoints are restricted strictly to local loopback (127.0.0.1).",
         )
 
 
-def record_audit_event(request_id: str, event_type: str, details: Dict[str, Any]):
+def record_audit_event(
+    request_id: str,
+    event_type: str,
+    details: Dict[str, Any],
+    experiment_id: Optional[str] = None,
+    trial_id: Optional[str] = None,
+):
+    """Records an audit event into the immutable process event store with full UUID identity."""
     EVENT_STORE.append({
-        "event_id": f"evt-{len(EVENT_STORE)+1}",
+        "event_id": f"evt-{uuid.uuid4()}",
         "request_id": request_id,
+        "experiment_id": experiment_id or details.get("experiment_id") or "global",
+        "trial_id": trial_id or details.get("trial_id"),
         "monotonic_timestamp": time.monotonic(),
         "utc_timestamp": datetime.now(timezone.utc).isoformat(),
         "event_type": event_type,
@@ -71,12 +84,17 @@ def login(req: LoginRequest):
 
 
 @router.get("/invoices/{invoice_id}")
-def get_invoice(invoice_id: str, authorization: str = Header(...), x_authtime_request_id: str = Header(default="anon")):
+def get_invoice(
+    invoice_id: str,
+    authorization: str = Header(...),
+    x_authtime_request_id: str = Header(default="anon"),
+    x_authtime_experiment_id: Optional[str] = Header(default=None),
+    x_authtime_trial_id: Optional[str] = Header(default=None),
+):
     token = authorization.replace("Bearer ", "").strip()
     payload = decode_access_token(token)
     user_id = payload["sub"]
 
-    # Cache Lookup
     cached_role = auth_cache.get(f"auth:{user_id}")
     if cached_role:
         role = cached_role
@@ -86,7 +104,13 @@ def get_invoice(invoice_id: str, authorization: str = Header(...), x_authtime_re
         auth_cache.set(f"auth:{user_id}", role)
         cache_hit = False
 
-    record_audit_event(x_authtime_request_id, "AUTH_CHECK", {"user_id": user_id, "role": role, "cache_hit": cache_hit})
+    record_audit_event(
+        x_authtime_request_id,
+        "AUTH_CHECK",
+        {"user_id": user_id, "role": role, "cache_hit": cache_hit},
+        experiment_id=x_authtime_experiment_id,
+        trial_id=x_authtime_trial_id,
+    )
 
     if not has_permission(role, "invoices:read"):
         raise HTTPException(status_code=403, detail="Permission Denied")
@@ -95,7 +119,12 @@ def get_invoice(invoice_id: str, authorization: str = Header(...), x_authtime_re
 
 
 @router.get("/admin/users")
-def get_admin_users(authorization: str = Header(...), x_authtime_request_id: str = Header(default="anon")):
+def get_admin_users(
+    authorization: str = Header(...),
+    x_authtime_request_id: str = Header(default="anon"),
+    x_authtime_experiment_id: Optional[str] = Header(default=None),
+    x_authtime_trial_id: Optional[str] = Header(default=None),
+):
     token = authorization.replace("Bearer ", "").strip()
     try:
         payload = decode_access_token(token)
@@ -113,7 +142,13 @@ def get_admin_users(authorization: str = Header(...), x_authtime_request_id: str
         auth_cache.set(f"auth:{user_id}", role)
         cache_hit = False
 
-    record_audit_event(x_authtime_request_id, "AUTH_CHECK", {"user_id": user_id, "role": role, "cache_hit": cache_hit})
+    record_audit_event(
+        x_authtime_request_id,
+        "AUTH_CHECK",
+        {"user_id": user_id, "role": role, "cache_hit": cache_hit},
+        experiment_id=x_authtime_experiment_id,
+        trial_id=x_authtime_trial_id,
+    )
 
     if not has_permission(role, "admin:read"):
         raise HTTPException(status_code=403, detail="Permission Denied")
@@ -122,33 +157,61 @@ def get_admin_users(authorization: str = Header(...), x_authtime_request_id: str
 
 
 @router.post("/faults/inject", dependencies=[Depends(enforce_local_client)])
-def inject_fault(req: FaultInjectRequest, x_authtime_request_id: str = Header(default="fault-inject")):
+def inject_fault(
+    req: FaultInjectRequest,
+    x_authtime_request_id: str = Header(default="fault-inject"),
+    x_authtime_experiment_id: Optional[str] = Header(default=None),
+    x_authtime_trial_id: Optional[str] = Header(default=None),
+):
     user_id = req.user_id
+    t_fault_applied = time.monotonic()
+    exp_id = req.experiment_id or x_authtime_experiment_id
+    tr_id = req.trial_id or x_authtime_trial_id
 
     if req.fault_type == "stale_cache":
-        # Simulate stale cache: Update DB role to revoked, but inject/retain old role in cache!
         old_role = USER_ROLES_DB.get(user_id, RoleEnum.ADMIN.value)
         USER_ROLES_DB[user_id] = req.new_role or RoleEnum.USER.value
-        effective_cache_ttl = (req.cache_ttl_seconds or 60.0) * (req.time_scale_factor or 1.0)
+        effective_cache_ttl = req.cache_ttl_seconds * req.time_scale_factor
         auth_cache.set(f"auth:{user_id}", old_role, ttl_seconds=effective_cache_ttl)
 
     elif req.fault_type == "role_revocation":
-        # Immediate DB revocation and cache invalidation
         USER_ROLES_DB[user_id] = req.new_role or RoleEnum.USER.value
         auth_cache.delete(f"auth:{user_id}")
 
-    elif req.fault_type == "agent_session_revocation":
-        # Delegated session fault: human delegator revoked, but token remains active until expiry
+    elif req.fault_type == "token_expiry":
+        pass
+
+    elif req.fault_type == "cross_user_isolation":
+        if not req.secondary_user_id:
+            raise HTTPException(status_code=400, detail="secondary_user_id is REQUIRED for cross_user_isolation scenario.")
         USER_ROLES_DB[user_id] = RoleEnum.USER.value
-        auth_cache.delete(f"auth:{user_id}")
+        effective_cache_ttl = req.cache_ttl_seconds * req.time_scale_factor
+        auth_cache.set(f"auth:{req.secondary_user_id}", RoleEnum.ADMIN.value, ttl_seconds=effective_cache_ttl)
 
-    record_audit_event(x_authtime_request_id, "FAULT_INJECTED", req.model_dump())
+    elif req.fault_type == "agent_session_revocation":
+        USER_ROLES_DB[user_id] = RoleEnum.USER.value
+        effective_cache_ttl = req.cache_ttl_seconds * req.time_scale_factor
+        auth_cache.set(f"auth:{user_id}", RoleEnum.ADMIN.value, ttl_seconds=effective_cache_ttl)
 
-    return {"status": "SUCCESS", "fault_type": req.fault_type, "target_user": user_id}
+    details = req.model_dump()
+    details["fault_applied_monotonic"] = t_fault_applied
+    record_audit_event(x_authtime_request_id, "FAULT_INJECTED", details, experiment_id=exp_id, trial_id=tr_id)
+
+    return {
+        "status": "SUCCESS",
+        "fault_type": req.fault_type,
+        "target_user": user_id,
+        "fault_applied_monotonic": t_fault_applied,
+    }
 
 
 @router.post("/faults/reset", dependencies=[Depends(enforce_local_client)])
-def reset_faults(x_authtime_request_id: str = Header(default="fault-reset")):
+def reset_faults(
+    x_authtime_request_id: str = Header(default="fault-reset"),
+    x_authtime_experiment_id: Optional[str] = Header(default=None),
+    x_authtime_trial_id: Optional[str] = Header(default=None),
+):
+    """Resets target authorization state (cache & roles) without destroying historical evidence."""
     auth_cache.clear()
     USER_ROLES_DB.clear()
     USER_ROLES_DB.update({
@@ -157,21 +220,33 @@ def reset_faults(x_authtime_request_id: str = Header(default="fault-reset")):
         "guest1": RoleEnum.GUEST.value,
         "svc1": RoleEnum.SERVICE_ACCOUNT.value,
     })
-    EVENT_STORE.clear()
-    record_audit_event(x_authtime_request_id, "FAULT_RESET", {"status": "RESET_COMPLETE"})
+    record_audit_event(
+        x_authtime_request_id,
+        "FAULT_RESET",
+        {"status": "RESET_COMPLETE"},
+        experiment_id=x_authtime_experiment_id,
+        trial_id=x_authtime_trial_id,
+    )
     return {"status": "RESET_COMPLETE"}
 
 
-@router.get("/events")
+@router.get("/events", dependencies=[Depends(enforce_local_client)])
 def get_events(experiment_id: Optional[str] = None):
-    return {"events": EVENT_STORE}
+    """Retrieves evidence events for a specific experiment_id strictly."""
+    if not experiment_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="experiment_id query parameter is REQUIRED for evidence event retrieval.",
+        )
+    filtered = [e for e in EVENT_STORE if e.get("experiment_id") == experiment_id]
+    return {"events": filtered}
 
 
 class RunExperimentRequest(BaseModel):
-    fault_type: str = "stale_cache"
-    time_scale: float = 1.0
-    repetitions: int = 3
-    target_url: str = "http://127.0.0.1:8000"
+    fault_type: str = Field("stale_cache", pattern="^(stale_cache|role_revocation|token_expiry|agent_session_revocation|cross_user_isolation)$")
+    time_scale: float = Field(1.0, gt=0.0, le=10.0)
+    repetitions: int = Field(3, ge=1, le=20)
+    target_url: str = Field("http://127.0.0.1:8000")
 
 
 @router.post("/api/run-experiment", dependencies=[Depends(enforce_local_client)])
@@ -179,7 +254,6 @@ async def api_run_experiment(req: RunExperimentRequest):
     from authtime.controller.experiment import ExperimentController
     from authtime.scenarios.generator import ScenarioGenerator
     from authtime.reporting.generator import ReportGenerator
-    from authtime.history.tracker import ExposureHistoryTracker
 
     controller = ExperimentController(req.target_url)
     if req.fault_type == "cross_user_isolation":
@@ -191,55 +265,37 @@ async def api_run_experiment(req: RunExperimentRequest):
             fault_type=req.fault_type, target_user_id="admin1", time_scale_factor=req.time_scale
         )
 
+    batch_run_id = f"RUN-{int(time.time())}"
+    run_dir = os.path.join("reports", batch_run_id)
+    os.makedirs(run_dir, exist_ok=True)
+
     results = []
     for i in range(req.repetitions):
-        exp_id = f"EXP-WEB-{int(time.time())}-{i+1}"
+        exp_id = f"EXP-{batch_run_id}-{i+1}"
         res = await controller.run_single_trial(exp_id, scenario)
         results.append(res)
 
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
 
-    tracker = ExposureHistoryTracker()
-    tracker.record_run(last_res)
-
-    os.makedirs("reports", exist_ok=True)
     md_content = ReportGenerator.generate_markdown_report(last_res, stats)
     html_content = ReportGenerator.generate_html_report(last_res, stats)
     json_content = ReportGenerator.generate_json_report(last_res, stats)
 
-    with open("reports/sample_report.md", "w", encoding="utf-8") as f:
+    md_path = os.path.join(run_dir, f"{last_res.experiment_id}_report.md")
+    html_path = os.path.join(run_dir, f"{last_res.experiment_id}_report.html")
+    json_path = os.path.join(run_dir, f"{last_res.experiment_id}_result.json")
+
+    with open(md_path, "w", encoding="utf-8") as f:
         f.write(md_content)
-    with open("reports/sample_report.html", "w", encoding="utf-8") as f:
+    with open(html_path, "w", encoding="utf-8") as f:
         f.write(html_content)
-    with open("reports/results.json", "w", encoding="utf-8") as f:
+    with open(json_path, "w", encoding="utf-8") as f:
         f.write(json_content)
 
     return {
-        "status": "SUCCESS",
-        "estimated_exposure_sec": last_res.exposure_metrics.estimated_exposure_sec,
-        "precision_sec": last_res.exposure_metrics.precision_sec,
-        "severity_score": last_res.finding.severity_score,
-        "severity_label": last_res.finding.severity_label,
-        "root_cause": last_res.finding.root_cause,
-
-        "jitter_ms": last_res.exposure_metrics.scheduler_jitter_ms,
-        "probes": [{"rel_sec": p.offset_target, "allowed": (p.actual_decision == "ALLOW"), "status": p.http_status} for p in last_res.probes],
-
-        "stats": {
-            "mean": stats.get("mean_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "mean_exposure_sec", 0.0),
-            "std_dev": stats.get("std_dev_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "std_dev_sec", 0.0),
-            "min": stats.get("min_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "min_exposure_sec", 0.0),
-            "max": stats.get("max_exposure_sec", 0.0) if isinstance(stats, dict) else getattr(stats, "max_exposure_sec", 0.0)
-        }
-
+        "status": "COMPLETED",
+        "batch_run_id": batch_run_id,
+        "repetitions": req.repetitions,
+        "reports": {"markdown": md_path, "html": html_path, "json": json_path},
     }
-
-
-
-@router.get("/api/history")
-def get_history():
-    from authtime.history.tracker import ExposureHistoryTracker
-    tracker = ExposureHistoryTracker()
-    return {"history": tracker.load_history()}
-

@@ -16,4 +16,4 @@ def test_cross_user_scenario_generation():
     assert len(scen.probes) == 10  # 5 coarse offsets x 2 users
     assert scen.probes[0].user_id == "admin1"
     assert scen.probes[1].user_id == "user1"
-    assert scen.probes[1].expected_decision == "ALLOW"
+    assert scen.probes[1].expected_decision == "DENY"

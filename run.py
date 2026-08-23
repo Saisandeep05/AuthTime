@@ -40,13 +40,16 @@ from authtime.history.tracker import ExposureHistoryTracker
 
 import webbrowser
 
+from urllib.parse import urlparse
+
 def start_server_in_thread(host: str = "127.0.0.1", port: int = 8000):
     url = f"http://{host}:{port}"
     if httpx_mod is not None:
         try:
-            r = httpx_mod.get(f"{url}/faults/reset", timeout=1.0)
-            print(f"[*] Target server & Web Control Center active on {url}", flush=True)
-            return None
+            r = httpx_mod.post(f"{url}/faults/reset", timeout=1.0)
+            if r.status_code == 200:
+                print(f"[*] Target server & Web Control Center active on {url}", flush=True)
+                return None
         except Exception:
             pass
 
@@ -77,7 +80,8 @@ async def run_experiment(
     print(" [AuthTime Main Temporal Authorization Verification Engine]", flush=True)
     print("=" * 70, flush=True)
 
-    if "127.0.0.1" not in target_url and "localhost" not in target_url:
+    parsed_url = urlparse(target_url)
+    if parsed_url.hostname not in ("127.0.0.1", "localhost", "::1", "testclient"):
         print(f"[FATAL SAFETY ERROR] Target URL '{target_url}' is non-local!", file=sys.stderr)
         sys.exit(1)
 
@@ -103,11 +107,13 @@ async def run_experiment(
         exp_id = f"EXP-MAIN-{int(time.time())}-{i+1}"
         res = await controller.run_single_trial(exp_id, scenario)
         results.append(res)
+        exp_disp = f"{res.exposure_metrics.estimated_exposure_sec:.2f}s" if res.exposure_metrics.estimated_exposure_sec is not None else f"≥{res.exposure_metrics.exposure_interval_min_sec:.2f}s (Censored)"
         print(
-            f"  [+] Trial {i+1}/{repetitions} Complete: Exposure={res.exposure_metrics.estimated_exposure_sec:.2f}s, "
+            f"  [+] Trial {i+1}/{repetitions} Complete: Exposure={exp_disp}, "
             f"Severity={res.finding.severity_score:.1f} ({res.finding.severity_label})",
             flush=True,
         )
+
 
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
@@ -140,13 +146,20 @@ async def run_experiment(
     print(f"    - Machine JSON:    {results_json}", flush=True)
     print(f"    - Standalone PoC:  {poc_path}\n", flush=True)
 
-    print("Headline Finding:", flush=True)
+    exp_val = (
+        f"{last_res.exposure_metrics.estimated_exposure_sec:.1f}s"
+        if last_res.exposure_metrics.estimated_exposure_sec is not None
+        else f"≥ {last_res.exposure_metrics.exposure_interval_min_sec:.1f}s (RIGHT-CENSORED LOWER BOUND)"
+    )
+    prec_str = f"± {last_res.exposure_metrics.precision_sec:.1f}s" if last_res.exposure_metrics.precision_sec is not None else ""
     print(
         f"  Revoked admin access remained exploitable for "
-        f"{last_res.exposure_metrics.estimated_exposure_sec:.1f}s ± {last_res.exposure_metrics.precision_sec:.1f}s due to authorization cache staleness.",
+        f"{exp_val} {prec_str} due to authorization cache staleness.",
         flush=True,
     )
     print(f"  Severity Score: {last_res.finding.severity_score:.1f} / 10.0 ({last_res.finding.severity_label})\n", flush=True)
+
+
     print("=" * 70, flush=True)
 
     print("[🌐] Web Control Center is ACTIVE and LISTENING at http://127.0.0.1:8000", flush=True)
