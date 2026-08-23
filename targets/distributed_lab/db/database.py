@@ -120,7 +120,7 @@ class LabDatabase:
         async with self._lock:
             return list(self._revocation_events)
 
-    async def reset_database((self) -> None:
+    async def reset_database(self) -> None:
         """Reset database state to initial baseline."""
         async with self._lock:
             self._users = {"admin1": "Admin", "user1": "User", "svc1": "ServiceAccount"}
