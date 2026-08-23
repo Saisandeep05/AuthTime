@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 260" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; stroke: #30363d; stroke-width: 1.5; rx: 10px; }
+      .box-core { fill: #161b22; stroke: #58a6ff; stroke-width: 1.5; rx: 6px; }
+      .box-adapter { fill: #161b22; stroke: #a371f7; stroke-width: 1.5; rx: 6px; }
+      .box-target { fill: #161b22; stroke: #38bdf8; stroke-width: 1.2; rx: 6px; }
+      .box-evidence { fill: #161b22; stroke: #3fb950; stroke-width: 1.5; rx: 6px; }
+      
+      .txt-title { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; fill: #c9d1d9; letter-spacing: 0.5px; }
+      .txt-node-hdr { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; }
+      .txt-node-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; fill: #8b949e; }
+      .txt-label { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 9px; fill: #8b949e; }
+
+      @keyframes dataFlow {
+        0% { stroke-dashoffset: 20; }
+        100% { stroke-dashoffset: 0; }
+      }
+
+      .flow-line { stroke: #58a6ff; stroke-width: 1.5; stroke-dasharray: 4, 4; animation: dataFlow 1s linear infinite; }
+      .flow-line-adapter { stroke: #a371f7; stroke-width: 1.5; stroke-dasharray: 4, 4; animation: dataFlow 1s linear infinite; }
+      .flow-line-evidence { stroke: #3fb950; stroke-width: 1.5; stroke-dasharray: 4, 4; animation: dataFlow 1s linear infinite; }
+    </style>
+
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#58a6ff" />
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#a371f7" />
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3fb950" />
+    </marker>
+  </defs>
+
+  <!-- Container -->
+  <rect x="2" y="2" width="796" height="256" class="bg"/>
+
+  <!-- Title -->
+  <text x="24" y="28" class="txt-title">AUTHTIME :: SYSTEM ARCHITECTURE &amp; DATA FLOW</text>
+  <text x="600" y="28" class="txt-node-body">Decoupled Adapter Model</text>
+
+  <!-- 1. Core Engine Block -->
+  <g transform="translate(24, 48)">
+    <rect width="200" height="188" class="box-core"/>
+    <text x="14" y="24" class="txt-node-hdr" fill="#58a6ff">AUTHTIME CORE ENGINE</text>
+    <line x1="14" y1="32" x2="186" y2="32" stroke="#21262d" stroke-width="1"/>
+    
+    <rect x="14" y="42" width="172" height="36" rx="4" fill="#21262d"/>
+    <text x="22" y="58" class="txt-node-hdr" fill="#c9d1d9">ExperimentController</text>
+    <text x="22" y="70" class="txt-node-body">Trial Lifecycle Coordinator</text>
+
+    <rect x="14" y="88" width="172" height="36" rx="4" fill="#21262d"/>
+    <text x="22" y="104" class="txt-node-hdr" fill="#c9d1d9">GroundTruthManager</text>
+    <text x="22" y="116" class="txt-node-body">Role DB &amp; Revocation State</text>
+
+    <rect x="14" y="134" width="172" height="36" rx="4" fill="#21262d"/>
+    <text x="22" y="150" class="txt-node-hdr" fill="#c9d1d9">FaultInjector</text>
+    <text x="22" y="162" class="txt-node-body">Stale Cache / Session Faults</text>
+  </g>
+
+  <!-- Flow: Engine -> Target Adapter -->
+  <line x1="224" y1="142" x2="264" y2="142" class="flow-line" marker-end="url(#arrow-blue)"/>
+
+  <!-- 2. Target Adapter Layer Block -->
+  <g transform="translate(268, 48)">
+    <rect width="180" height="188" class="box-adapter"/>
+    <text x="14" y="24" class="txt-node-hdr" fill="#a371f7">TARGET ADAPTER LAYER</text>
+    <line x1="14" y1="32" x2="166" y2="32" stroke="#21262d" stroke-width="1"/>
+
+    <rect x="14" y="42" width="152" height="42" rx="4" fill="#21262d"/>
+    <text x="22" y="58" class="txt-node-hdr" fill="#a371f7">BaseTargetAdapter</text>
+    <text x="22" y="72" class="txt-node-body">Abstract Interface Contract</text>
+
+    <rect x="14" y="96" width="152" height="74" rx="4" fill="#21262d"/>
+    <text x="22" y="112" class="txt-node-hdr" fill="#c9d1d9">HTTPTargetAdapter</text>
+    <text x="22" y="126" class="txt-node-body">• verify_identity()</text>
+    <text x="22" y="138" class="txt-node-body">• inject_fault()</text>
+    <text x="22" y="150" class="txt-node-body">• probe_endpoint()</text>
+    <text x="22" y="162" class="txt-node-body">• reset_state()</text>
+  </g>
+
+  <!-- Flow: Adapter -> Framework Targets -->
+  <line x1="448" y1="142" x2="488" y2="142" class="flow-line-adapter" marker-end="url(#arrow-purple)"/>
+
+  <!-- 3. Framework Targets Block -->
+  <g transform="translate(492, 48)">
+    <rect width="130" height="188" class="box-target"/>
+    <text x="12" y="24" class="txt-node-hdr" fill="#38bdf8">TARGET SUITE</text>
+    <line x1="12" y1="32" x2="118" y2="32" stroke="#21262d" stroke-width="1"/>
+
+    <rect x="12" y="40" width="106" height="30" rx="3" fill="#032b45"/>
+    <text x="20" y="58" class="txt-node-hdr" fill="#38bdf8">FastAPI Target</text>
+
+    <rect x="12" y="76" width="106" height="30" rx="3" fill="#093829"/>
+    <text x="20" y="94" class="txt-node-hdr" fill="#3fb950">Django Target</text>
+
+    <rect x="12" y="112" width="106" height="30" rx="3" fill="#3b2b07"/>
+    <text x="20" y="130" class="txt-node-hdr" fill="#d29922">Express Target</text>
+
+    <rect x="12" y="148" width="106" height="30" rx="3" fill="#2d1517"/>
+    <text x="20" y="166" class="txt-node-hdr" fill="#f85149">CAEP / SSF</text>
+  </g>
+
+  <!-- Flow: Targets -> Evidence & Reporting -->
+  <line x1="622" y1="142" x2="656" y2="142" class="flow-line-evidence" marker-end="url(#arrow-green)"/>
+
+  <!-- 4. Evidence Store & Reports Block -->
+  <g transform="translate(660, 48)">
+    <rect width="116" height="188" class="box-evidence"/>
+    <text x="10" y="24" class="txt-node-hdr" fill="#3fb950">EVIDENCE</text>
+    <line x1="10" y1="32" x2="106" y2="32" stroke="#21262d" stroke-width="1"/>
+
+    <rect x="10" y="42" width="96" height="38" rx="3" fill="#1b4721"/>
+    <text x="16" y="58" class="txt-node-hdr" fill="#3fb950">AUDIT_EVENTS</text>
+    <text x="16" y="70" class="txt-node-body">Forensic Trail</text>
+
+    <rect x="10" y="90" width="96" height="38" rx="3" fill="#1b4721"/>
+    <text x="16" y="106" class="txt-node-hdr" fill="#3fb950">JSON / HTML</text>
+    <text x="16" y="118" class="txt-node-body">Security Audit</text>
+
+    <rect x="10" y="138" width="96" height="38" rx="3" fill="#1b4721"/>
+    <text x="16" y="154" class="txt-node-hdr" fill="#3fb950">PoC Generator</text>
+    <text x="16" y="166" class="txt-node-body">Python Script</text>
+  </g>
+
+</svg>

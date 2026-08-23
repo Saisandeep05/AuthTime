@@ -1,0 +1,142 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; stroke: #30363d; stroke-width: 1.5; rx: 10px; }
+      .stage-card { fill: #161b22; stroke: #30363d; stroke-width: 1.2; rx: 6px; }
+      .stage-card-active { fill: #1f2937; stroke: #38bdf8; stroke-width: 1.5; rx: 6px; }
+      .stage-title { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; fill: #58a6ff; }
+      .stage-desc { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; fill: #8b949e; }
+      .flow-title { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 13px; font-weight: 700; fill: #c9d1d9; letter-spacing: 0.5px; }
+      
+      @keyframes pulsePath {
+        0% { stroke-dashoffset: 24; }
+        100% { stroke-dashoffset: 0; }
+      }
+
+      @keyframes highlightStage3 {
+        0%, 100% { stroke: #30363d; fill: #161b22; }
+        50% { stroke: #f85149; fill: #2d1517; }
+      }
+
+      @keyframes highlightStage5 {
+        0%, 100% { stroke: #30363d; fill: #161b22; }
+        50% { stroke: #d29922; fill: #2c2210; }
+      }
+
+      .pulse-arrow { stroke-dasharray: 6, 6; animation: pulsePath 1.2s linear infinite; }
+      .stage-fault { animation: highlightStage3 3s ease-in-out infinite; }
+      .stage-measure { animation: highlightStage5 3s ease-in-out infinite 1.5s; }
+    </style>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#58a6ff" />
+    </marker>
+  </defs>
+
+  <!-- Container -->
+  <rect x="2" y="2" width="796" height="216" class="bg"/>
+
+  <!-- Section Header -->
+  <text x="24" y="30" class="flow-title">AUTHTIME :: EXPERIMENT EXECUTION PIPELINE</text>
+  <text x="590" y="30" class="stage-desc" fill="#8b949e">Deterministic &amp; Reproducible</text>
+
+  <!-- Stage 1: Configure -->
+  <g transform="translate(20, 50)">
+    <rect width="108" height="135" class="stage-card"/>
+    <circle cx="20" cy="24" r="10" fill="#21262d"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#58a6ff" text-anchor="middle">1</text>
+    <text x="36" y="28" class="stage-title">Configure</text>
+    <text x="12" y="52" class="stage-desc">• Select Target</text>
+    <text x="12" y="68" class="stage-desc">• Fault Type</text>
+    <text x="12" y="84" class="stage-desc">• Time Scale</text>
+    <text x="12" y="100" class="stage-desc">• Precision</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#21262d"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#8b949e" text-anchor="middle">Config JSON</text>
+  </g>
+
+  <!-- Connector 1-2 -->
+  <line x1="130" y1="117" x2="148" y2="117" stroke="#58a6ff" stroke-width="2" class="pulse-arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 2: Baseline -->
+  <g transform="translate(150, 50)">
+    <rect width="108" height="135" class="stage-card"/>
+    <circle cx="20" cy="24" r="10" fill="#21262d"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#3fb950" text-anchor="middle">2</text>
+    <text x="36" y="28" class="stage-title" fill="#3fb950">Baseline</text>
+    <text x="12" y="52" class="stage-desc">• Identity Handshake</text>
+    <text x="12" y="68" class="stage-desc">• Probe Auth Route</text>
+    <text x="12" y="84" class="stage-desc">• Verify 200 OK</text>
+    <text x="12" y="100" class="stage-desc">• Set Baseline</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#1b4721"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#3fb950" text-anchor="middle">STATUS: ALLOW</text>
+  </g>
+
+  <!-- Connector 2-3 -->
+  <line x1="260" y1="117" x2="278" y2="117" stroke="#58a6ff" stroke-width="2" class="pulse-arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 3: Revocation Fault (Animated Highlight) -->
+  <g transform="translate(280, 50)">
+    <rect width="108" height="135" class="stage-card stage-fault"/>
+    <circle cx="20" cy="24" r="10" fill="#3c1e1e"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#f85149" text-anchor="middle">3</text>
+    <text x="36" y="28" class="stage-title" fill="#f85149">Inject Fault</text>
+    <text x="12" y="52" class="stage-desc">• Demote DB Role</text>
+    <text x="12" y="68" class="stage-desc">• Revoke Session</text>
+    <text x="12" y="84" class="stage-desc">• Emit SSF Event</text>
+    <text x="12" y="100" class="stage-desc">• Mark Monotonic t0</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#4c1d1d"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#f85149" text-anchor="middle">t0: REVOKED</text>
+  </g>
+
+  <!-- Connector 3-4 -->
+  <line x1="390" y1="117" x2="408" y2="117" stroke="#58a6ff" stroke-width="2" class="pulse-arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 4: High-Precision Probing -->
+  <g transform="translate(410, 50)">
+    <rect width="108" height="135" class="stage-card"/>
+    <circle cx="20" cy="24" r="10" fill="#21262d"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#38bdf8" text-anchor="middle">4</text>
+    <text x="36" y="28" class="stage-title" fill="#38bdf8">Probing</text>
+    <text x="12" y="52" class="stage-desc">• Scheduled Offsets</text>
+    <text x="12" y="68" class="stage-desc">• ≤100ms Precision</text>
+    <text x="12" y="84" class="stage-desc">• Adaptive Binary</text>
+    <text x="12" y="100" class="stage-desc">• Capture Contracts</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#0c4a6e"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#38bdf8" text-anchor="middle">PROBES FAILED</text>
+  </g>
+
+  <!-- Connector 4-5 -->
+  <line x1="520" y1="117" x2="538" y2="117" stroke="#58a6ff" stroke-width="2" class="pulse-arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 5: Measure Δt Exposure -->
+  <g transform="translate(540, 50)">
+    <rect width="108" height="135" class="stage-card stage-measure"/>
+    <circle cx="20" cy="24" r="10" fill="#372e17"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#d29922" text-anchor="middle">5</text>
+    <text x="36" y="28" class="stage-title" fill="#d29922">Measure Δt</text>
+    <text x="12" y="52" class="stage-desc">• Compute Window</text>
+    <text x="12" y="68" class="stage-desc">• Root Cause AI</text>
+    <text x="12" y="84" class="stage-desc">• Severity Score</text>
+    <text x="12" y="100" class="stage-desc">• Temporal Bounds</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#543b0c"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#d29922" text-anchor="middle">Δt CALC</text>
+  </g>
+
+  <!-- Connector 5-6 -->
+  <line x1="650" y1="117" x2="668" y2="117" stroke="#58a6ff" stroke-width="2" class="pulse-arrow" marker-end="url(#arrow)"/>
+
+  <!-- Stage 6: Evidence & PoC -->
+  <g transform="translate(670, 50)">
+    <rect width="108" height="135" class="stage-card"/>
+    <circle cx="20" cy="24" r="10" fill="#21262d"/>
+    <text x="20" y="28" font-family="monospace" font-size="10" fill="#a371f7" text-anchor="middle">6</text>
+    <text x="36" y="28" class="stage-title" fill="#a371f7">Report &amp; PoC</text>
+    <text x="12" y="52" class="stage-desc">• JSON / HTML Report</text>
+    <text x="12" y="68" class="stage-desc">• Audit Trail</text>
+    <text x="12" y="84" class="stage-desc">• Standalone PoC</text>
+    <text x="12" y="100" class="stage-desc">• State Reset</text>
+    <rect x="10" y="112" width="88" height="14" rx="3" fill="#3c1f66"/>
+    <text x="54" y="122" font-family="monospace" font-size="9" fill="#a371f7" text-anchor="middle">POC CREATED</text>
+  </g>
+
+</svg>

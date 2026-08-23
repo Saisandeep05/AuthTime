@@ -2,20 +2,54 @@
 
 > **An open-source controlled security research harness for experimentally measuring and quantifying Temporal Authorization Exposure Windows ($\Delta t_{\text{exp}}$) during access revocation fault injection.**
 
-[![AuthTime CI & Verification Pipeline](https://github.com/Saisandeep05/AuthTime/actions/workflows/ci.yml/badge.svg)](https://github.com/Saisandeep05/AuthTime/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
+<p align="center">
+  <img src="assets/animations/authtime-exposure-window.svg" alt="AuthTime Exposure Window Measurement Animation" width="100%">
+</p>
 
-**Tech Stack**: `Python 3.12` • `FastAPI` • `Django` • `Express.js` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
+<p align="center">
+  <a href="https://github.com/Saisandeep05/AuthTime/actions"><img src="https://github.com/Saisandeep05/AuthTime/actions/workflows/ci.yml/badge.svg" alt="CI Pipeline"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
+  <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
+  <a href="#-safety-boundary--constraints"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
+  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-58%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
+</p>
+
+**Tech Stack**: `Python 3.12` • `FastAPI` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
 
 ---
 
-## 🎯 Why AuthTime?
+## 🎯 The Security Exposure Problem
 
-- **Investigates Access Revocation Delay**: When permissions are revoked in a database (e.g. employee termination or privilege demotion), web applications often continue trusting stale in-memory caches or unrevoked JWT tokens.
-- **Quantifies Vulnerability Windows**: Measures exact time delays ($\le 100\text{ms}$ schedule precision) during which unauthorized requests succeed post-revocation.
-- **Multi-Framework Behavioral Testing**: Evaluates identical revocation fault scenarios across FastAPI, Django, Express.js, and OpenID CAEP/SSF push revocation targets.
-- **Empirical Security Research Engine**: Automatically generates standalone, zero-dependency Python PoC reproduction scripts to verify findings independently.
+When an administrative user's privileges are revoked in a primary database (due to employee termination, role demotion, or security compromise), distributed microservices and web applications often **fail to immediately enforce revocation**. 
+
+Applications continue accepting unauthorized requests during a silent **Temporal Authorization Exposure Window** ($\Delta t_{\text{exp}}$) caused by:
+1. **Stale In-Memory Caches**: Application workers caching user permissions until a local TTL expires.
+2. **Unrevoked Stateless JWT Tokens**: Valid cryptographic signatures accepted until token expiration (`exp`).
+3. **Asynchronous Propagation Delays**: Back-channel revocation events failing or delayed across message brokers.
+
+<p align="center">
+  <img src="assets/diagrams/authorization-exposure-model.svg" alt="Stale Authorization Exposure Model" width="100%">
+</p>
+
+**AuthTime** provides an empirical, automated research harness to inject controlled revocation faults, execute high-precision HTTP probing ($\le 100\text{ms}$ resolution), measure exact exposure windows, and generate standalone proof-of-concept reproduction scripts.
+
+---
+
+## ⚡ Headline Discovery
+
+In our reference web application benchmark setup:
+
+- **What Happened**: An admin user's role was demoted to a standard `User` in the primary ground-truth database.
+- **The Vulnerability**: The application continued executing privileged admin requests for **60.0 seconds** of configured TTL (or **4.52s ± 0.05s** in accelerated 0.1x experimental mode) because the worker authorization cache was stale.
+- **Severity Score**: Assigned a **Severity Score of 7.3 / 10.0 (HIGH)** per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
+- **Root Cause**: `AUTHORIZATION_CACHE` (Stale in-memory cache trusting outdated role claims post-revocation).
+
+```
+[10:00:00 AM] HR Revokes Admin Rights in Database ────────┐
+                                                         ├── ⚠️ 60.0-Second Vulnerability Gap (60.0s Configured TTL at 1.0x Real-Time)
+[10:01:00 AM] Application Cache Finally Expires ─────────┘
+```
+*(Note: In 0.1x accelerated experimental mode, the 60.0s TTL window completes in 4.52s ± 0.05s of wall-clock time).*
 
 ---
 
@@ -29,39 +63,30 @@
 
 ---
 
-## 🔄 How It Works
+## 🔄 Visual Experiment Lifecycle
 
-```
- 1. Configure Target ────> 2. Baseline Check ────> 3. Inject Fault ────> 4. High-Precision Probing ────> 5. Evidence & Analysis
-    (FastAPI / Express /      (Verify pre-fault       (Demote role or        (Fire probes at <=100ms        (Compute exposure window,
-    Django / CAEP)             authorized access)     revoke session)         offsets)                       root cause & PoC)
-```
+AuthTime coordinates a multi-stage experimental pipeline to measure access revocation lag with high precision:
 
-1. **Configure Target**: Select a reference target application (FastAPI, Node.js Express, Django, or OpenID CAEP/SSF).
+<p align="center">
+  <img src="assets/animations/experiment-lifecycle.svg" alt="AuthTime Experiment Execution Pipeline" width="100%">
+</p>
+
+1. **Configure Target**: Select reference target application (FastAPI, Node.js Express, Django, or OpenID CAEP/SSF).
 2. **Establish Baseline**: Perform identity verification and validate pre-fault authorized access (`ALLOW`).
 3. **Inject Controlled Fault**: Demote user role or revoke session in database/control plane.
 4. **Execute High-Precision Probes**: Fire background HTTP probes at scheduled offsets ($\le 100\text{ms}$ schedule resolution) using `time.monotonic()`.
 5. **Collect Evidence & Analyze**: Evaluate response contracts, compute exposure window $[t_{\text{last\_unauth}}, t_{\text{first\_block}}]$, determine root cause, and generate runnable PoC scripts.
-
----
-
-## ⚡ Headline Discovery
-
-In our reference web application setup:
-- **What Happened**: An admin user's role was changed to a standard `User`.
-- **The Vulnerability**: The application continued accepting admin requests for **60.0 seconds** of configured TTL (or **4.52s ± 0.05s** in accelerated 0.1x experimental mode) because the authorization cache was stale.
-- **Severity Score**: Assigned a **Severity Score of 7.3 / 10.0 (HIGH)** per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
-
-```
-[10:00:00 AM] HR Revokes Admin Rights in Database ────────┐
-                                                         ├── ⚠️ 60-Second Vulnerability Gap (60.0s Configured TTL at 1.0x Real-Time)
-[10:01:00 AM] Application Cache Finally Expires ─────────┘
-```
-*(Note: In 0.1x accelerated experimental mode, the 60.0s TTL window completes in 4.52s ± 0.05s of wall-clock time).*
+6. **Generate Reports & Reset State**: Output formatted JSON, HTML, and standalone Python PoC reproduction scripts, resetting target state while preserving immutable forensic audit trails.
 
 ---
 
 ## 🏗️ System Architecture
+
+AuthTime uses a modular, decoupled architecture where the core measurement engine communicates with target applications exclusively through a standardized **Target Adapter Abstraction Layer**:
+
+<p align="center">
+  <img src="assets/animations/architecture-flow.svg" alt="AuthTime System Architecture Data Flow" width="100%">
+</p>
 
 ```mermaid
 flowchart TD
@@ -106,10 +131,29 @@ flowchart TD
 
 ---
 
+## 💻 Supported Target Frameworks
+
+| Target Framework | Implementation Path | Execution Mode | Adapter Interface | Status |
+| :--- | :--- | :--- | :--- | :---: |
+| **FastAPI** | `src/app/main.py` | Python 3.12 (ASGI) | `HTTPTargetAdapter` | ✅ Primary Tested |
+| **Node.js Express** | `targets/express/server.js` | Node.js 18+ (HTTP) | `HTTPTargetAdapter` | ✅ Tested E2E |
+| **Django Native** | `targets/django/app.py` | Python 3.12 (WSGI) | `HTTPTargetAdapter` | ✅ Tested (Optional Req) |
+| **OpenID CAEP / SSF** | `targets/caep/server.py` | Cryptographic SSF | `HTTPTargetAdapter` | ✅ Tested (HMAC/RS256) |
+
+---
+
 ## 📂 Directory Structure
 
 ```
 AuthTime/
+├── assets/                         # Visual Assets & Animations
+│   ├── animations/                 # SVG Animated Visualizations
+│   │   ├── authtime-exposure-window.svg
+│   │   ├── experiment-lifecycle.svg
+│   │   └── architecture-flow.svg
+│   └── diagrams/                   # Conceptual Visual Diagrams
+│       └── authorization-exposure-model.svg
+│
 ├── src/                            # Source Packages
 │   ├── app/                        # Reference Auth Target Application (FastAPI on 127.0.0.1:8000)
 │   │   ├── main.py                 # FastAPI application factory
@@ -144,12 +188,12 @@ AuthTime/
 ├── dashboard/                      # Visual Exposure Timeline Dashboard
 │   └── index.html                  # Interactive HTML5/Chart.js visual dashboard
 │
-├── docs/                           # Specifications & Research Papers
+├── docs/                           # Specifications & Research Write-ups
 │   ├── architecture.md             # System architecture & component interface spec
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   └── findings-report.md          # Technical security research write-up
 │
-├── tests/                          # Automated Verification Suite (57 Tests)
+├── tests/                          # Automated Verification Suite (59 Tests)
 │   ├── unit/                       # Unit tests (schemas, adapters, ground truth, root cause)
 │   ├── integration/                # Integration tests (controller, fault injection, multi-framework)
 │   ├── scenarios/                  # Scenario tests (cross-user isolation)

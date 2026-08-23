@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 240" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; stroke: #30363d; stroke-width: 1.5; rx: 10px; }
+      .card-normal { fill: #161b22; stroke: #238636; stroke-width: 1.2; rx: 6px; }
+      .card-event { fill: #161b22; stroke: #58a6ff; stroke-width: 1.2; rx: 6px; }
+      .card-vuln { fill: #2d1517; stroke: #f85149; stroke-width: 1.5; rx: 6px; }
+      .card-denied { fill: #161b22; stroke: #8b949e; stroke-width: 1.2; rx: 6px; }
+
+      .hdr { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; font-weight: 700; }
+      .subhdr { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 10px; font-weight: 600; fill: #8b949e; }
+      .body-txt { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10.5px; fill: #c9d1d9; }
+      .code-txt { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 10px; }
+
+      @keyframes warnGlow {
+        0%, 100% { stroke: #f85149; stroke-opacity: 0.6; }
+        50% { stroke: #f85149; stroke-opacity: 1.0; fill-opacity: 0.9; }
+      }
+
+      .vuln-box { animation: warnGlow 2.5s ease-in-out infinite; }
+    </style>
+  </defs>
+
+  <!-- Container -->
+  <rect x="2" y="2" width="796" height="236" class="bg"/>
+
+  <!-- Title Header -->
+  <text x="24" y="28" class="hdr" fill="#c9d1d9">AUTHTIME :: STALE AUTHORIZATION EXPOSURE MODEL</text>
+  <text x="590" y="28" class="subhdr">Conceptual Revocation Failure</text>
+
+  <!-- Panel 1: Normal State -->
+  <g transform="translate(24, 46)">
+    <rect width="224" height="170" class="card-normal"/>
+    <text x="14" y="24" class="hdr" fill="#3fb950">1. PRE-REVOCATION</text>
+    <text x="14" y="38" class="subhdr">Authorized Baseline</text>
+    <line x1="14" y1="46" x2="210" y2="46" stroke="#21262d" stroke-width="1"/>
+
+    <text x="14" y="66" class="body-txt">• DB State: <tspan fill="#3fb950" class="code-txt">role="Admin"</tspan></text>
+    <text x="14" y="86" class="body-txt">• Cache State: <tspan fill="#3fb950" class="code-txt">role="Admin"</tspan></text>
+    <text x="14" y="106" class="body-txt">• JWT Token: <tspan fill="#3fb950" class="code-txt">Valid (Admin)</tspan></text>
+    
+    <rect x="14" y="124" width="196" height="32" rx="4" fill="#1b4721"/>
+    <text x="112" y="144" class="code-txt" fill="#3fb950" text-anchor="middle">HTTP 200 OK (ALLOW)</text>
+  </g>
+
+  <!-- Connector 1-2 -->
+  <path d="M 252,130 L 272,130" stroke="#58a6ff" stroke-width="2" stroke-dasharray="3,3"/>
+
+  <!-- Panel 2: Revocation Event -->
+  <g transform="translate(276, 46)">
+    <rect width="224" height="170" class="card-event"/>
+    <text x="14" y="24" class="hdr" fill="#58a6ff">2. REVOCATION FAULT</text>
+    <text x="14" y="38" class="subhdr">Admin Privilege Demotion</text>
+    <line x1="14" y1="46" x2="210" y2="46" stroke="#21262d" stroke-width="1"/>
+
+    <text x="14" y="66" class="body-txt">• HR demotes user in DB</text>
+    <text x="14" y="86" class="body-txt">• DB State: <tspan fill="#f85149" class="code-txt">role="User"</tspan> ❌</text>
+    <text x="14" y="106" class="body-txt">• Cache Invalidation: <tspan fill="#d29922" class="code-txt">MISSED</tspan></text>
+    
+    <rect x="14" y="124" width="196" height="32" rx="4" fill="#1c2d42"/>
+    <text x="112" y="144" class="code-txt" fill="#58a6ff" text-anchor="middle">t0: FAULT INJECTED</text>
+  </g>
+
+  <!-- Connector 2-3 -->
+  <path d="M 504,130 L 524,130" stroke="#f85149" stroke-width="2" stroke-dasharray="3,3"/>
+
+  <!-- Panel 3: Exposure Window (Vulnerability) -->
+  <g transform="translate(528, 46)">
+    <rect width="248" height="170" class="card-vuln vuln-box"/>
+    <text x="14" y="24" class="hdr" fill="#f85149">3. EXPOSURE WINDOW</text>
+    <text x="14" y="38" class="subhdr" fill="#d29922">Stale Access Vulnerability</text>
+    <line x1="14" y1="46" x2="234" y2="46" stroke="#4c1d1d" stroke-width="1"/>
+
+    <text x="14" y="66" class="body-txt">• DB State: <tspan fill="#f85149" class="code-txt">User (REVOKED)</tspan></text>
+    <text x="14" y="86" class="body-txt">• App Cache: <tspan fill="#d29922" class="code-txt">Admin (STALE)</tspan> ⚠️</text>
+    <text x="14" y="106" class="body-txt">• Impact: <tspan fill="#f85149" class="code-txt">Unauthorized Access</tspan></text>
+    
+    <rect x="14" y="124" width="220" height="32" rx="4" fill="#4c1d1d"/>
+    <text x="124" y="144" class="code-txt" fill="#f85149" font-weight="700" text-anchor="middle">⚠️ HTTP 200 OK (STALE ALLOW)</text>
+  </g>
+
+</svg>

@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" width="100%" height="100%">
+  <defs>
+    <style>
+      .bg { fill: #0d1117; stroke: #30363d; stroke-width: 1.5; rx: 10px; }
+      .panel { fill: #161b22; stroke: #21262d; stroke-width: 1; rx: 6px; }
+      .title { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 14px; font-weight: 700; fill: #58a6ff; letter-spacing: 0.5px; }
+      .subtitle { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #8b949e; }
+      .label { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #c9d1d9; font-weight: 600; }
+      .sublabel { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 10px; fill: #8b949e; }
+      .metric-title { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 11px; fill: #8b949e; text-transform: uppercase; }
+      .metric-val { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; font-size: 16px; font-weight: 700; }
+      
+      /* Keyframe Animations */
+      @keyframes probeScan {
+        0% { transform: translateX(0px); opacity: 0; }
+        5% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { transform: translateX(640px); opacity: 0; }
+      }
+      
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+      }
+
+      @keyframes statusChange {
+        0%, 25% { fill: #3fb950; text: "200 OK (ALLOW)"; }
+        26%, 80% { fill: #d29922; }
+        81%, 100% { fill: #f85149; }
+      }
+
+      @keyframes windowHighlight {
+        0%, 100% { fill: #d29922; fill-opacity: 0.15; stroke: #d29922; stroke-opacity: 0.4; }
+        50% { fill: #d29922; fill-opacity: 0.30; stroke: #d29922; stroke-opacity: 0.9; }
+      }
+
+      .probe-laser { animation: probeScan 6s linear infinite; }
+      .exposure-box { animation: windowHighlight 3s ease-in-out infinite; }
+      .pulse-text { animation: pulseGlow 2s ease-in-out infinite; }
+    </style>
+
+    <linearGradient id="exposureGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d29922" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#f85149" stop-opacity="0.35"/>
+    </linearGradient>
+
+    <linearGradient id="laserGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#58a6ff" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#58a6ff" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#58a6ff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Container -->
+  <rect x="2" y="2" width="796" height="276" class="bg"/>
+
+  <!-- Top Header Bar -->
+  <text x="24" y="32" class="title">AUTHTIME :: ACCELERATED REVOCATION MEASUREMENT</text>
+  <text x="560" y="32" class="subtitle">Monotonic Precision: ≤100ms</text>
+
+  <!-- Metric Summary Cards -->
+  <rect x="24" y="46" width="170" height="48" class="panel"/>
+  <text x="36" y="62" class="metric-title">Configured TTL</text>
+  <text x="36" y="82" class="metric-val" fill="#c9d1d9">60.0s</text>
+
+  <rect x="204" y="46" width="190" height="48" class="panel"/>
+  <text x="216" y="62" class="metric-title">Fault Type</text>
+  <text x="216" y="82" class="metric-val" fill="#d29922">STALE_CACHE</text>
+
+  <rect x="404" y="46" width="180" height="48" class="panel"/>
+  <text x="416" y="62" class="metric-title">Time Scale</text>
+  <text x="416" y="82" class="metric-val" fill="#58a6ff">0.10x (Accelerated)</text>
+
+  <rect x="594" y="46" width="182" height="48" class="panel"/>
+  <text x="606" y="62" class="metric-title">Measured Window Δt</text>
+  <text x="606" y="82" class="metric-val" fill="#f85149">4.52s ± 0.05s</text>
+
+  <!-- Main Timeline Canvas -->
+  <rect x="24" y="108" width="752" height="148" class="panel"/>
+
+  <!-- Time Axis Line -->
+  <line x1="80" y1="180" x2="720" y2="180" stroke="#30363d" stroke-width="2"/>
+
+  <!-- Phase 1: Authorized Access (0s to 2s in timeline coordinate space) -->
+  <rect x="80" y="160" width="150" height="40" fill="#238636" fill-opacity="0.2" stroke="#2e8fff" stroke-width="0"/>
+  <line x1="80" y1="180" x2="230" y2="180" stroke="#3fb950" stroke-width="4"/>
+  <text x="100" y="152" class="label" fill="#3fb950">200 OK (ALLOW)</text>
+  <text x="95" y="202" class="sublabel">Pre-Fault Baseline</text>
+
+  <!-- Revocation Trigger Point -->
+  <line x1="230" y1="124" x2="230" y2="236" stroke="#f85149" stroke-width="2" stroke-dasharray="4,4"/>
+  <circle cx="230" cy="180" r="6" fill="#f85149"/>
+  <text x="230" y="120" class="label" fill="#f85149" text-anchor="middle">⚡ FAULT INJECTED</text>
+  <text x="230" y="250" class="sublabel" text-anchor="middle">DB Role Revoked (Admin → User)</text>
+
+  <!-- Phase 2: Exposure Window (Stale Cache Window) -->
+  <rect x="230" y="148" width="350" height="64" class="exposure-box" rx="4"/>
+  <line x1="230" y1="180" x2="580" y2="180" stroke="#d29922" stroke-width="4"/>
+  <text x="405" y="140" class="label pulse-text" fill="#d29922" text-anchor="middle">⚠ STALE AUTHORIZATION EXPOSURE WINDOW</text>
+  <text x="405" y="230" class="sublabel" text-anchor="middle">Unauthorized Admin Requests Succeed (Δt = 4.52s Wall-Clock)</text>
+
+  <!-- Measurement Bracket -->
+  <path d="M 230,165 L 230,158 L 580,158 L 580,165" fill="none" stroke="#d29922" stroke-width="1.5"/>
+
+  <!-- Phase 3: Access Revoked (Post Cache Expiry) -->
+  <line x1="580" y1="124" x2="580" y2="236" stroke="#8b949e" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <circle cx="580" cy="180" r="5" fill="#8b949e"/>
+  <line x1="580" y1="180" x2="720" y2="180" stroke="#f85149" stroke-width="4"/>
+  <text x="650" y="152" class="label" fill="#f85149">403 DENY</text>
+  <text x="650" y="202" class="sublabel">Cache Expired</text>
+
+  <!-- Animated Probe Laser Scanner -->
+  <g class="probe-laser" transform="translate(80, 0)">
+    <line x1="0" y1="124" x2="0" y2="236" stroke="url(#laserGrad)" stroke-width="3"/>
+    <circle cx="0" cy="180" r="4" fill="#58a6ff"/>
+  </g>
+
+</svg>
