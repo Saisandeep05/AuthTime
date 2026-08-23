@@ -30,3 +30,26 @@ async def test_experiment_controller_single_trial():
 
         assert res.finding.root_cause in ("AUTHORIZATION_CACHE", "OBSERVATION_HORIZON_REACHED")
 
+
+@pytest.mark.asyncio
+async def test_experiment_controller_custom_target_adapter():
+    from authtime.adapters.target_adapter import HTTPTargetAdapter
+
+    called_verify = False
+
+    class TrackingAdapter(HTTPTargetAdapter):
+        async def verify_identity(self):
+            nonlocal called_verify
+            called_verify = True
+            return await super().verify_identity()
+
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://testclient") as async_client:
+        adapter = TrackingAdapter("http://testclient", http_client=async_client)
+        controller = ExperimentController("http://testclient", target_adapter=adapter, http_client=async_client)
+        
+        ok = await controller.verify_baseline("admin1", "/admin/users", http_client=async_client)
+        assert ok is True
+        assert called_verify is True
+
+

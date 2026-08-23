@@ -28,6 +28,8 @@ from authtime.verification.predicate import evaluate_http_decision, evaluate_aut
 from authtime.verification.root_cause import RootCauseAnalyzer
 from authtime.reporting.generator import compute_severity_score
 from authtime.adapters.contract import DEFAULT_ADMIN_USERS_CONTRACT, ResourceContract
+from authtime.adapters.target_adapter import BaseTargetAdapter, HTTPTargetAdapter
+
 from authtime.models.evidence import (
     ExperimentState,
     RawProbeObservation,
@@ -67,12 +69,14 @@ class ExperimentController:
         event_collector: Optional[EventCollector] = None,
         http_client: Optional[httpx.AsyncClient] = None,
         contract: Optional[ResourceContract] = None,
+        target_adapter: Optional[BaseTargetAdapter] = None,
     ):
         self.target_url = target_url.rstrip("/")
         self._enforce_safety_boundary()
         self.fault_injector = fault_injector or FaultInjectorClient(self.target_url, http_client=http_client)
         self.event_collector = event_collector or EventCollector(self.target_url, http_client=http_client)
         self.contract = contract or DEFAULT_ADMIN_USERS_CONTRACT
+        self.target_adapter = target_adapter or HTTPTargetAdapter(self.target_url, http_client=http_client)
 
     def _enforce_safety_boundary(self):
         if "testclient" in self.target_url:
@@ -88,39 +92,27 @@ class ExperimentController:
         resource_path: str = "/admin/users",
         http_client: Optional[httpx.AsyncClient] = None,
     ) -> bool:
-        close_client = False
-        client = http_client or self.fault_injector._shared_client
-        if client is None:
-            client = httpx.AsyncClient()
-            close_client = True
+        adapter = self.target_adapter
+        if http_client is not None and getattr(adapter, "_shared_client", None) != http_client:
+            adapter = HTTPTargetAdapter(self.target_url, http_client=http_client)
 
         try:
-            id_resp = await client.get(f"{self.target_url}/target/identity")
-            if id_resp.status_code != 200:
-                return False
-            id_data = id_resp.json() if id_resp.text else {}
+            id_data = await adapter.verify_identity()
             if id_data.get("product") != "AuthTime" or "authtime" not in str(id_data.get("target", "")).lower():
                 return False
 
-            await self.fault_injector.reset(http_client=client)
+            await adapter.reset_state()
             ground_truth_manager.reset_to_defaults()
 
-            login_resp = await client.post(f"{self.target_url}/auth/login", json={"user_id": user_id})
-            if login_resp.status_code != 200:
-                return False
-            token = login_resp.json()["access_token"]
-            headers = {"Authorization": f"Bearer {token}", "X-AuthTime-Request-ID": "baseline-probe"}
+            token = await adapter.login_user(user_id)
+            st_code, body_text, _ = await adapter.probe_endpoint(resource_path, token, "baseline-probe")
 
-            resp = await client.get(f"{self.target_url}{resource_path}", headers=headers)
             expected = ground_truth_manager.get_expected_decision(user_id, resource_path, time.monotonic())
-            actual = evaluate_http_decision(resp.status_code, resp.text, resource_path, self.contract)
+            actual = evaluate_http_decision(st_code, body_text, resource_path, self.contract)
 
             return expected == actual
         except Exception:
             return False
-        finally:
-            if close_client and client:
-                await client.aclose()
 
     async def verify_cleanup(
         self,
@@ -132,14 +124,17 @@ class ExperimentController:
         Independent Post-Reset State Verification.
         Verifies reset succeeded, target identity endpoint is active, and unauthorized requests are DENIED.
         """
+        adapter = self.target_adapter
+        if http_client is not None and getattr(adapter, "_shared_client", None) != http_client:
+            adapter = HTTPTargetAdapter(self.target_url, http_client=http_client)
+
         try:
-            await self.fault_injector.reset(http_client=http_client)
-            id_resp = await self.fault_injector._shared_client.get(f"{self.target_url}/target/identity") if self.fault_injector._shared_client else await httpx.get(f"{self.target_url}/target/identity")
-            if id_resp.status_code != 200:
-                return False
-            return True
+            await adapter.reset_state()
+            id_data = await adapter.verify_identity()
+            return id_data.get("product") == "AuthTime"
         except Exception:
             return False
+
 
     async def run_single_trial(
         self,

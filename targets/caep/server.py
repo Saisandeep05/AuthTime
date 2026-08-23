@@ -29,7 +29,8 @@ ACTIVE_SESSIONS: Dict[str, Dict[str, Any]] = {
     "user1": {"role": "User", "session_id": "sess-user1", "revoked": False, "revoked_at": None},
 }
 AUDIT_EVENTS: List[Dict[str, Any]] = []
-CONSUMED_JTIS: Set[str] = set()
+CONSUMED_JTIS: Dict[str, float] = {}
+
 
 
 @app.get("/target/identity")
@@ -129,11 +130,17 @@ async def receive_caep_event(request: Request, authorization: Optional[str] = He
     except Exception:
         raise HTTPException(status_code=400, detail="Cryptographic SSF SET Token Validation Failed")
 
-    # 1. Replay Resistance (jti deduplication)
+    # 1. Replay Resistance (jti deduplication with 300s TTL eviction)
+    now_ts = time.time()
+    expired_jtis = [k for k, ts in CONSUMED_JTIS.items() if now_ts - ts > 300.0]
+    for k in expired_jtis:
+        del CONSUMED_JTIS[k]
+
     jti = decoded_set.get("jti")
     if not jti or jti in CONSUMED_JTIS:
         raise HTTPException(status_code=400, detail="SET Replay Detected or Missing jti Claim")
-    CONSUMED_JTIS.add(jti)
+    CONSUMED_JTIS[jti] = now_ts
+
 
     # 2. Expiration & Freshness Validation
     now = int(time.time())
@@ -152,7 +159,8 @@ async def receive_caep_event(request: Request, authorization: Optional[str] = He
 
     user_id = caep_rev.get("sub") or caep_rev.get("user_id")
     if not user_id or user_id not in ACTIVE_SESSIONS:
-        raise HTTPException(status_code=404, detail=f"Target Subject '{{user_id}}' Not Found")
+        raise HTTPException(status_code=404, detail=f"Target Subject '{user_id}' Not Found")
+
 
     ACTIVE_SESSIONS[user_id]["revoked"] = True
     ACTIVE_SESSIONS[user_id]["revoked_at"] = time.monotonic()
