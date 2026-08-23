@@ -12,6 +12,16 @@ from app.cache.ttl_cache import TTLCache
 client = TestClient(app)
 
 
+def test_target_identity_endpoint():
+    res = client.get("/target/identity")
+    assert res.status_code == 200
+    data = res.json()
+    assert "target" in data
+    assert "authtime" in data["target"].lower()
+    assert "capabilities" in data
+
+
+
 def test_jwt_token_flow():
     token = create_access_token("admin1", "Admin", ttl_seconds=60)
     payload = decode_access_token(token)

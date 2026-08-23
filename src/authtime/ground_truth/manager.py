@@ -3,13 +3,12 @@ Ground Truth State Manager.
 
 Defines an independent, decoupled expected authorization oracle (ALLOW vs DENY)
 for any user, role, and resource at timestamp T.
+Supports experiment-isolated ground-truth state.
 """
 
 from typing import Dict, List, Set, Optional, Any
 from authtime.models.schemas import RoleEnum, GroundTruthState
 
-
-# Independent Authorization Policy Map (Decoupled from target application RBAC code)
 INDEPENDENT_POLICY_MAP: Dict[str, Set[str]] = {
     "Admin": {"admin:read", "invoices:read"},
     "User": {"invoices:read"},
@@ -19,7 +18,8 @@ INDEPENDENT_POLICY_MAP: Dict[str, Set[str]] = {
 
 
 class GroundTruthStateManager:
-    def __init__(self):
+    def __init__(self, experiment_id: Optional[str] = None):
+        self.experiment_id = experiment_id
         self._initial_user_roles: Dict[str, str] = {
             "admin1": "Admin",
             "user1": "User",
@@ -68,6 +68,7 @@ class GroundTruthStateManager:
         role_str = self.get_expected_role(user_id, timestamp_monotonic)
         perms = list(INDEPENDENT_POLICY_MAP.get(role_str, set()))
         decision = self.get_expected_decision(user_id, resource_path, timestamp_monotonic)
+        dec_typed = "ALLOW" if decision == "ALLOW" else "DENY"
 
         return GroundTruthState(
             timestamp_monotonic=timestamp_monotonic,
@@ -75,7 +76,7 @@ class GroundTruthStateManager:
             expected_role=RoleEnum(role_str) if role_str in RoleEnum._value2member_map_ else RoleEnum.USER,
             expected_permissions=perms,
             resource_path=resource_path,
-            expected_decision=decision,
+            expected_decision=dec_typed,
         )
 
 

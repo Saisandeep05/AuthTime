@@ -1,65 +1,143 @@
 """
 Django Reference Authorization Target for AuthTime.
-Runs via WSGI / ASGI bound strictly to 127.0.0.1:8002.
+Runs a native Django WSGI application bound strictly to 127.0.0.1:8002.
 """
 
+import os
+import sys
 import time
+import json
+import uuid
 import jwt
-from fastapi import FastAPI, Request, HTTPException, Depends
-from pydantic import BaseModel
+import django
+from django.conf import settings
+from django.http import JsonResponse, HttpResponse
+from django.urls import path
+from django.core.wsgi import get_wsgi_application
 
-app = FastAPI(title="Django AuthTarget Replica")
-JWT_SECRET = "authtime-django-secret-key-32-bytes!"
+# Ephemeral startup secret if JWT_SECRET environment variable is not explicitly provided
+JWT_SECRET = os.getenv("JWT_SECRET") or f"ephemeral-{uuid.uuid4().hex}"
+DEBUG_MODE = os.getenv("AUTHTIME_DEBUG", "false").lower() == "true"
 
-USER_ROLES_DB = {"admin1": "Admin", "user1": "User"}
+# Configure Minimal In-Memory Django Settings
+if not settings.configured:
+    settings.configure(
+        DEBUG=DEBUG_MODE,
+        SECRET_KEY=JWT_SECRET,
+        ROOT_URLCONF=__name__,
+        ALLOWED_HOSTS=["127.0.0.1", "localhost", "testclient"],
+        MIDDLEWARE=[
+            "django.middleware.common.CommonMiddleware",
+        ],
+    )
+    django.setup()
+
+# In-memory target state
+USER_ROLES_DB = {"admin1": "Admin", "user1": "User", "guest1": "Guest", "svc1": "ServiceAccount"}
+ALLOWED_ROLES = {"Admin", "User", "Guest", "ServiceAccount"}
 AUTH_CACHE = {}
 
 
-@app.post("/auth/login")
-def login(data: dict):
-    user_id = data.get("user_id", "admin1")
+def enforce_loopback_security(request) -> bool:
+    remote_addr = request.META.get("REMOTE_ADDR", "127.0.0.1")
+    return remote_addr in ("127.0.0.1", "localhost", "::1")
+
+
+def login_view(request):
+    if request.method != "POST":
+        return JsonResponse({"detail": "Method Not Allowed"}, status=405)
+    try:
+        body = json.loads(request.body.decode("utf-8")) if request.body else {}
+    except Exception:
+        body = {}
+    user_id = body.get("user_id", "admin1")
     role = USER_ROLES_DB.get(user_id, "User")
     token = jwt.encode({"sub": user_id, "role": role, "exp": int(time.time()) + 3600}, JWT_SECRET, algorithm="HS256")
-    return {"access_token": token, "token_type": "bearer"}
+    return JsonResponse({"access_token": token, "token_type": "bearer", "user_id": user_id, "role": role})
 
 
-@app.get("/admin/users")
-def get_admin_users(request: Request):
+def get_admin_users_view(request):
     auth_header = request.headers.get("Authorization")
     if not auth_header:
-        raise HTTPException(status_code=401, detail="Missing Token")
-    token = auth_header.split(" ")[1]
+        return JsonResponse({"detail": "Missing Token"}, status=401)
+    token = auth_header.replace("Bearer ", "").strip()
     try:
         decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     except Exception:
-        raise HTTPException(status_code=401, detail="Invalid Token")
+        return JsonResponse({"detail": "Invalid Token"}, status=401)
 
     user_id = decoded["sub"]
     now = time.monotonic()
-    role = USER_ROLES_DB.get(user_id, "User")
 
-    if user_id in AUTH_CACHE and AUTH_CACHE[user_id]["expires_at"] > now:
-        role = AUTH_CACHE[user_id]["role"]
+    cached = AUTH_CACHE.get(f"auth:{user_id}")
+    if cached and cached["expires_at"] > now:
+        role = cached["role"]
+    else:
+        role = USER_ROLES_DB.get(user_id, "User")
 
     if role != "Admin":
-        raise HTTPException(status_code=403, detail="Permission Denied")
+        return JsonResponse({"detail": "Permission Denied"}, status=403)
 
-    return {"users": ["admin1", "user1"], "target": "Django Replica"}
+    return JsonResponse({"users": ["admin1", "user1"], "target": "Django Native Replica", "count": 2})
 
 
-@app.post("/faults/inject")
-def inject_fault(data: dict):
-    user_id = data.get("user_id", "admin1")
-    new_role = data.get("new_role", "User")
+def inject_fault_view(request):
+    if not enforce_loopback_security(request):
+        return JsonResponse({"detail": "Safety Error: Fault injection restricted to local loopback"}, status=403)
+    if request.method != "POST":
+        return JsonResponse({"detail": "Method Not Allowed"}, status=405)
+    try:
+        body = json.loads(request.body.decode("utf-8")) if request.body else {}
+    except Exception:
+        body = {}
+    user_id = body.get("user_id", "admin1")
+    new_role = body.get("new_role", "User")
+    if new_role not in ALLOWED_ROLES:
+        return JsonResponse({"detail": f"Invalid role '{new_role}'. Must be one of {sorted(list(ALLOWED_ROLES))}"}, status=400)
+
     USER_ROLES_DB[user_id] = new_role
-    if data.get("fault_type") == "stale_cache":
-        AUTH_CACHE[user_id] = {"role": "Admin", "expires_at": time.monotonic() + data.get("cache_ttl_seconds", 30)}
-    return {"status": "fault_injected"}
+    if body.get("fault_type") == "stale_cache":
+        AUTH_CACHE[f"auth:{user_id}"] = {
+            "role": "Admin",
+            "expires_at": time.monotonic() + body.get("cache_ttl_seconds", 30.0),
+        }
+    return JsonResponse({"status": "SUCCESS", "fault_type": body.get("fault_type"), "target_user": user_id})
 
 
-@app.post("/faults/reset")
-def reset_state():
+def reset_state_view(request):
+    if not enforce_loopback_security(request):
+        return JsonResponse({"detail": "Safety Error: State reset restricted to local loopback"}, status=403)
     global USER_ROLES_DB, AUTH_CACHE
-    USER_ROLES_DB = {"admin1": "Admin", "user1": "User"}
+    USER_ROLES_DB = {"admin1": "Admin", "user1": "User", "guest1": "Guest", "svc1": "ServiceAccount"}
     AUTH_CACHE = {}
-    return {"status": "reset_complete"}
+    return JsonResponse({"status": "RESET_COMPLETE"})
+
+
+def target_identity_view(request):
+    return JsonResponse({
+        "product": "AuthTime",
+        "target": "authtime-django-target",
+        "target_type": "django-reference-target",
+        "protocol_version": "1.0",
+        "target_version": "1.0.0",
+        "capabilities": ["fault_injection", "reset", "audit_events"],
+        "framework": "Django Native",
+    })
+
+
+urlpatterns = [
+    path("target/identity", target_identity_view),
+    path("auth/login", login_view),
+    path("admin/users", get_admin_users_view),
+    path("faults/inject", inject_fault_view),
+    path("faults/reset", reset_state_view),
+]
+
+
+app = get_wsgi_application()
+
+if __name__ == "__main__":
+    from wsgiref.simple_server import make_server
+    print("[*] Starting Native Django Reference Target on http://127.0.0.1:8002...")
+    httpd = make_server("127.0.0.1", 8002, app)
+    httpd.serve_forever()

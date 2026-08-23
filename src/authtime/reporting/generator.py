@@ -10,6 +10,7 @@ import re
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from authtime.models.schemas import ExperimentResult, SecurityFinding, ExposureMetric
+from authtime.verification.predicate import evaluate_authorization_violation, evaluate_http_decision
 
 
 def compute_severity_score(
@@ -32,10 +33,24 @@ def compute_severity_score(
     if exposure_sec <= 0:
         return 0.0, "LOW"
 
-
     s_exposure = 3.0 + 2.5 * math.log10(exposure_sec + 1.0)
-    w_endpoint = 1.5 if resource_path.startswith("/admin") else 1.0
-    c_conf = 1.0 if "PROVEN" in confidence else (0.85 if "SUPPORTED" in confidence else 0.70)
+    
+    if resource_path.startswith("/admin") or "admin" in resource_path:
+        w_endpoint = 1.5
+    elif "secret" in resource_path or "key" in resource_path or "payment" in resource_path:
+        w_endpoint = 1.8
+    else:
+        w_endpoint = 1.0
+
+    conf_str = str(confidence).upper()
+    if conf_str == "PROVEN":
+        c_conf = 1.0
+    elif conf_str == "SUPPORTED":
+        c_conf = 0.85
+    elif conf_str == "INDICATIVE":
+        c_conf = 0.70
+    else:
+        c_conf = 0.50
 
     raw_score = min(10.0, round(s_exposure * w_endpoint * c_conf, 1))
 
@@ -97,6 +112,8 @@ class ReportGenerator:
         md = f"""# AuthTime Security Verification Report: {finding.finding_id}
 
 ## Executive Summary
+- **Protocol Version**: `{result.protocol_version}`
+- **Schema Version**: `{result.schema_version}`
 - **Finding Title**: {finding.title}
 - **Fault Type**: `{finding.fault_type}`
 - **Severity Score**: `{finding.severity_score:.1f} / 10.0` (**{finding.severity_label}**)
@@ -143,7 +160,7 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
         stats_html = ""
         if stats:
-            rep_note = f"<p class='note'><strong>Note:</strong> {stats['limited_sample_note']}</p>" if stats.get("limited_sample_note") else ""
+            rep_note = f"<p class='note'><strong>Note:</strong> {html.escape(str(stats['limited_sample_note']))}</p>" if stats.get("limited_sample_note") else ""
             stats_html = f"""
             <h2>Aggregate Trial Statistics (N={stats.get('repetitions', 1)})</h2>
             {rep_note}
@@ -157,26 +174,25 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
             </ul>
             """
 
-        jitter_warn_html = f"<div class='warning'><strong>⚠️ Jitter Warning:</strong> {metrics.jitter_warning}</div>" if metrics.jitter_warning else ""
-        badge_class = finding.severity_label.lower()
+        badge_class = str(finding.severity_label).lower()
+        jitter_warn_html = f"<p class='warning'><strong>Jitter Warning:</strong> {html.escape(str(metrics.jitter_warning))}</p>" if metrics.jitter_warning else ""
         first_blocked_str = f"{metrics.first_blocked_monotonic:.3f}s" if metrics.first_blocked_monotonic is not None else "NOT OBSERVED"
         interval_str = (
             f"[{metrics.exposure_interval_min_sec:.2f}s, {metrics.exposure_interval_max_sec:.2f}s]"
             if metrics.exposure_interval_max_sec is not None
-            else f"[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED)"
+            else f"[{metrics.exposure_interval_min_sec:.2f}s, ∞] (RIGHT-CENSORED at horizon {metrics.observation_horizon_sec:.2f}s)"
         )
         est_exp_str = f"{metrics.estimated_exposure_sec:.2f}s" if metrics.estimated_exposure_sec is not None else f"≥ {metrics.exposure_interval_min_sec:.2f}s (Censored)"
-        precision_str = f"±{metrics.precision_sec:.2f}s" if metrics.precision_sec is not None else "UNBOUNDED"
+        precision_str = f"±{metrics.precision_sec:.2f}s" if metrics.precision_sec is not None else "UNBOUNDED (Censored Observation)"
 
-        html = f"""<!DOCTYPE html>
+        html_doc = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuthTime Security Verification Report - {finding.finding_id}</title>
+    <title>AuthTime Security Report - {html.escape(finding.finding_id)}</title>
     <style>
-        body {{ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 900px; margin: 0 auto; padding: 2rem 1rem; background-color: #f8f9fa; }}
-        .card {{ background: #ffffff; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); margin-bottom: 1.5rem; border: 1px solid #e9ecef; }}
+        body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f8fafc; }}
+        .card {{ background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }}
         h1, h2, h3 {{ color: #0f172a; }}
         .badge {{ display: inline-block; padding: 0.25rem 0.75rem; font-weight: 700; border-radius: 4px; color: white; font-size: 0.9rem; }}
         .badge.critical {{ background-color: #dc2626; }}
@@ -195,11 +211,12 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
         <h1>AuthTime Security Verification Report</h1>
         <h2>Executive Summary</h2>
         <table>
-            <tr><th>Finding Title</th><td>{finding.title}</td></tr>
-            <tr><th>Fault Type</th><td><code>{finding.fault_type}</code></td></tr>
-            <tr><th>Severity Score</th><td><code>{finding.severity_score:.1f} / 10.0</code> <span class="badge {badge_class}">{finding.severity_label}</span></td></tr>
-            <tr><th>Root Cause</th><td><code>{finding.root_cause}</code> (Confidence: <strong>{finding.root_cause_confidence}</strong>)</td></tr>
-            <tr><th>Measurement Status</th><td><code>{metrics.measurement_status}</code></td></tr>
+            <tr><th>Protocol Version</th><td><code>{html.escape(result.protocol_version)}</code></td></tr>
+            <tr><th>Finding Title</th><td>{html.escape(finding.title)}</td></tr>
+            <tr><th>Fault Type</th><td><code>{html.escape(finding.fault_type)}</code></td></tr>
+            <tr><th>Severity Score</th><td><code>{finding.severity_score:.1f} / 10.0</code> <span class="badge {badge_class}">{html.escape(finding.severity_label)}</span></td></tr>
+            <tr><th>Root Cause</th><td><code>{html.escape(finding.root_cause)}</code> (Confidence: <strong>{html.escape(str(finding.root_cause_confidence))}</strong>)</td></tr>
+            <tr><th>Measurement Status</th><td><code>{html.escape(metrics.measurement_status)}</code></td></tr>
             <tr><th>Baseline Status</th><td><strong>{'PASSED' if result.baseline_passed else 'FAILED'}</strong></td></tr>
         </table>
     </div>
@@ -210,10 +227,10 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
             <tr><th>Revocation Timestamp (t_fault)</th><td><code>{metrics.fault_timestamp_monotonic:.3f}s</code></td></tr>
             <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>{metrics.first_unauth_monotonic or 0.0:.3f}s</code></td></tr>
             <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>{metrics.last_unauth_monotonic or 0.0:.3f}s</code></td></tr>
-            <tr><th>First Blocked Access (t_first_block)</th><td><code>{first_blocked_str}</code></td></tr>
-            <tr><th>Exposure Interval</th><td><code>{interval_str}</code></td></tr>
-            <tr><th>Estimated Exposure Window</th><td><strong><code>{est_exp_str}</code></strong></td></tr>
-            <tr><th>Measurement Precision</th><td><code>{precision_str}</code></td></tr>
+            <tr><th>First Blocked Access (t_first_block)</th><td><code>{html.escape(first_blocked_str)}</code></td></tr>
+            <tr><th>Exposure Interval</th><td><code>{html.escape(interval_str)}</code></td></tr>
+            <tr><th>Estimated Exposure Window</th><td><strong><code>{html.escape(est_exp_str)}</code></strong></td></tr>
+            <tr><th>Measurement Precision</th><td><code>{html.escape(precision_str)}</code></td></tr>
             <tr><th>Scheduler Jitter</th><td><code>{metrics.scheduler_jitter_ms:.2f}ms</code></td></tr>
         </table>
         {jitter_warn_html}
@@ -222,20 +239,20 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
     <div class="card">
         <h2>Root Cause Analysis & Real-World Calibration</h2>
-        <p>{finding.explanation}</p>
+        <p>{html.escape(finding.explanation)}</p>
         <h3>Real-World Calibration</h3>
-        <p>{finding.real_world_calibration}</p>
+        <p>{html.escape(finding.real_world_calibration)}</p>
     </div>
 
     <div class="card">
         <h2>Reproduction & PoC Script</h2>
-        <pre><code>{finding.reproduction_curl}</code></pre>
-        <p>Standalone Python PoC: <code>{finding.poc_script_path}</code></p>
+        <pre><code>{html.escape(finding.reproduction_curl)}</code></pre>
+        <p>Standalone Python PoC: <code>{html.escape(finding.poc_script_path)}</code></p>
     </div>
 </body>
 </html>
 """
-        return html
+        return html_doc
 
     @staticmethod
     def generate_json_report(result: ExperimentResult, stats: Optional[Dict[str, Any]] = None) -> str:
@@ -252,55 +269,210 @@ Standalone reproduction script generated at: [`{finding.poc_script_path}`]({find
 
         target_url = result.config.get("target_url", "http://127.0.0.1:8000")
         fault_type = result.config.get("fault_type", "stale_cache")
-        metrics = result.exposure_metrics
-        exp_min = metrics.exposure_interval_min_sec
-        exp_max = metrics.exposure_interval_max_sec or metrics.observation_horizon_sec
+        
+        # Exact probe schedule offsets
+        if result.exact_probe_schedule:
+            probe_offsets = [item["requested_offset_sec"] if isinstance(item, dict) else item for item in result.exact_probe_schedule]
+        else:
+            offsets = [p.offset_target for p in result.probes]
+            probe_offsets = offsets if offsets else [0.0, 1.0, 5.0]
 
         script_code = f"""# Standalone Reproduction Script for AuthTime Finding: {finding.finding_id}
 # Target: {target_url}
 # Fault Type: {fault_type}
+# Protocol Version: {result.protocol_version}
 # Generated: {datetime.now().isoformat()}
 
-import httpx
+import sys
+import json
 import time
+import uuid
+import argparse
+import httpx
+
+from authtime.network.safety import validate_and_resolve_loopback
+from authtime.verification.predicate import evaluate_http_decision, evaluate_authorization_violation
+from authtime.adapters.contract import DEFAULT_ADMIN_USERS_CONTRACT
 
 TARGET_URL = "{target_url}"
+EXP_ID = "{result.experiment_id}"
+PROTOCOL_VERSION = "{result.protocol_version}"
+PROBE_OFFSETS = {probe_offsets}
 
-def run_poc():
-    print("[+] Starting AuthTime Multi-Probe Boundary PoC Execution...")
-    httpx.post(f"{{TARGET_URL}}/faults/reset", headers={{"X-AuthTime-Request-ID": "poc-reset"}})
-    resp = httpx.post(f"{{TARGET_URL}}/auth/login", json={{"user_id": "admin1"}})
-    token = resp.json()["access_token"]
-    headers = {{"Authorization": f"Bearer {{token}}", "X-AuthTime-Request-ID": "poc-probe"}}
+# Exit Code Contract
+EXIT_NO_VIOLATION = 0
+EXIT_VIOLATION_DETECTED = 1
+EXIT_TARGET_UNAVAILABLE = 2
+EXIT_INVALID_TARGET = 3
+EXIT_EXPERIMENT_FAILURE = 4
+EXIT_CLEANUP_FAILURE = 5
 
-    r_base = httpx.get(f"{{TARGET_URL}}/admin/users", headers=headers)
-    print(f"[*] Baseline Access Status: {{r_base.status_code}} (Expected: 200)")
-    if r_base.status_code != 200:
-        raise RuntimeError("Baseline authorization failed!")
 
-    print(f"[*] Injecting Fault: {fault_type}...")
-    t_start = time.monotonic()
-    r_fault = httpx.post(
-        f"{{TARGET_URL}}/faults/inject",
-        json={{"fault_type": "{fault_type}", "user_id": "admin1", "new_role": "User"}},
-        headers={{"X-AuthTime-Request-ID": "poc-fault"}}
-    )
-    if r_fault.status_code != 200:
-        raise RuntimeError("Fault injection failed on target!")
+def run_poc(json_output: bool = False) -> int:
+    is_ok, resolved_ip, err = validate_and_resolve_loopback(TARGET_URL)
+    if not is_ok:
+        if not json_output:
+            print(f"[!] SAFETY ERROR: {{err}}")
+        return EXIT_INVALID_TARGET
 
-    probe_offsets = [0.1, max(1.0, {exp_min:.2f} * 0.5), {exp_min:.2f}, {exp_max:.2f}]
-    for offset in sorted(list(set(probe_offsets))):
-        elapsed = time.monotonic() - t_start
-        if offset > elapsed:
-            time.sleep(offset - elapsed)
-        
-        r_probe = httpx.get(f"{{TARGET_URL}}/admin/users", headers=headers)
-        status = "VULNERABLE (200 ALLOW)" if r_probe.status_code == 200 else f"BLOCKED ({{r_probe.status_code}})"
-        print(f"  [+] Probe at offset {{offset:.2f}}s -> {{status}}")
+    poc_run_id = f"run-poc-{{uuid.uuid4().hex[:8]}}"
+    
+    if not json_output:
+        print(f"[+] Starting AuthTime PoC Execution for {{EXP_ID}} (Run ID: {{poc_run_id}})...")
+    
+    probes_summary = []
+    has_violation = False
+    cleanup_success = False
+
+    try:
+        with httpx.Client(timeout=5.0, follow_redirects=False, trust_env=False) as client:
+            try:
+                # 1. Full Target Identity Handshake Verification
+                try:
+                    r_id = client.get(f"{{TARGET_URL}}/target/identity")
+                    if r_id.status_code != 200:
+                        if not json_output:
+                            print(f"[!] ERROR: Target at {{TARGET_URL}} returned status {{r_id.status_code}} on identity endpoint.")
+                        return EXIT_INVALID_TARGET
+                    id_data = r_id.json() if r_id.text else {{}}
+                    if id_data.get("product") != "AuthTime" or id_data.get("protocol_version") != PROTOCOL_VERSION:
+                        if not json_output:
+                            print(f"[!] ERROR: Target product/protocol identity mismatch: {{id_data}}")
+                        return EXIT_INVALID_TARGET
+                except Exception as e:
+                    if not json_output:
+                        print(f"[!] ERROR: Unable to reach target identity endpoint: {{e}}")
+                    return EXIT_TARGET_UNAVAILABLE
+
+                # 2. State Reset
+                res_reset = client.post(
+                    f"{{TARGET_URL}}/faults/reset",
+                    headers={{"X-AuthTime-Request-ID": f"poc-reset-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
+                )
+                res_reset.raise_for_status()
+
+                # 3. Login
+                resp = client.post(f"{{TARGET_URL}}/auth/login", json={{"user_id": "admin1"}})
+                resp.raise_for_status()
+                token = resp.json()["access_token"]
+                
+                headers = {{
+                    "Authorization": f"Bearer {{token}}",
+                    "X-AuthTime-Request-ID": f"poc-baseline-{{poc_run_id}}",
+                    "X-AuthTime-Experiment-ID": EXP_ID,
+                    "X-AuthTime-Run-ID": poc_run_id,
+                }}
+
+                # 4. Baseline Verification using ResourceContract
+                r_base = client.get(f"{{TARGET_URL}}/admin/users", headers=headers)
+                base_dec = evaluate_http_decision(r_base.status_code, r_base.text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
+                if base_dec != "ALLOW":
+                    if not json_output:
+                        print(f"[!] ERROR: Baseline check failed with decision '{{base_dec}}' (status {{r_base.status_code}})")
+                    return EXIT_EXPERIMENT_FAILURE
+
+                # 5. Fault Injection
+                if not json_output:
+                    print(f"[*] Injecting Fault: {fault_type}...")
+                t_start = time.monotonic()
+                r_fault = client.post(
+                    f"{{TARGET_URL}}/faults/inject",
+                    json={{"fault_type": "{fault_type}", "user_id": "admin1", "new_role": "User", "experiment_id": EXP_ID}},
+                    headers={{"X-AuthTime-Request-ID": f"poc-fault-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
+                )
+                r_fault.raise_for_status()
+
+                # 6. Multi-probe schedule execution
+                for idx, offset in enumerate(PROBE_OFFSETS):
+                    t_req_start = time.monotonic()
+                    elapsed = t_req_start - t_start
+                    if offset > elapsed:
+                        time.sleep(offset - elapsed)
+                    
+                    probe_t = time.monotonic()
+                    actual_offset_sec = round(probe_t - t_start, 4)
+                    
+                    probe_headers = dict(headers)
+                    probe_headers["X-AuthTime-Request-ID"] = f"poc-probe-{{poc_run_id}}-{{idx+1}}"
+                    
+                    try:
+                        r_probe = client.get(f"{{TARGET_URL}}/admin/users", headers=probe_headers)
+                        st_code = r_probe.status_code
+                        body_text = r_probe.text
+                    except httpx.TimeoutException:
+                        st_code = 408
+                        body_text = ""
+                    except httpx.NetworkError:
+                        st_code = 502
+                        body_text = ""
+                    except Exception:
+                        st_code = 500
+                        body_text = ""
+
+                    act_dec = evaluate_http_decision(st_code, body_text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
+                    is_viol, _ = evaluate_authorization_violation(act_dec, "DENY", st_code, body_text, "/admin/users", DEFAULT_ADMIN_USERS_CONTRACT)
+                    
+                    if is_viol:
+                        has_violation = True
+
+                    status_str = f"VULNERABLE ({{st_code}} ALLOW)" if is_viol else f"BLOCKED ({{st_code}} {{act_dec}})"
+                    probes_summary.append({{
+                        "probe_index": idx + 1,
+                        "requested_offset_sec": offset,
+                        "actual_offset_sec": actual_offset_sec,
+                        "status_code": st_code,
+                        "actual_decision": act_dec,
+                        "is_violation": is_viol
+                    }})
+
+                    if not json_output:
+                        print(f"  [+] Probe {{idx+1}} at requested {{offset:.2f}}s (actual {{actual_offset_sec:.2f}}s) -> {{status_str}}")
+
+            finally:
+                # Guaranteed Cleanup and Post-Reset State Verification
+                try:
+                    res_c = client.post(
+                        f"{{TARGET_URL}}/faults/reset",
+                        headers={{"X-AuthTime-Request-ID": f"poc-cleanup-{{poc_run_id}}", "X-AuthTime-Experiment-ID": EXP_ID}}
+                    )
+                    if res_c.status_code == 200:
+                        cleanup_success = True
+                except Exception as e:
+                    if not json_output:
+                        print(f"[!] CLEANUP ERROR: Target state reset failed: {{e}}")
+                    cleanup_success = False
+
+    except Exception as e:
+        if not json_output:
+            print(f"[!] UNHANDLED ERROR: {{e}}")
+        return EXIT_EXPERIMENT_FAILURE
+
+    if not cleanup_success:
+        if not json_output:
+            print(f"[!] CRITICAL: State cleanup failed! Experiment marked INVALID.")
+        return EXIT_CLEANUP_FAILURE
+
+    if json_output:
+        print(json.dumps({{
+            "experiment_id": EXP_ID,
+            "run_id": poc_run_id,
+            "target_url": TARGET_URL,
+            "has_violation": has_violation,
+            "cleanup_success": cleanup_success,
+            "probes": probes_summary
+        }}, indent=2))
+
+    return EXIT_VIOLATION_DETECTED if has_violation else EXIT_NO_VIOLATION
 
 
 if __name__ == "__main__":
-    run_poc()
+
+    parser = argparse.ArgumentParser(description="Standalone AuthTime Reproduction PoC")
+    parser.add_argument("--json", action="store_true", help="Output machine-readable JSON results")
+    args = parser.parse_args()
+    
+    code = run_poc(json_output=args.json)
+    sys.exit(code)
 """
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(script_code)

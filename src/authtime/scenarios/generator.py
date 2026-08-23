@@ -1,5 +1,6 @@
 """
 Scenario Generator & Experiment Matrix Engine.
+Includes Positive Control (known vulnerable) and Negative Control (known safe) scenario generators.
 """
 
 from typing import List, Dict, Any, Optional
@@ -22,6 +23,8 @@ class Scenario(BaseModel):
     resource_path: str
     probes: List[ScenarioProbeSpec]
     time_scale_factor: float = 1.0
+    is_positive_control: bool = False
+    is_negative_control: bool = False
 
 
 class ScenarioGenerator:
@@ -68,6 +71,44 @@ class ScenarioGenerator:
         )
 
     @classmethod
+    def generate_positive_control_scenario(
+        cls,
+        target_user_id: str = "admin1",
+        time_scale_factor: float = 1.0,
+    ) -> Scenario:
+        """
+        Positive Control Scenario: Known vulnerable stale authorization cache configuration.
+        Expected: Detector MUST observe exposure window > 0.
+        """
+        scen = cls.generate_single_fault_scenario(
+            fault_type="stale_cache",
+            target_user_id=target_user_id,
+            time_scale_factor=time_scale_factor,
+        )
+        scen.scenario_id = f"pos-control-stale_cache-{target_user_id}"
+        scen.is_positive_control = True
+        return scen
+
+    @classmethod
+    def generate_negative_control_scenario(
+        cls,
+        target_user_id: str = "admin1",
+        time_scale_factor: float = 1.0,
+    ) -> Scenario:
+        """
+        Negative Control Scenario: Known safe immediate role revocation without cache staleness.
+        Expected: Detector MUST observe zero exposure window (exposure == 0.0s).
+        """
+        scen = cls.generate_single_fault_scenario(
+            fault_type="role_revocation",
+            target_user_id=target_user_id,
+            time_scale_factor=time_scale_factor,
+        )
+        scen.scenario_id = f"neg-control-immediate_revocation-{target_user_id}"
+        scen.is_negative_control = True
+        return scen
+
+    @classmethod
     def generate_cross_user_isolation_scenario(
         cls,
         user_a_id: str = "admin1",
@@ -99,7 +140,7 @@ class ScenarioGenerator:
                     probe_index=probe_idx,
                     offset_seconds=offset,
                     user_id=user_b_id,
-                    resource_path=user_a_resource,  # Probes protected admin endpoint!
+                    resource_path=user_a_resource,
                     expected_decision="DENY",
                 )
             )

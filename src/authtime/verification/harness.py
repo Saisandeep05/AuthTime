@@ -2,8 +2,21 @@
 Verification Harness & Exposure Window Calculator.
 """
 
+import asyncio
+import time
 from typing import List, Optional
 from authtime.models.schemas import ProbeResult, ExposureMetric
+
+
+async def measure_scheduler_jitter(n_probes: int = 10, delay_ms: float = 2.0) -> float:
+    delays = []
+    target_sec = delay_ms / 1000.0
+    for _ in range(n_probes):
+        t0 = time.monotonic()
+        await asyncio.sleep(target_sec)
+        t1 = time.monotonic()
+        delays.append(abs((t1 - t0) - target_sec) * 1000.0)
+    return float(sum(delays) / len(delays)) if delays else 0.0
 
 
 class VerificationHarness:

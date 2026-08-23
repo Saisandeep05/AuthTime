@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuthTime Security Verification Report - FIND-EXP-MAIN-1787435225-3</title>
+    <title>AuthTime Security Report - FIND-EXP-MAIN-1787488711-3</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 900px; margin: 0 auto; padding: 2rem 1rem; background-color: #f8f9fa; }
-        .card { background: #ffffff; border-radius: 8px; padding: 2rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); margin-bottom: 1.5rem; border: 1px solid #e9ecef; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f8fafc; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         h1, h2, h3 { color: #0f172a; }
         .badge { display: inline-block; padding: 0.25rem 0.75rem; font-weight: 700; border-radius: 4px; color: white; font-size: 0.9rem; }
         .badge.critical { background-color: #dc2626; }
@@ -25,11 +24,12 @@
         <h1>AuthTime Security Verification Report</h1>
         <h2>Executive Summary</h2>
         <table>
-            <tr><th>Finding Title</th><td>Authorization Exposure Finding: OBSERVATION_HORIZON_REACHED</td></tr>
+            <tr><th>Protocol Version</th><td><code>1.0</code></td></tr>
+            <tr><th>Finding Title</th><td>Authorization Exposure Finding: AUTHORIZATION_CACHE</td></tr>
             <tr><th>Fault Type</th><td><code>stale_cache</code></td></tr>
-            <tr><th>Severity Score</th><td><code>6.5 / 10.0</code> <span class="badge medium">MEDIUM</span></td></tr>
-            <tr><th>Root Cause</th><td><code>OBSERVATION_HORIZON_REACHED</code> (Confidence: <strong>SUPPORTED (Observation Horizon Reached)</strong>)</td></tr>
-            <tr><th>Measurement Status</th><td><code>CENSORED_LOWER_BOUND</code></td></tr>
+            <tr><th>Severity Score</th><td><code>7.3 / 10.0</code> <span class="badge high">HIGH</span></td></tr>
+            <tr><th>Root Cause</th><td><code>AUTHORIZATION_CACHE</code> (Confidence: <strong>PROVEN</strong>)</td></tr>
+            <tr><th>Measurement Status</th><td><code>OBSERVED_TRANSITION</code></td></tr>
             <tr><th>Baseline Status</th><td><strong>PASSED</strong></td></tr>
         </table>
     </div>
@@ -37,24 +37,24 @@
     <div class="card">
         <h2>Exposure Window Metrics</h2>
         <table>
-            <tr><th>Revocation Timestamp (t_fault)</th><td><code>42115.375s</code></td></tr>
-            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>42115.375s</code></td></tr>
-            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>42121.375s</code></td></tr>
-            <tr><th>First Blocked Access (t_first_block)</th><td><code>NOT OBSERVED</code></td></tr>
-            <tr><th>Exposure Interval</th><td><code>[6.00s, ∞] (RIGHT-CENSORED)</code></td></tr>
-            <tr><th>Estimated Exposure Window</th><td><strong><code>≥ 6.00s (Censored)</code></strong></td></tr>
-            <tr><th>Measurement Precision</th><td><code>UNBOUNDED</code></td></tr>
-            <tr><th>Scheduler Jitter</th><td><code>15.20ms</code></td></tr>
+            <tr><th>Revocation Timestamp (t_fault)</th><td><code>7828.593s</code></td></tr>
+            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>7828.593s</code></td></tr>
+            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>7831.609s</code></td></tr>
+            <tr><th>First Blocked Access (t_first_block)</th><td><code>7834.625s</code></td></tr>
+            <tr><th>Exposure Interval</th><td><code>[3.02s, 6.03s]</code></td></tr>
+            <tr><th>Estimated Exposure Window</th><td><strong><code>4.52s</code></strong></td></tr>
+            <tr><th>Measurement Precision</th><td><code>±1.51s</code></td></tr>
+            <tr><th>Scheduler Jitter</th><td><code>13.60ms</code></td></tr>
         </table>
         
         
             <h2>Aggregate Trial Statistics (N=1)</h2>
-            
+            <p class='note'><strong>Note:</strong> Sample size N &lt; 5 or right-censored data present: inferential P95 and standard deviation are suppressed.</p>
             <ul>
                 <li><strong>Minimum Exposure:</strong> <code>0.00s</code></li>
                 <li><strong>Maximum Exposure:</strong> <code>0.00s</code></li>
                 <li><strong>Mean Exposure (µ):</strong> <code>0.00s</code></li>
-                <li><strong>Median Exposure (x̃):</strong> <code>0.00s</code></li>
+                <li><strong>Median Exposure (x̃):</strong> <code>4.52s</code></li>
                 <li><strong>Standard Deviation (σ):</strong> <code>0.00s</code></li>
                 <li><strong>95th Percentile (P95):</strong> <code>0.00s</code></li>
             </ul>
@@ -63,15 +63,15 @@
 
     <div class="card">
         <h2>Root Cause Analysis & Real-World Calibration</h2>
-        <p>Unauthorized access remained observable through the full observation horizon (6.00s). Consistent with extended exposure.</p>
+        <p>Observed exposure boundary (4.52s) matches effective authorization cache TTL (6.00s; raw TTL=60.0s at 0.10x scale) within ±1.48s (24.6% relative tolerance).</p>
         <h3>Real-World Calibration</h3>
-        <p>Tested cache_ttl=60.0s. Mirrors standard API gateway caching defaults.</p>
+        <p>Experimental cache_ttl configured to 60.0s; this is a representative test value and is not evidence of a production default.</p>
     </div>
 
     <div class="card">
         <h2>Reproduction & PoC Script</h2>
-        <pre><code>curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users</code></pre>
-        <p>Standalone Python PoC: <code>reports/EXP-MAIN-1787435225-3/poc_EXP-MAIN-1787435225-3.py</code></p>
+        <pre><code>curl -H &#x27;Authorization: Bearer &lt;token&gt;&#x27; http://127.0.0.1:8000/admin/users</code></pre>
+        <p>Standalone Python PoC: <code>reports/EXP-MAIN-1787488711-3/poc_EXP-MAIN-1787488711-3.py</code></p>
     </div>
 </body>
 </html>

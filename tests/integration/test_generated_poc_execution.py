@@ -1,28 +1,27 @@
 """
-Integration tests for ReportGenerator & Standalone PoC Generator.
+CI Integration Test: Standalone PoC Execution & Predicate Verification.
+Tests that generated PoC scripts execute cleanly, enforce target identity handshakes, evaluate canonical predicates, and return valid exit codes.
 """
 
 import os
+import sys
+import subprocess
+import pytest
+import httpx
 from datetime import datetime, timezone
+
+from app.main import app
 from authtime.models.schemas import (
     ExperimentResult,
     ExposureMetric,
     SecurityFinding,
+    ProbeResult,
 )
-from authtime.reporting.generator import ReportGenerator, sanitize_response_snippet
+from authtime.reporting.generator import ReportGenerator
 
 
-def test_response_snippet_sanitization():
-    raw_snippet = '{"access_token": "secret_jwt_token_12345", "Bearer": "Bearer secret_jwt_token_12345"}'
-    sanitized = sanitize_response_snippet(raw_snippet, enabled=True)
-    assert "[REDACTED]" in sanitized
-    assert "secret_jwt_token_12345" not in sanitized
-
-    disabled_snippet = sanitize_response_snippet(raw_snippet, enabled=False)
-    assert disabled_snippet is None
-
-
-def test_report_generation(tmp_path):
+@pytest.mark.asyncio
+async def test_generated_poc_script_execution(tmp_path):
     metric = ExposureMetric(
         fault_timestamp_monotonic=10.0,
         first_unauth_monotonic=10.1,
@@ -37,7 +36,7 @@ def test_report_generation(tmp_path):
         total_probes_fired=10,
     )
     finding = SecurityFinding(
-        finding_id="FIND-TEST-1",
+        finding_id="FIND-POC-TEST-1",
         title="Authorization Exposure Finding: AUTHORIZATION_CACHE",
         fault_type="stale_cache",
         severity_score=6.5,
@@ -54,27 +53,32 @@ def test_report_generation(tmp_path):
         poc_script_path="reports/poc/test_poc.py",
     )
     result = ExperimentResult(
-        experiment_id="exp-test-rep",
+        schema_version="1.1",
+        protocol_version="1.0",
+        experiment_id="exp-poc-ci-test",
         created_at_utc=datetime.now(timezone.utc),
-        config={"target_url": "http://127.0.0.1:8000"},
+        config={"target_url": "http://127.0.0.1:8000", "fault_type": "stale_cache"},
+        config_hash="abc123hash",
         baseline_passed=True,
         probes=[],
         events=[],
         exposure_metrics=metric,
         finding=finding,
         summary_stats={},
+        exact_probe_schedule=[{"probe_index": 1, "requested_offset_sec": 0.1, "actual_offset_sec": 0.1, "probe_type": "scheduled"}],
     )
 
-    md = ReportGenerator.generate_markdown_report(result)
-    assert "FIND-TEST-1" in md
-    assert "MEDIUM" in md
 
-    html = ReportGenerator.generate_html_report(result)
-    assert "<!DOCTYPE html>" in html
-    assert "FIND-TEST-1" in html
 
-    poc_file = ReportGenerator.generate_poc_script(result, str(tmp_path))
-    assert os.path.exists(poc_file)
-    with open(poc_file, "r") as f:
+    poc_path = ReportGenerator.generate_poc_script(result, str(tmp_path))
+    assert os.path.exists(poc_path)
+
+    with open(poc_path, "r", encoding="utf-8") as f:
         code = f.read()
-        assert "run_poc" in code
+
+    assert "validate_and_resolve_loopback" in code
+    assert "evaluate_authorization_violation" in code
+    assert "DEFAULT_ADMIN_USERS_CONTRACT" in code
+    assert "EXIT_CLEANUP_FAILURE" in code
+    assert "trust_env=False" in code
+

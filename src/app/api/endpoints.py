@@ -31,6 +31,21 @@ def get_dashboard():
     return "<h1>AuthTime Control Center Target Server Active</h1>"
 
 
+@router.get("/target/identity")
+def get_target_identity():
+    return {
+        "product": "AuthTime",
+        "target": "authtime-reference-target",
+        "target_type": "reference-target",
+        "protocol_version": "1.0",
+        "target_version": "1.0.0",
+        "capabilities": ["fault_injection", "reset", "audit_events"],
+        "framework": "FastAPI",
+    }
+
+
+
+
 class LoginRequest(BaseModel):
     user_id: str = Field(..., min_length=1, max_length=128)
     ttl_seconds: Optional[int] = Field(None, gt=0)

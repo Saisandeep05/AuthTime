@@ -12,7 +12,7 @@ Imagine an employee gets fired at **10:00 AM**, and HR immediately revokes their
 
 However, because web applications store user permissions in fast temporary memory (caches or JWT tokens) to speed things up, **the application doesn't notice the revocation right away**. For the next 60 seconds, the fired employee can still log in, download sensitive user records, or make admin changes!
 
-**AuthTime** is an open-source security tool that automatically tests web applications to find, measure, and prove this hidden security vulnerability — called the **Authorization Exposure Window**.
+**AuthTime** is an open-source controlled security research harness designed to experimentally measure and quantify this hidden security vulnerability — called the **Authorization Exposure Window**.
 
 ```
 [10:00:00 AM] HR Revokes Admin Rights in Database ────────┐
@@ -39,7 +39,7 @@ Modern websites (built with FastAPI, Node.js, Django, React, microservices, or A
 2. **Application Cache / Token**: Stores the user's old role in memory for 30–300 seconds (`ALLOW`).
 3. **The Risk**: Until that cache expires, the application trusts the stale memory instead of the database.
 
-AuthTime simulates controlled access revocations and fires high-precision background requests to measure the exact second access is finally blocked.
+AuthTime simulates controlled access revocations and fires background requests to narrow the observed transition interval to approximately 100 ms under controlled local test conditions.
 
 ---
 
@@ -51,6 +51,7 @@ AuthTime simulates controlled access revocations and fires high-precision backgr
 > - **NO** real credentials or personal data.
 > - **NO** external network traffic.
 > - **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement that immediately aborts execution if any non-local target URL is supplied.
+
 
 ---
 
