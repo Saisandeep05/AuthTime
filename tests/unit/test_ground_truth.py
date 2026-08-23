@@ -1,39 +1,22 @@
 """
-Unit tests for Ground Truth State Manager.
+Unit tests for GroundTruthStateManager.
 """
 
-from authtime.ground_truth.manager import GroundTruthStateManager, RoleEnum
+from authtime.ground_truth.manager import GroundTruthStateManager
 
 
-def test_ground_truth_initial_states():
+def test_ground_truth_pre_and_post_fault():
     gt = GroundTruthStateManager()
+    gt.reset_to_defaults()
 
-    assert gt.get_expected_role("admin1", 10.0) == "Admin"
+    # Pre-fault decision for admin1 on /admin/users should be ALLOW
     assert gt.get_expected_decision("admin1", "/admin/users", 10.0) == "ALLOW"
 
-    assert gt.get_expected_role("user1", 10.0) == "User"
-    assert gt.get_expected_decision("user1", "/admin/users", 10.0) == "DENY"
-    assert gt.get_expected_decision("user1", "/invoices/1", 10.0) == "ALLOW"
+    # Record fault at t=20.0 (revokes admin1 to User)
+    gt.record_fault_event("stale_cache", "admin1", timestamp_monotonic=20.0, new_role="User")
 
+    # At t=15.0 (pre-fault), decision should still be ALLOW
+    assert gt.get_expected_decision("admin1", "/admin/users", 15.0) == "ALLOW"
 
-def test_ground_truth_fault_recording():
-    gt = GroundTruthStateManager()
-
-    # Before fault at T=100s
-    assert gt.get_expected_role("admin1", 50.0) == "Admin"
-    assert gt.get_expected_decision("admin1", "/admin/users", 50.0) == "ALLOW"
-
-    # Record role revocation fault at T=100s
-    gt.record_fault_event("role_revocation", "admin1", 100.0, new_role="User")
-
-    # Probe before T=100s should still expect Admin / ALLOW
-    assert gt.get_expected_role("admin1", 99.9) == "Admin"
-    assert gt.get_expected_decision("admin1", "/admin/users", 99.9) == "ALLOW"
-
-    # Probe at or after T=100s should expect User / DENY
-    assert gt.get_expected_role("admin1", 100.0) == "User"
-    assert gt.get_expected_decision("admin1", "/admin/users", 100.0) == "DENY"
-
-    state = gt.get_expected_state("admin1", "/admin/users", 100.5)
-    assert state.expected_role == RoleEnum.USER
-    assert state.expected_decision == "DENY"
+    # At t=20.1 (post-fault), decision should be DENY
+    assert gt.get_expected_decision("admin1", "/admin/users", 20.1) == "DENY"

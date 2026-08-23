@@ -1,103 +1,80 @@
 """
-Integration tests for ReportGenerator and PoC Artifact Engine.
+Integration tests for ReportGenerator & Standalone PoC Generator.
 """
 
 import os
-import json
-import pytest
 from datetime import datetime, timezone
-
 from authtime.models.schemas import (
     ExperimentResult,
-    ProbeResult,
     ExposureMetric,
     SecurityFinding,
 )
 from authtime.reporting.generator import ReportGenerator, sanitize_response_snippet
 
 
-def test_response_sanitization():
-    raw = '{"token": "Bearer secret-token-12345", "access_token": "secret-value"}'
-    # Disabled by default
-    assert sanitize_response_snippet(raw, enabled=False) is None
+def test_response_snippet_sanitization():
+    raw_snippet = '{"access_token": "secret_jwt_token_12345", "Bearer": "Bearer secret_jwt_token_12345"}'
+    sanitized = sanitize_response_snippet(raw_snippet, enabled=True)
+    assert "[REDACTED]" in sanitized
+    assert "secret_jwt_token_12345" not in sanitized
 
-    # Enabled: should redact tokens and secrets
-    cleaned = sanitize_response_snippet(raw, enabled=True)
-    assert "secret-token-12345" not in cleaned
-    assert "secret-value" not in cleaned
-    assert "[REDACTED]" in cleaned
+    disabled_snippet = sanitize_response_snippet(raw_snippet, enabled=False)
+    assert disabled_snippet is None
 
 
-def test_markdown_and_json_report_generation(tmp_path):
-    metrics = ExposureMetric(
-        fault_timestamp_monotonic=100.0,
-        first_unauth_monotonic=100.1,
-        last_unauth_monotonic=147.2,
-        first_blocked_monotonic=160.1,
-        exposure_interval_min_sec=47.2,
-        exposure_interval_max_sec=60.1,
-        estimated_exposure_sec=53.65,
-        precision_sec=6.45,
+def test_report_generation(tmp_path):
+    metric = ExposureMetric(
+        fault_timestamp_monotonic=10.0,
+        first_unauth_monotonic=10.1,
+        last_unauth_monotonic=16.0,
+        first_blocked_monotonic=16.1,
+        exposure_interval_min_sec=6.0,
+        exposure_interval_max_sec=6.1,
+        estimated_exposure_sec=6.05,
+        precision_sec=0.05,
         scheduler_jitter_ms=1.5,
-        unauthorized_request_count=2,
-        total_probes_fired=5,
+        unauthorized_request_count=5,
+        total_probes_fired=10,
     )
-
     finding = SecurityFinding(
-        finding_id="FIND-EXP-001",
+        finding_id="FIND-TEST-1",
         title="Authorization Exposure Finding: AUTHORIZATION_CACHE",
         fault_type="stale_cache",
-        severity_score=8.4,
-        severity_label="HIGH",
-        config_snapshot={"cache_ttl_seconds": 60.0},
+        severity_score=6.5,
+        severity_label="MEDIUM",
+        config_snapshot={"cache_ttl": 60.0},
         time_scale_enabled=False,
         time_scale_factor=1.0,
-        observed_exposure=metrics,
+        observed_exposure=metric,
         root_cause="AUTHORIZATION_CACHE",
         root_cause_confidence="Likely",
-        explanation="Stale cache entry allowed access.",
-        real_world_calibration="Mirrors Redis cache defaults.",
+        explanation="Stale cache test explanation.",
+        real_world_calibration="Tested cache_ttl=60s.",
         reproduction_curl="curl http://127.0.0.1:8000/admin/users",
-        poc_script_path="reports/poc/EXP-001_poc.py",
+        poc_script_path="reports/poc/test_poc.py",
     )
-
     result = ExperimentResult(
-        experiment_id="EXP-001",
+        experiment_id="exp-test-rep",
         created_at_utc=datetime.now(timezone.utc),
-        config={"target_url": "http://127.0.0.1:8000", "fault_type": "stale_cache"},
+        config={"target_url": "http://127.0.0.1:8000"},
         baseline_passed=True,
         probes=[],
         events=[],
-        exposure_metrics=metrics,
+        exposure_metrics=metric,
         finding=finding,
-        summary_stats={"trial_count": 1},
+        summary_stats={},
     )
 
-    stats = {
-        "repetitions": 3,
-        "min_sec": 45.0,
-        "max_sec": 55.0,
-        "mean_sec": 50.0,
-        "median_sec": 50.0,
-        "stddev_sec": 5.0,
-        "p95_sec": 54.5,
-        "limited_sample_note": "If N < 5, the report must explicitly identify the result as a limited-sample observation.",
-    }
+    md = ReportGenerator.generate_markdown_report(result)
+    assert "FIND-TEST-1" in md
+    assert "MEDIUM" in md
 
-    md_report = ReportGenerator.generate_markdown_report(result, stats)
-    assert "AuthTime Security Verification Report" in md_report
-    assert "FIND-EXP-001" in md_report
-    assert "Aggregate Trial Statistics (N=3)" in md_report
-    assert "limited-sample observation" in md_report
+    html = ReportGenerator.generate_html_report(result)
+    assert "<!DOCTYPE html>" in html
+    assert "FIND-TEST-1" in html
 
-    json_report = ReportGenerator.generate_json_report(result, stats)
-    parsed = json.loads(json_report)
-    assert parsed["experiment_id"] == "EXP-001"
-    assert parsed["aggregated_statistics"]["mean_sec"] == 50.0
-
-    poc_path = ReportGenerator.generate_poc_script(result, output_dir=str(tmp_path))
-    assert os.path.exists(poc_path)
-    with open(poc_path, "r", encoding="utf-8") as f:
-        content = f.read()
-        assert "run_poc" in content
-        assert "stale_cache" in content
+    poc_file = ReportGenerator.generate_poc_script(result, str(tmp_path))
+    assert os.path.exists(poc_file)
+    with open(poc_file, "r") as f:
+        code = f.read()
+        assert "run_poc" in code

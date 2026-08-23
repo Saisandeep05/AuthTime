@@ -1,0 +1,264 @@
+{
+  "experiment_id": "EXP-DEMO-1787410614-3",
+  "created_at_utc": "2026-08-22T14:57:00.524594Z",
+  "config": {
+    "target_url": "http://127.0.0.1:8000",
+    "fault_type": "stale_cache",
+    "cache_ttl": 60.0
+  },
+  "baseline_passed": true,
+  "probes": [
+    {
+      "request_id": "probe-EXP-DEMO-1787410614-3-0",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "scenario_id": "scen-stale_cache-admin1",
+      "probe_index": 0,
+      "offset_target": 0.0,
+      "monotonic_timestamp": 17503.671,
+      "utc_timestamp": "2026-08-22T14:56:54.521671Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
+      "ground_truth_decision": "DENY",
+      "is_violation": true,
+      "response_latency_ms": 0.0,
+      "node_id": null,
+      "cache_hit": null,
+      "response_body_snippet": null
+    },
+    {
+      "request_id": "probe-EXP-DEMO-1787410614-3-1",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "scenario_id": "scen-stale_cache-admin1",
+      "probe_index": 1,
+      "offset_target": 0.1,
+      "monotonic_timestamp": 17503.781,
+      "utc_timestamp": "2026-08-22T14:56:54.632276Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
+      "ground_truth_decision": "DENY",
+      "is_violation": true,
+      "response_latency_ms": 0.0,
+      "node_id": null,
+      "cache_hit": null,
+      "response_body_snippet": null
+    },
+    {
+      "request_id": "probe-EXP-DEMO-1787410614-3-2",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "scenario_id": "scen-stale_cache-admin1",
+      "probe_index": 2,
+      "offset_target": 0.5,
+      "monotonic_timestamp": 17504.187,
+      "utc_timestamp": "2026-08-22T14:56:55.032105Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
+      "ground_truth_decision": "DENY",
+      "is_violation": true,
+      "response_latency_ms": 0.0,
+      "node_id": null,
+      "cache_hit": null,
+      "response_body_snippet": null
+    },
+    {
+      "request_id": "probe-EXP-DEMO-1787410614-3-3",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "scenario_id": "scen-stale_cache-admin1",
+      "probe_index": 3,
+      "offset_target": 3.0,
+      "monotonic_timestamp": 17506.687,
+      "utc_timestamp": "2026-08-22T14:56:57.526475Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
+      "ground_truth_decision": "DENY",
+      "is_violation": true,
+      "response_latency_ms": 0.0,
+      "node_id": null,
+      "cache_hit": null,
+      "response_body_snippet": null
+    },
+    {
+      "request_id": "probe-EXP-DEMO-1787410614-3-4",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "scenario_id": "scen-stale_cache-admin1",
+      "probe_index": 4,
+      "offset_target": 6.0,
+      "monotonic_timestamp": 17509.671,
+      "utc_timestamp": "2026-08-22T14:57:00.519594Z",
+      "http_status": 200,
+      "actual_decision": "ALLOW",
+      "ground_truth_decision": "DENY",
+      "is_violation": true,
+      "response_latency_ms": 0.0,
+      "node_id": null,
+      "cache_hit": null,
+      "response_body_snippet": null
+    }
+  ],
+  "events": [
+    {
+      "event_id": "evt-1",
+      "request_id": "fault-reset",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17503.5,
+      "utc_timestamp": "2026-08-22T14:56:54.344567Z",
+      "event_type": "FAULT_RESET",
+      "details": {
+        "status": "RESET_COMPLETE"
+      }
+    },
+    {
+      "event_id": "evt-2",
+      "request_id": "baseline-probe",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17503.5,
+      "utc_timestamp": "2026-08-22T14:56:54.344567Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": false
+      }
+    },
+    {
+      "event_id": "evt-3",
+      "request_id": "fault-stale_cache",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17503.671,
+      "utc_timestamp": "2026-08-22T14:56:54.518952Z",
+      "event_type": "FAULT_INJECTED",
+      "details": {
+        "fault_type": "stale_cache",
+        "user_id": "admin1",
+        "new_role": "User",
+        "cache_ttl_seconds": 60.0,
+        "time_scale_factor": 0.1
+      }
+    },
+    {
+      "event_id": "evt-4",
+      "request_id": "probe-EXP-DEMO-1787410614-3-0",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17503.671,
+      "utc_timestamp": "2026-08-22T14:56:54.521671Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": true
+      }
+    },
+    {
+      "event_id": "evt-5",
+      "request_id": "probe-EXP-DEMO-1787410614-3-1",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17503.781,
+      "utc_timestamp": "2026-08-22T14:56:54.632276Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": true
+      }
+    },
+    {
+      "event_id": "evt-6",
+      "request_id": "probe-EXP-DEMO-1787410614-3-2",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17504.187,
+      "utc_timestamp": "2026-08-22T14:56:55.032105Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": true
+      }
+    },
+    {
+      "event_id": "evt-7",
+      "request_id": "probe-EXP-DEMO-1787410614-3-3",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17506.687,
+      "utc_timestamp": "2026-08-22T14:56:57.526475Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": true
+      }
+    },
+    {
+      "event_id": "evt-8",
+      "request_id": "probe-EXP-DEMO-1787410614-3-4",
+      "experiment_id": "EXP-DEMO-1787410614-3",
+      "monotonic_timestamp": 17509.671,
+      "utc_timestamp": "2026-08-22T14:57:00.520594Z",
+      "event_type": "AUTH_CHECK",
+      "details": {
+        "user_id": "admin1",
+        "role": "Admin",
+        "cache_hit": true
+      }
+    }
+  ],
+  "exposure_metrics": {
+    "fault_timestamp_monotonic": 17503.671,
+    "first_unauth_monotonic": 17503.671,
+    "last_unauth_monotonic": 17509.671,
+    "first_blocked_monotonic": null,
+    "exposure_interval_min_sec": 6.0,
+    "exposure_interval_max_sec": 6.0,
+    "estimated_exposure_sec": 6.0,
+    "precision_sec": 0.0,
+    "scheduler_jitter_ms": 13.599999999903957,
+    "jitter_warning": null,
+    "unauthorized_request_count": 5,
+    "total_probes_fired": 5
+  },
+  "finding": {
+    "finding_id": "FIND-EXP-DEMO-1787410614-3",
+    "title": "Authorization Exposure Finding: AUTHORIZATION_CACHE",
+    "fault_type": "stale_cache",
+    "severity_score": 6.5,
+    "severity_label": "MEDIUM",
+    "config_snapshot": {
+      "cache_ttl_seconds": 60.0,
+      "jwt_ttl_seconds": 300
+    },
+    "time_scale_enabled": true,
+    "time_scale_factor": 0.1,
+    "observed_exposure": {
+      "fault_timestamp_monotonic": 17503.671,
+      "first_unauth_monotonic": 17503.671,
+      "last_unauth_monotonic": 17509.671,
+      "first_blocked_monotonic": null,
+      "exposure_interval_min_sec": 6.0,
+      "exposure_interval_max_sec": 6.0,
+      "estimated_exposure_sec": 6.0,
+      "precision_sec": 0.0,
+      "scheduler_jitter_ms": 13.599999999903957,
+      "jitter_warning": null,
+      "unauthorized_request_count": 5,
+      "total_probes_fired": 5
+    },
+    "root_cause": "AUTHORIZATION_CACHE",
+    "root_cause_confidence": "Likely",
+    "explanation": "Authorization cache retained stale role/permissions for up to 60.0 seconds.",
+    "real_world_calibration": "Tested cache_ttl=60.0s. Mirrors standard API gateway caching defaults.",
+    "reproduction_curl": "curl -H 'Authorization: Bearer <token>' http://127.0.0.1:8000/admin/users",
+    "poc_script_path": "reports/poc/EXP-DEMO-1787410614-3_poc.py"
+  },
+  "summary_stats": {
+    "trial_count": 1,
+    "mean_exposure_sec": 6.0
+  },
+  "aggregated_statistics": {
+    "repetitions": 3,
+    "min_sec": 4.507999999999811,
+    "max_sec": 6.0,
+    "mean_sec": 5.502666666666603,
+    "median_sec": 6.0,
+    "stddev_sec": 0.8614066016310309,
+    "p95_sec": 6.0,
+    "limited_sample_note": "If N < 5, the report must explicitly identify the result as a limited-sample observation and must avoid inferential statistical claims."
+  }
+}

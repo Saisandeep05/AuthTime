@@ -1,1 +1,0 @@
-"""AuthTime App Package"""

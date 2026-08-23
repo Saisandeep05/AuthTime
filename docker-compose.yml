@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  authtime-target:
+    build: .
+    container_name: authtime-target
+    ports:
+      # Safety Requirement: Bind exclusively to local loopback 127.0.0.1
+      - "127.0.0.1:8000:8000"
+    environment:
+      - TARGET_HOST=127.0.0.1
+      - TARGET_PORT=8000
+    restart: unless-stopped

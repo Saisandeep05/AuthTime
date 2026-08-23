@@ -10,38 +10,21 @@ from authtime.scenarios.generator import ScenarioGenerator
 
 
 @pytest.mark.asyncio
-async def test_experiment_controller_safety_boundary():
+async def test_experiment_controller_safety():
     with pytest.raises(ValueError, match="SAFETY VIOLATION"):
-        ExperimentController("http://external-target.com:8000")
+        ExperimentController("http://external-target-domain.com")
 
 
 @pytest.mark.asyncio
-async def test_experiment_controller_single_trial_run():
-    controller = ExperimentController("http://127.0.0.1:8000")
-
+async def test_experiment_controller_single_trial():
     transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8000") as client:
-        # Run baseline check
-        baseline_ok = await controller.verify_baseline(http_client=client)
-        assert baseline_ok is True
-
-        # Generate scenario
+    async with httpx.AsyncClient(transport=transport, base_url="http://testclient") as async_client:
+        controller = ExperimentController("http://testclient", http_client=async_client)
         scenario = ScenarioGenerator.generate_single_fault_scenario(
-            fault_type="stale_cache",
-            coarse_offsets=[0.0, 0.1, 0.2],
-            time_scale_factor=0.1,
+            fault_type="stale_cache", target_user_id="admin1", time_scale_factor=0.01
         )
 
-        result = await controller.run_single_trial(
-            experiment_id="EXP-TEST-001",
-            scenario=scenario,
-            cache_ttl_seconds=1.0,
-            jwt_ttl_seconds=300,
-            http_client=client,
-        )
-
-        assert result.experiment_id == "EXP-TEST-001"
-        assert result.baseline_passed is True
-        assert len(result.probes) == 3
-        assert result.finding is not None
-        assert result.finding.fault_type == "stale_cache"
+        res = await controller.run_single_trial("exp-test-1", scenario, http_client=async_client)
+        assert res.baseline_passed is True
+        assert len(res.probes) == 5
+        assert res.finding.root_cause == "AUTHORIZATION_CACHE"

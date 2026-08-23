@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AuthTime — Visual Exposure Timeline Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-card: #151d30;
+            --bg-card-hover: #1e2942;
+            --border-color: #2a3654;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            padding: 2rem;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo { font-size: 1.75rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .subtitle { color: var(--text-secondary); font-size: 0.95rem; margin-top: 0.25rem; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .metric-card:hover { transform: translateY(-2px); background: var(--bg-card-hover); }
+
+        .metric-label { font-size: 0.85rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+        .metric-value { font-size: 1.8rem; font-weight: 700; margin-top: 0.5rem; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .badge-medium { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .badge-high { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .badge-critical { background: rgba(220, 38, 38, 0.3); color: #ef4444; border: 1px solid #ef4444; }
+
+        .main-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-header { font-size: 1.2rem; font-weight: 600; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+
+        .chart-container { position: relative; height: 350px; width: 100%; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.85rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); font-size: 0.9rem; }
+        th { background: rgba(255,255,255,0.03); color: var(--text-secondary); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .status-allow { color: var(--accent-red); font-weight: 600; }
+        .status-block { color: var(--accent-green); font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <div class="logo">AuthTime Dashboard</div>
+            <div class="subtitle">Visual Authorization Exposure Window & Timeline Analyzer</div>
+        </div>
+        <div id="severity-badge-container">
+            <span class="badge badge-medium" id="severity-badge">MEDIUM (6.2 / 10.0)</span>
+        </div>
+    </header>
+
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-label">Estimated Exposure Window</div>
+            <div class="metric-value" id="val-exposure">6.00s <span style="font-size: 0.9rem; color: var(--text-secondary)">± 0.0s</span></div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Root Cause Analysis</div>
+            <div class="metric-value" id="val-rootcause" style="font-size: 1.2rem; color: #a78bfa">AUTHORIZATION_CACHE</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Baseline Verification</div>
+            <div class="metric-value" id="val-baseline" style="color: var(--accent-green)">PASSED</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Harness Scheduler Jitter</div>
+            <div class="metric-value" id="val-jitter">1.50ms</div>
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="card-header">
+            <span>Probe Timeline & Exposure Transition</span>
+            <span style="font-size: 0.85rem; color: var(--text-secondary)" id="fault-timestamp-label">t_fault = 0.00s</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="timelineChart"></canvas>
+        </div>
+    </div>
+
+    <div class="main-card">
+        <div class="card-header">
+            <span>Executed Probe Sequence Audit Log</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Probe Index</th>
+                    <th>Offset Target</th>
+                    <th>HTTP Status</th>
+                    <th>Actual Decision</th>
+                    <th>Ground Truth</th>
+                    <th>Violation Status</th>
+                    <th>Latency</th>
+                </tr>
+            </thead>
+            <tbody id="probe-table-body">
+                <!-- Dynamically populated -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        async function loadResults() {
+            let data;
+            try {
+                const resp = await fetch('../reports/results.json');
+                data = await resp.json();
+            } catch (e) {
+                // Fallback mock data for visual demonstration if results.json not found
+                data = {
+                    baseline_passed: true,
+                    exposure_metrics: { estimated_exposure_sec: 6.0, precision_sec: 0.0, scheduler_jitter_ms: 1.5, fault_timestamp_monotonic: 100.0 },
+                    finding: { severity_score: 6.5, severity_label: "MEDIUM", root_cause: "AUTHORIZATION_CACHE" },
+                    probes: [
+                        { probe_index: 0, offset_target: 0.0, monotonic_timestamp: 100.0, http_status: 200, actual_decision: "ALLOW", ground_truth_decision: "DENY", is_violation: true, response_latency_ms: 2.1 },
+                        { probe_index: 1, offset_target: 1.0, monotonic_timestamp: 101.0, http_status: 200, actual_decision: "ALLOW", ground_truth_decision: "DENY", is_violation: true, response_latency_ms: 2.3 },
+                        { probe_index: 2, offset_target: 5.0, monotonic_timestamp: 105.0, http_status: 200, actual_decision: "ALLOW", ground_truth_decision: "DENY", is_violation: true, response_latency_ms: 2.0 },
+                        { probe_index: 3, offset_target: 30.0, monotonic_timestamp: 130.0, http_status: 403, actual_decision: "DENY", ground_truth_decision: "DENY", is_violation: false, response_latency_ms: 2.5 }
+                    ]
+                };
+            }
+
+            document.getElementById('val-exposure').innerHTML = `${data.exposure_metrics.estimated_exposure_sec.toFixed(2)}s <span style="font-size: 0.9rem; color: var(--text-secondary)">± ${data.exposure_metrics.precision_sec.toFixed(2)}s</span>`;
+            document.getElementById('val-rootcause').innerText = data.finding.root_cause;
+            document.getElementById('val-jitter').innerText = `${data.exposure_metrics.scheduler_jitter_ms.toFixed(2)}ms`;
+
+            const badge = document.getElementById('severity-badge');
+            badge.innerText = `${data.finding.severity_label} (${data.finding.severity_score.toFixed(1)} / 10.0)`;
+            badge.className = `badge badge-${data.finding.severity_label.toLowerCase()}`;
+
+            renderChart(data);
+            renderTable(data);
+        }
+
+        function renderChart(data) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            const probes = data.probes || [];
+            const t_fault = data.exposure_metrics.fault_timestamp_monotonic;
+
+            const labels = probes.map(p => `+${p.offset_target.toFixed(1)}s`);
+            const statusValues = probes.map(p => p.actual_decision === "ALLOW" ? 1 : 0);
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Application Authorization Status (1 = ALLOW, 0 = BLOCK)',
+                        data: statusValues,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        stepped: true,
+                        pointBackgroundColor: probes.map(p => p.is_violation ? '#ef4444' : '#10b981'),
+                        pointRadius: 6,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            min: -0.2,
+                            max: 1.2,
+                            ticks: {
+                                callback: val => val === 1 ? 'ALLOW (200)' : (val === 0 ? 'BLOCK (403)' : ''),
+                                color: '#94a3b8'
+                            },
+                            grid: { color: '#2a3654' }
+                        },
+                        x: {
+                            grid: { color: '#2a3654' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#f8fafc' } }
+                    }
+                }
+            });
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('probe-table-body');
+            tbody.innerHTML = '';
+            (data.probes || []).forEach(p => {
+                const tr = document.createElement('tr');
+                const decClass = p.is_violation ? 'status-allow' : 'status-block';
+                tr.innerHTML = `
+                    <td>#${p.probe_index}</td>
+                    <td>+${p.offset_target.toFixed(2)}s</td>
+                    <td><code>${p.http_status}</code></td>
+                    <td class="${decClass}">${p.actual_decision}</td>
+                    <td><code>${p.ground_truth_decision}</code></td>
+                    <td>${p.is_violation ? '<span style="color:#ef4444; font-weight:700">VIOLATION</span>' : '<span style="color:#10b981">EXPECTED</span>'}</td>
+                    <td>${p.response_latency_ms.toFixed(2)}ms</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.onload = loadResults;
+    </script>
+</body>
+</html>

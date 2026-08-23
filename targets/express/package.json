@@ -1,0 +1,10 @@
+{
+  "name": "authtime-express-target",
+  "version": "0.1.0",
+  "description": "Express.js Reference Auth Target for AuthTime",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0"
+  }
+}

@@ -1,28 +1,14 @@
-# Operating System Files
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Environment and Secrets
-.env
-*.env.local
-
-# Node / Web Dependencies
-node_modules/
-dist/
-build/
-
-# Python / Backend Dependencies
 __pycache__/
-*.pyc
-.venv/
-venv/
-env/
-*.egg-info/
+*.py[cod]
+*$py.class
 .pytest_cache/
 .coverage
-
-# IDE & Editor files
-.idea/
-.vscode/
-*.swp
+htmlcov/
+*.egg-info/
+dist/
+build/
+.env
+.venv
+env/
+venv/
+.DS_Store

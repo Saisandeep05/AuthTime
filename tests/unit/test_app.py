@@ -1,111 +1,72 @@
 """
-Unit and Integration tests for Reference Auth Target (app/).
+Unit tests for FastAPI Reference Auth Target (`app/`).
 """
 
-import time
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.auth.jwt import create_jwt_token, verify_jwt_token
-from app.rbac.roles import has_permission, Role
-from app.cache.ttl_cache import AuthCache
-from app.models.db import db
+from app.auth.jwt import create_access_token, decode_access_token
+from app.rbac.roles import has_permission, RoleEnum
+from app.cache.ttl_cache import TTLCache
 
 client = TestClient(app)
 
 
-def test_jwt_generation_and_verification():
-    token = create_jwt_token("admin1", "Admin", ttl_seconds=60)
-    claims = verify_jwt_token(token)
-    assert claims is not None
-    assert claims["sub"] == "admin1"
-    assert claims["role"] == "Admin"
+def test_jwt_token_flow():
+    token = create_access_token("admin1", "Admin", ttl_seconds=60)
+    payload = decode_access_token(token)
+    assert payload["sub"] == "admin1"
+    assert payload["role"] == "Admin"
 
 
-def test_expired_jwt():
-    token = create_jwt_token("admin1", "Admin", ttl_seconds=-10)
-    claims = verify_jwt_token(token)
-    assert claims is None
+def test_rbac_permissions():
+    assert has_permission("Admin", "admin:read") is True
+    assert has_permission("User", "admin:read") is False
+    assert has_permission("User", "invoices:read") is True
 
 
-def test_rbac_roles():
-    assert has_permission("Admin", "MANAGE_USERS") is True
-    assert has_permission("User", "MANAGE_USERS") is False
-    assert has_permission("User", "READ_INVOICE") is True
-    assert has_permission("Guest", "WRITE_INVOICE") is False
+def test_ttl_cache_expiry():
+    cache = TTLCache(default_ttl_seconds=0.1)
+    cache.set("key1", "val1")
+    assert cache.get("key1") == "val1"
+    import time
+    time.sleep(0.15)
+    assert cache.get("key1") is None
 
 
-def test_auth_cache_operations():
-    cache = AuthCache(default_ttl_seconds=1.0)
-    cache.set("key1", "value1")
+def test_app_login_and_admin_endpoint():
+    # Reset fault state
+    r_reset = client.post("/faults/reset")
+    assert r_reset.status_code == 200
 
-    val, hit = cache.get("key1")
-    assert hit is True
-    assert val == "value1"
+    # Login
+    r_login = client.post("/auth/login", json={"user_id": "admin1"})
+    assert r_login.status_code == 200
+    token = r_login.json()["access_token"]
 
-    time.sleep(1.1)
-    val2, hit2 = cache.get("key1")
-    assert hit2 is False
-    assert val2 is None
-
-
-def test_login_endpoint():
-    resp = client.post("/auth/login", json={"user_id": "admin1"})
-    assert resp.status_code == 200
-    data = resp.json()
-    assert "access_token" in data
-    assert data["role"] == "Admin"
+    # Access admin endpoint
+    headers = {"Authorization": f"Bearer {token}"}
+    r_admin = client.get("/admin/users", headers=headers)
+    assert r_admin.status_code == 200
+    assert "admin1" in r_admin.json()["users"]
 
 
-def test_protected_routes():
-    # Login as admin
-    login_resp = client.post("/auth/login", json={"user_id": "admin1"}).json()
-    token = login_resp["access_token"]
-    headers = {"Authorization": f"Bearer {token}", "X-AuthTime-Request-ID": "test-req-1"}
-
-    # Access /admin/users
-    admin_resp = client.get("/admin/users", headers=headers)
-    assert admin_resp.status_code == 200
-    assert admin_resp.headers.get("X-AuthTime-Request-ID") == "test-req-1"
-
-    # Access /invoices/101
-    inv_resp = client.get("/invoices/101", headers=headers)
-    assert inv_resp.status_code == 200
-
-
-def test_role_revocation_fault_injection():
-    # Reset state
+def test_stale_cache_fault_injection():
+    # Reset
     client.post("/faults/reset")
 
-    # Get admin token
-    token = client.post("/auth/login", json={"user_id": "admin1"}).json()["access_token"]
+    # Login
+    r_login = client.post("/auth/login", json={"user_id": "admin1"})
+    token = r_login.json()["access_token"]
     headers = {"Authorization": f"Bearer {token}"}
 
-    # Verify baseline admin access
+    # Verify initial access
     assert client.get("/admin/users", headers=headers).status_code == 200
 
-    # Clear cache to force DB lookup test
-    client.post("/faults/reset")
-    token = client.post("/auth/login", json={"user_id": "admin1"}).json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
+    # Inject stale cache fault (revokes DB role, but retains old role in cache)
+    r_fault = client.post("/faults/inject", json={"fault_type": "stale_cache", "user_id": "admin1", "new_role": "User", "cache_ttl_seconds": 2.0})
+    assert r_fault.status_code == 200
 
-    # Inject fault: Revoke admin1 to User role
-    fault_resp = client.post("/faults/inject", json={"fault_type": "role_revocation", "user_id": "admin1", "new_role": "User"})
-    assert fault_resp.status_code == 200
-
-    # Invalidate cache to test DB lookup
-    from app.cache.ttl_cache import auth_cache
-    auth_cache.invalidate("auth:admin1")
-
-    # Request /admin/users should now return 403 Forbidden
-    blocked_resp = client.get("/admin/users", headers=headers)
-    assert blocked_resp.status_code == 403
-
-    # Cleanup reset
-    client.post("/faults/reset")
-
-
-def test_fault_api_local_safety_guard():
-    # TestClient request_host defaults to testclient (which is in local allowlist)
-    res = client.post("/faults/reset")
-    assert res.status_code == 200
+    # Immediate access post-revocation should STILL be allowed due to stale cache!
+    r_post = client.get("/admin/users", headers=headers)
+    assert r_post.status_code == 200

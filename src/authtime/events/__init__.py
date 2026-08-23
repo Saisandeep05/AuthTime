@@ -1,0 +1,1 @@
+"""Events Collector Package."""

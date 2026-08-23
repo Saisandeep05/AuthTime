@@ -1,34 +1,31 @@
 """
-Unit tests for Root Cause Analyzer.
+Unit tests for RootCauseAnalyzer.
 """
 
 from authtime.models.schemas import ExposureMetric
 from authtime.verification.root_cause import RootCauseAnalyzer
 
 
-def test_root_cause_analysis_types():
-    metrics = ExposureMetric(
-        fault_timestamp_monotonic=100.0,
-        first_unauth_monotonic=100.1,
-        last_unauth_monotonic=147.2,
-        first_blocked_monotonic=160.1,
-        exposure_interval_min_sec=47.2,
-        exposure_interval_max_sec=60.1,
-        estimated_exposure_sec=53.65,
-        precision_sec=6.45,
-        scheduler_jitter_ms=1.5,
-        unauthorized_request_count=10,
-        total_probes_fired=15,
+def test_root_cause_classifications():
+    dummy_metric = ExposureMetric(
+        fault_timestamp_monotonic=0.0,
+        exposure_interval_min_sec=0.0,
+        exposure_interval_max_sec=0.0,
+        estimated_exposure_sec=0.0,
+        precision_sec=0.0,
+        scheduler_jitter_ms=0.0,
+        unauthorized_request_count=0,
+        total_probes_fired=0,
     )
 
-    code1, conf1, _ = RootCauseAnalyzer.analyze_root_cause("stale_cache", {"cache_ttl_seconds": 60.0}, metrics)
-    assert code1 == "AUTHORIZATION_CACHE"
-    assert conf1 == "Likely"
+    code, conf, expl = RootCauseAnalyzer.analyze_root_cause("stale_cache", {"cache_ttl_seconds": 60.0}, dummy_metric)
+    assert code == "AUTHORIZATION_CACHE"
+    assert conf == "Likely"
 
-    code2, conf2, _ = RootCauseAnalyzer.analyze_root_cause("role_revocation", {}, metrics, has_cache_key_collision=True)
-    assert code2 == "CACHE_KEY_COLLISION"
-    assert conf2 == "High"
+    code_col, conf_col, _ = RootCauseAnalyzer.analyze_root_cause("stale_cache", {}, dummy_metric, has_cache_key_collision=True)
+    assert code_col == "CACHE_KEY_COLLISION"
+    assert conf_col == "High"
 
-    code3, conf3, _ = RootCauseAnalyzer.analyze_root_cause("agent_session_revocation", {}, metrics)
-    assert code3 == "DELEGATED_CREDENTIAL_STALENESS"
-    assert conf3 == "High"
+    code_agent, conf_agent, _ = RootCauseAnalyzer.analyze_root_cause("agent_session_revocation", {}, dummy_metric)
+    assert code_agent == "DELEGATED_CREDENTIAL_STALENESS"
+    assert conf_agent == "High"

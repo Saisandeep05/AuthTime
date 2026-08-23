@@ -1,27 +1,14 @@
 # Contributing to AuthTime
 
-Thank you for your interest in AuthTime — Temporal Authorization Attack & Verification Engine.
+Thank you for your interest in contributing to AuthTime!
 
-## Local Development & Testing
+## Safety First
+- AuthTime is designed **exclusively** for local cybersecurity verification against local loopback target endpoints (`127.0.0.1` / `localhost`).
+- Pull requests attempting to relax or remove safety target URL boundary checks will be rejected.
 
-1. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **Run Test Suite**:
-   ```bash
-   pytest -v
-   ```
-
-3. **Run Local Target & Engine**:
-   ```bash
-   python run.py
-   ```
-
-## Development Guidelines
-
-- **Local Safety Boundary**: All testing must operate strictly against `127.0.0.1`. Do not add features that target external domains or network interfaces.
-- **Monotonic Timing**: Use `time.monotonic()` for all duration/interval calculations.
-- **Clean Code & Typings**: Use Pydantic v2 schemas for all experiment data structures.
-- **Commit Format**: Use conventional commit messages (`feat(...)`, `fix(...)`, `test(...)`, `docs(...)`).
+## Development Workflow
+1. Create a feature branch off `main`.
+2. Implement your changes following established Pydantic v2 schemas and FastAPI patterns.
+3. Run the automated test suite using `pytest`. All tests must pass cleanly.
+4. Ensure no real secrets, credentials, or PII are committed.
+5. Submit a detailed Pull Request.
