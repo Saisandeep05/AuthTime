@@ -12,35 +12,34 @@ from authtime.models.schemas import EvidenceEvent
 
 
 class EventCollector:
-    def __init__(self, target_url: Optional[str] = None):
+    def __init__(self, target_url: Optional[str] = None, http_client: Optional[httpx.AsyncClient] = None):
         self.target_url = target_url or f"http://{settings.TARGET_HOST}:{settings.TARGET_PORT}"
-
-    async def fetch_raw_events() -> List[Dict[str, Any]]:
-        """Fetch raw audit logs from reference target GET /events."""
-        endpoint = f"{self.target_url}/events"
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(endpoint)
-            if resp.status_code == 200:
-                return resp.json().get("events", [])
-            return []
+        self._shared_client = http_client
 
     async def fetch_evidence_events(
         self,
         experiment_id: str,
         request_id: Optional[str] = None,
+        http_client: Optional[httpx.AsyncClient] = None,
     ) -> List[EvidenceEvent]:
         """
         Retrieves and filters audit events converted into EvidenceEvent models.
         """
         endpoint = f"{self.target_url}/events"
-        async with httpx.AsyncClient() as client:
-            try:
+        client = http_client or self._shared_client
+
+        try:
+            if client is not None:
                 resp = await client.get(endpoint)
-                if resp.status_code != 200:
-                    return []
-                raw_list = resp.json().get("events", [])
-            except Exception:
+            else:
+                async with httpx.AsyncClient() as c:
+                    resp = await c.get(endpoint)
+
+            if resp.status_code != 200:
                 return []
+            raw_list = resp.json().get("events", [])
+        except Exception:
+            return []
 
         events: List[EvidenceEvent] = []
         for item in raw_list:

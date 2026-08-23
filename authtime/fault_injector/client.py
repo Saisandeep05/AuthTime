@@ -11,9 +11,10 @@ from app.config import settings
 
 
 class FaultInjectorClient:
-    def __init__(self, target_url: Optional[str] = None):
+    def __init__(self, target_url: Optional[str] = None, http_client: Optional[httpx.AsyncClient] = None):
         self.target_url = target_url or f"http://{settings.TARGET_HOST}:{settings.TARGET_PORT}"
         self._enforce_safety_boundary()
+        self._shared_client = http_client
 
     def _enforce_safety_boundary(self):
         """Hardcoded safety guard ensuring target URL is local loopback only."""
@@ -32,6 +33,7 @@ class FaultInjectorClient:
         new_role: Optional[str] = "User",
         cache_ttl_seconds: Optional[float] = None,
         time_scale_factor: Optional[float] = 1.0,
+        http_client: Optional[httpx.AsyncClient] = None,
     ) -> Dict[str, Any]:
         """
         Injects a controlled fault directive via POST /faults/inject.
@@ -46,20 +48,31 @@ class FaultInjectorClient:
             "time_scale_factor": time_scale_factor,
         }
 
-        async with httpx.AsyncClient() as client:
+        client = http_client or self._shared_client
+        if client is not None:
             resp = await client.post(endpoint, json=payload, headers={"X-AuthTime-Request-ID": "fault-inject-req"})
-            if resp.status_code != 200:
-                raise RuntimeError(f"Fault injection failed: HTTP {resp.status_code} - {resp.text}")
-            return resp.json()
+        else:
+            async with httpx.AsyncClient() as c:
+                resp = await c.post(endpoint, json=payload, headers={"X-AuthTime-Request-ID": "fault-inject-req"})
 
-    async def reset(self) -> Dict[str, Any]:
+        if resp.status_code != 200:
+            raise RuntimeError(f"Fault injection failed: HTTP {resp.status_code} - {resp.text}")
+        return resp.json()
+
+    async def reset(self, http_client: Optional[httpx.AsyncClient] = None) -> Dict[str, Any]:
         """
         Resets target application state and cache via POST /faults/reset.
         """
         self._enforce_safety_boundary()
         endpoint = f"{self.target_url}/faults/reset"
-        async with httpx.AsyncClient() as client:
+
+        client = http_client or self._shared_client
+        if client is not None:
             resp = await client.post(endpoint, headers={"X-AuthTime-Request-ID": "fault-reset-req"})
-            if resp.status_code != 200:
-                raise RuntimeError(f"State reset failed: HTTP {resp.status_code} - {resp.text}")
-            return resp.json()
+        else:
+            async with httpx.AsyncClient() as c:
+                resp = await c.post(endpoint, headers={"X-AuthTime-Request-ID": "fault-reset-req"})
+
+        if resp.status_code != 200:
+            raise RuntimeError(f"State reset failed: HTTP {resp.status_code} - {resp.text}")
+        return resp.json()

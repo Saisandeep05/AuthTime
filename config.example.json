@@ -1,0 +1,9 @@
+{
+  "target_url": "http://127.0.0.1:8000",
+  "fault_type": "stale_cache",
+  "time_scale_factor": 1.0,
+  "repetitions": 3,
+  "output_dir": "reports",
+  "cache_ttl_seconds": 60,
+  "jwt_ttl_seconds": 300
+}
