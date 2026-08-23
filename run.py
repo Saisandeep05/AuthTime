@@ -129,15 +129,15 @@ async def run_experiment(
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
 
-    os.makedirs("reports", exist_ok=True)
+    os.makedirs("reports/examples", exist_ok=True)
     md_content = ReportGenerator.generate_markdown_report(last_res, stats)
     html_content = ReportGenerator.generate_html_report(last_res, stats)
     json_content = ReportGenerator.generate_json_report(last_res, stats)
     poc_path = ReportGenerator.generate_poc_script(last_res, "reports/poc")
 
-    sample_md = "reports/sample_report.md"
-    sample_html = "reports/sample_report.html"
-    results_json = "reports/results.json"
+    sample_md = "reports/examples/sample_report.md"
+    sample_html = "reports/examples/sample_report.html"
+    results_json = "reports/examples/results.json"
 
     with open(sample_md, "w", encoding="utf-8") as f:
         f.write(md_content)

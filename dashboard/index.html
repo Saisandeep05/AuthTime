@@ -160,7 +160,7 @@
         async function loadResults() {
             let data;
             try {
-                const resp = await fetch('../reports/results.json');
+                const resp = await fetch('../reports/examples/results.json');
                 data = await resp.json();
             } catch (e) {
                 // Fallback mock data for visual demonstration if results.json not found

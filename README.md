@@ -16,6 +16,41 @@
 
 **Tech Stack**: `Python 3.12` • `FastAPI` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
 
+<details>
+<summary><strong>📚 Table of Contents</strong> (Click to Expand)</summary>
+
+- [⚡ What You Get](#-what-you-get)
+- [📊 Explore Results](#-explore-results--sample-artifacts)
+- [🎯 The Security Exposure Problem](#-the-security-exposure-problem)
+- [⚡ Reference Benchmark Result](#-reference-benchmark-result)
+- [✅ Verified Project Status](#-verified-project-status)
+- [🔄 Visual Experiment Lifecycle](#-visual-experiment-lifecycle)
+- [🏗️ System Architecture](#-system-architecture)
+- [💻 Supported Target Frameworks](#-supported-target-frameworks)
+- [📂 Directory Structure](#-directory-structure)
+- [🚀 Quickstart](#-quickstart)
+- [🛠️ Key Engineering Highlights](#-key-engineering-highlights)
+- [🛡️ Safety Boundary & Constraints](#-safety-boundary--constraints)
+</details>
+
+---
+
+## ⚡ What You Get
+
+| ⏱️ **Measure Exposure Window ($\Delta t_{\text{exp}}$)** | 🔍 **Classify Root Cause** | 📜 **Generate Standalone PoC** |
+| :--- | :--- | :--- |
+| Pinpoint exact temporal delay between role revocation and enforcement down to $\le 100\text{ms}$ precision. | Diagnose revocation lag (stale cache, unrevoked JWT, async delay) with confidence metrics. | Automatically output executable zero-dependency Python scripts reproducing findings. |
+
+---
+
+## 📊 Explore Results & Sample Artifacts
+
+- 📈 [**Interactive Visual Dashboard**](dashboard/index.html) — Timeline charts, probe markers, and audit logs
+- 📄 [**Sample Security Report (Markdown)**](reports/examples/sample_report.md) — Generated audit write-up
+- 🌐 [**Sample Security Report (HTML)**](reports/examples/sample_report.html) — Styled HTML audit artifact
+- 🤖 [**Machine-Readable Telemetry (JSON)**](reports/examples/results.json) — Auditable JSON metadata & results
+- 🔬 [**Technical Research Write-up**](docs/findings-report.md) — Deep-dive research on authorization revocation gaps
+
 ---
 
 ## 🎯 The Security Exposure Problem
@@ -35,7 +70,7 @@ Applications continue accepting unauthorized requests during a silent **Temporal
 
 ---
 
-## ⚡ Headline Discovery
+## ⚡ Reference Benchmark Result
 
 In our reference web application benchmark setup:
 
@@ -82,11 +117,15 @@ AuthTime coordinates a multi-stage experimental pipeline to measure access revoc
 
 ## 🏗️ System Architecture
 
-AuthTime uses a modular, decoupled architecture where the core measurement engine communicates with target applications exclusively through a standardized **Target Adapter Abstraction Layer**:
+AuthTime uses a modular, decoupled architecture where the core measurement engine communicates with target applications exclusively through a standardized **Target Adapter Abstraction Layer**.
+
+### Visual Data Flow Overview
 
 <p align="center">
   <img src="assets/animations/architecture-flow.svg" alt="AuthTime System Architecture Data Flow" width="100%">
 </p>
+
+### Detailed Component Architecture
 
 ```mermaid
 flowchart TD
@@ -122,9 +161,9 @@ flowchart TD
     EC --> RCA
     RCA --> RG
 
-    RG --> MD["reports/sample_report.md"]
-    RG --> HTML["reports/sample_report.html"]
-    RG --> JSON["reports/results.json"]
+    RG --> MD["reports/examples/sample_report.md"]
+    RG --> HTML["reports/examples/sample_report.html"]
+    RG --> JSON["reports/examples/results.json"]
     RG --> POC["reports/poc/<exp>_poc.py"]
     RG --> DASH["dashboard/index.html"]
 ```
@@ -188,22 +227,26 @@ AuthTime/
 ├── dashboard/                      # Visual Exposure Timeline Dashboard
 │   └── index.html                  # Interactive HTML5/Chart.js visual dashboard
 │
-├── docs/                           # Specifications & Research Write-ups
+├── docs/                           # Technical Specifications & Research
 │   ├── architecture.md             # System architecture & component interface spec
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
-│   └── findings-report.md          # Technical security research write-up
+│   ├── findings-report.md          # Technical security research write-up
+│   └── development/                # Process & Development History
+│       ├── implementation_plan.md  # Architectural implementation plan
+│       └── DEVELOPMENT_LOG.md      # Development milestone log
 │
-├── tests/                          # Automated Verification Suite (59 Tests)
+├── tests/                          # Automated Verification Suite
 │   ├── unit/                       # Unit tests (schemas, adapters, ground truth, root cause)
 │   ├── integration/                # Integration tests (controller, fault injection, multi-framework)
 │   ├── scenarios/                  # Scenario tests (cross-user isolation)
 │   ├── system/                     # System CLI tests
 │   └── property/                   # Property-based randomized fuzzing suite (Hypothesis)
 │
-├── reports/                        # Auto-generated Output Reports & PoCs
-│   ├── sample_report.md
-│   ├── sample_report.html
-│   ├── results.json
+├── reports/                        # Output Reports & Reproduction Scripts
+│   ├── examples/                   # Committed Sample Demonstration Artifacts
+│   │   ├── sample_report.md
+│   │   ├── sample_report.html
+│   │   └── results.json
 │   └── poc/                        # Standalone Python PoC scripts
 │
 ├── Dockerfile                      # Container build manifest (bound to 127.0.0.1)
@@ -245,7 +288,7 @@ python test_live.py
 ```bash
 python run.py
 ```
-This automatically starts the local reference target, executes experiment trials, and generates formatted reports in `reports/`.
+This automatically starts the local reference target, executes experiment trials, and generates formatted reports in `reports/examples/`.
 
 ### 4. Execute Full Automated Test Suite
 
@@ -264,7 +307,7 @@ Open [`dashboard/index.html`](dashboard/index.html) in any web browser to view i
 python -m authtime.cli target start --port 8000
 
 # Execute experiment scenario
-python -m authtime.cli run --fault-type stale_cache --repetitions 3 --output-dir reports
+python -m authtime.cli run --fault-type stale_cache --repetitions 3 --output-dir reports/examples
 
 # Compare current exposure against historical baseline for regression testing
 python -m authtime.cli compare --current-exposure 6.0 --threshold 0.5

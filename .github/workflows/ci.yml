@@ -39,7 +39,7 @@ jobs:
 
       - name: Verify Report Artifact Generation
         run: |
-          test -f reports/sample_report.md
-          test -f reports/sample_report.html
-          test -f reports/results.json
+          test -f reports/examples/sample_report.md
+          test -f reports/examples/sample_report.html
+          test -f reports/examples/results.json
           echo "All reports successfully generated and validated!"

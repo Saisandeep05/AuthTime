@@ -19,8 +19,8 @@ reports/*.html
 reports/*.md
 reports/poc/*.py
 history/exposure_history.jsonl
-!reports/sample_report.md
-!reports/sample_report.html
-!reports/results.json
+!reports/examples/sample_report.md
+!reports/examples/sample_report.html
+!reports/examples/results.json
 node_modules/
 
