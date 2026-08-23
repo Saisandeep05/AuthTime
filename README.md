@@ -1,134 +1,63 @@
-# AuthTime — Temporal Authorization Attack & Verification Engine
+# AuthTime
+
+> **An open-source controlled security research harness for experimentally measuring and quantifying Temporal Authorization Exposure Windows ($\Delta t_{\text{exp}}$) during access revocation fault injection.**
 
 [![AuthTime CI & Verification Pipeline](https://github.com/Saisandeep05/AuthTime/actions/workflows/ci.yml/badge.svg)](https://github.com/Saisandeep05/AuthTime/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/Python-3.12-green.svg)](https://www.python.org/)
 
+**Tech Stack**: `Python 3.12` • `FastAPI` • `Django` • `Express.js` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
+
 ---
 
-## 🤔 What is AuthTime? (Explained Simply)
+## 🎯 Why AuthTime?
 
-Imagine an employee gets fired at **10:00 AM**, and HR immediately revokes their admin account in the company database.
+- **Investigates Access Revocation Delay**: When permissions are revoked in a database (e.g. employee termination or privilege demotion), web applications often continue trusting stale in-memory caches or unrevoked JWT tokens.
+- **Quantifies Vulnerability Windows**: Measures exact time delays ($\le 100\text{ms}$ schedule precision) during which unauthorized requests succeed post-revocation.
+- **Multi-Framework Behavioral Testing**: Evaluates identical revocation fault scenarios across FastAPI, Django, Express.js, and OpenID CAEP/SSF push revocation targets.
+- **Empirical Security Research Engine**: Automatically generates standalone, zero-dependency Python PoC reproduction scripts to verify findings independently.
 
-However, because web applications store user permissions in fast temporary memory (caches or JWT tokens) to speed things up, **the application doesn't notice the revocation right away**. For the next 60 seconds, the fired employee can still log in, download sensitive user records, or make admin changes!
+---
 
-**AuthTime** is an open-source controlled security research harness designed to experimentally measure and quantify this hidden security vulnerability — called the **Authorization Exposure Window**.
+## ✅ Verified Project Status
+
+- **58 Automated Tests Passing (58 passed, 1 skipped cleanly)** across unit, integration, property fuzzing, and system CLI test suites.
+- **Target Adapter Abstraction Layer** (`BaseTargetAdapter` / `HTTPTargetAdapter`) decoupling measurement orchestration from target web frameworks.
+- **Cryptographically Hardened SSF/CAEP Implementation** (HMAC-SHA256 & RS256 token verification, `jti` replay resistance with 300s TTL eviction).
+- **Forensic Audit Log Preservation** (`AUDIT_EVENTS` preserved across state reset cycles).
+- **Strict Local Loopback Boundary** (Hardcoded runtime enforcement restricting execution exclusively to `127.0.0.1` / `localhost`).
+
+---
+
+## 🔄 How It Works
 
 ```
-[10:00:00 AM] HR Revokes Admin Rights in Database ────────┐
-                                                         ├── ⚠️ 10-Second Vulnerability Gap (Exposure Window)
-[10:00:10 AM] Application Cache Finally Expires ─────────┘
+ 1. Configure Target ────> 2. Baseline Check ────> 3. Inject Fault ────> 4. High-Precision Probing ────> 5. Evidence & Analysis
+    (FastAPI / Express /      (Verify pre-fault       (Demote role or        (Fire probes at <=100ms        (Compute exposure window,
+    Django / CAEP)             authorized access)     revoke session)         offsets)                       root cause & PoC)
 ```
+
+1. **Configure Target**: Select a reference target application (FastAPI, Node.js Express, Django, or OpenID CAEP/SSF).
+2. **Establish Baseline**: Perform identity verification and validate pre-fault authorized access (`ALLOW`).
+3. **Inject Controlled Fault**: Demote user role or revoke session in database/control plane.
+4. **Execute High-Precision Probes**: Fire background HTTP probes at scheduled offsets ($\le 100\text{ms}$ schedule resolution) using `time.monotonic()`.
+5. **Collect Evidence & Analyze**: Evaluate response contracts, compute exposure window $[t_{\text{last\_unauth}}, t_{\text{first\_block}}]$, determine root cause, and generate runnable PoC scripts.
 
 ---
 
 ## ⚡ Headline Discovery
 
 In our reference web application setup:
-- **What happened**: An admin user's role was changed to a standard `User`.
-- **The flaw**: The application continued accepting admin requests for **60.0 seconds** of configured TTL (or **4.52s ± 0.05s** in accelerated 0.1x experimental mode) because the authorization cache was stale.
-- **Security Score**: Assigned a **Severity Score of 7.3 / 10.0 (HIGH)** per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
-
----
-
-## 💡 Why Does This Problem Exist?
-
-Modern web applications (built with FastAPI, Node.js, Django, React, microservices, or API Gateways) use caching to run fast:
-
-1. **Database**: Updates instantly when access is revoked (`DENY`).
-2. **Application Cache / Token**: Stores the user's old role in memory for 30–300 seconds (`ALLOW`).
-3. **The Risk**: Until that cache expires, the application trusts the stale memory instead of the database.
-
-AuthTime simulates controlled access revocations and fires background probes to pinpoint the revocation boundary. High-precision monotonic local clock measurements achieve probe schedule resolution down to $\le 100\text{ms}$, while accounting for HTTP request dispatch ($t_{\text{start}}$) and application processing latency.
-
-
----
-
-## 🛡️ Safety Boundary & Operating Constraints
-
-> [!CAUTION]
-> **Strict Local Loopback Boundary**: AuthTime operates **exclusively** against local reference targets running on `127.0.0.1` or `localhost`.
-> - **NO** external network scanning or third-party targets.
-> - **NO** real credentials or personal data.
-> - **NO** external network traffic.
-> - **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement that immediately aborts execution if any non-local target URL is supplied.
-
-
----
-
-## 📂 Project Directory Structure
-
-AuthTime follows a standard Python **`src/` package layout**:
+- **What Happened**: An admin user's role was changed to a standard `User`.
+- **The Vulnerability**: The application continued accepting admin requests for **60.0 seconds** of configured TTL (or **4.52s ± 0.05s** in accelerated 0.1x experimental mode) because the authorization cache was stale.
+- **Severity Score**: Assigned a **Severity Score of 7.3 / 10.0 (HIGH)** per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
 
 ```
-AuthTime/
-├── src/                            # Source Packages
-│   ├── app/                        # Reference Auth Target Application (FastAPI on 127.0.0.1)
-│   │   ├── main.py                 # FastAPI application factory
-│   │   ├── config.py               # Settings & secrets
-│   │   ├── api/endpoints.py        # Protected routes & /faults/* injection controller
-│   │   ├── auth/jwt.py             # PyJWT creation & verification
-│   │   ├── cache/ttl_cache.py      # Thread-safe in-memory authorization TTL cache
-│   │   └── rbac/roles.py           # Role definitions & RBAC checks
-│   │
-│   ├── authtime/                   # AuthTime Engine Core
-│   │   ├── cli.py                  # CLI entrypoint (authtime)
-│   │   ├── controller/experiment.py# Trial controller & statistical aggregator
-│   │   ├── events/collector.py     # Audit event collector (X-AuthTime-Request-ID)
-│   │   ├── fault_injector/client.py# Loopback fault injection client
-│   │   ├── ground_truth/manager.py # Dynamic Ground Truth state manager
-│   │   ├── history/tracker.py      # Cross-run exposure history tracker & regression diffing
-│   │   ├── models/schemas.py       # Pydantic v2 schemas
-│   │   ├── reporting/generator.py  # Markdown, HTML, JSON & runnable PoC generator
-│   │   ├── scenarios/generator.py  # Coarse, matrix & cross-user scenario generators
-│   │   ├── timing/clock.py         # Monotonic clock & scheduler jitter calibration
-│   │   └── verification/           # Exposure calculator, prober & root cause analyzer
-│   │
-│   └── targets/                    # Multi-Framework Target Replicas
-│       └── caep_target.py          # OpenID CAEP/SSF push revocation target
-│
-├── dashboard/                      # Visual Exposure Timeline Dashboard
-│   └── index.html                  # Interactive HTML5/Chart.js visual dashboard
-│
-├── targets/                        # Additional Framework Reference Targets
-│   ├── express/                    # Node.js Express target (server.js, 127.0.0.1:8001)
-│   └── django/                     # Django target (app.py, 127.0.0.1:8002)
-│
-├── docs/                           # Specifications & Research Reports
-│   ├── architecture.md             # System architecture & component interfaces
-│   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
-│   ├── findings-report.md          # Technical security research paper
-│   └── DEVELOPMENT_LOG.md          # 16-phase development tracking log
-│
-├── scripts/                        # Live Demo & Testing Scripts
-│   ├── test_live.py                # Python interactive live verification script
-│   └── test_live.ps1               # PowerShell native live verification script
-│
-├── tests/                          # Automated Verification Suite (22 Tests)
-│   ├── unit/                       # Unit tests (schemas, app, ground truth, root cause)
-│   ├── integration/                # Integration tests (controller, fault injection, reports)
-│   ├── scenarios/                  # Scenario tests (cross-user isolation)
-│   ├── system/                     # System CLI tests
-│   └── property/                   # Property-based randomized fuzzing suite (Hypothesis)
-│
-├── reports/                        # Auto-generated Output Reports
-│   ├── sample_report.md
-│   ├── sample_report.html
-│   ├── results.json
-│   └── poc/                        # Standalone Python PoC scripts
-│
-├── .github/workflows/ci.yml        # GitHub Actions CI workflow
-├── Dockerfile                      # Container build manifest (bound to 127.0.0.1)
-├── docker-compose.yml              # Single target compose configuration
-├── docker-compose.multi-node.yml   # Multi-replica load-balanced cluster setup
-├── pyproject.toml                  # Setuptools package configuration (pythonpath = "src")
-├── requirements.txt                # Python dependencies
-├── run.py                          # Top-level demonstration launcher
-├── test_live.py                    # Root interactive test shortcut
-├── test_live.ps1                   # Root PowerShell test shortcut
-├── implementation_plan.md          # Detailed engineering & design specification
-└── README.md                       # Portfolio overview & documentation
+[10:00:00 AM] HR Revokes Admin Rights in Database ────────┐
+                                                         ├── ⚠️ 60-Second Vulnerability Gap (60.0s Configured TTL at 1.0x Real-Time)
+[10:01:00 AM] Application Cache Finally Expires ─────────┘
 ```
+*(Note: In 0.1x accelerated experimental mode, the 60.0s TTL window completes in 4.52s ± 0.05s of wall-clock time).*
 
 ---
 
@@ -136,54 +65,116 @@ AuthTime/
 
 ```mermaid
 flowchart TD
-    GT["Ground Truth State Manager"] --> SG["Scenario Generator"]
-    EC["Experiment Controller"] --> FI["Fault Injector"]
-    SG --> EC
-    
-    EC --> TH["Verification & Timing Harness"]
-    
-    FI -->|Controlled Fault Directive| REF["Local Reference Auth Target (FastAPI/Express/Django)"]
-    TH -->|Async Probes + X-AuthTime-Request-ID| REF
-    
-    REF -->|Structured Audit Logs| ECOL["Event Collector"]
-    
-    TH --> VE["Verification Engine"]
-    ECOL --> VE
-    GT --> VE
-    
-    VE --> EM["Exposure Metrics Engine"]
-    VE --> RCA["Root Cause Analyzer"]
-    
-    EM --> RG["Report Generator"]
+    subgraph Core Engine
+        CSM["Experiment State Machine\n(state_machine.py)"]
+        GTM["Ground Truth Manager\n(ground_truth/manager.py)"]
+        EC["Experiment Controller\n(controller/experiment.py)"]
+        TA["Target Adapter Layer\n(adapters/target_adapter.py)"]
+    end
+
+    subgraph Reference Target Replicas
+        FAP["FastAPI Target\n(src/app/main.py)"]
+        EXP["Express Target\n(targets/express/server.js)"]
+        DJG["Django Native Target\n(targets/django/app.py)"]
+        CAEP["Cryptographic CAEP Target\n(targets/caep/server.py)"]
+    end
+
+    subgraph Evidence & Analysis
+        KM["Kaplan-Meier Survival Analysis\n(statistics/censoring.py)"]
+        RCA["Root Cause Analyzer\n(verification/root_cause.py)"]
+        RG["Report & PoC Generator\n(reporting/generator.py)"]
+    end
+
+    CSM --> EC
+    GTM --> EC
+    EC --> TA
+    TA -->|HTTP / Loopback| FAP
+    TA -->|HTTP / Loopback| EXP
+    TA -->|HTTP / Loopback| DJG
+    TA -->|Cryptographic SSF| CAEP
+
+    EC --> KM
+    EC --> RCA
     RCA --> RG
-    
+
     RG --> MD["reports/sample_report.md"]
     RG --> HTML["reports/sample_report.html"]
     RG --> JSON["reports/results.json"]
-    RG --> POC["reports/poc/<experiment_id>_poc.py"]
+    RG --> POC["reports/poc/<exp>_poc.py"]
     RG --> DASH["dashboard/index.html"]
 ```
 
 ---
 
-## 🌟 Key Features & Capabilities
+## 📂 Directory Structure
 
-1. **Ground Truth vs. Application Decision Engine**: Compares expected authorization decisions against actual application HTTP responses at exact timestamps.
-2. **High-Precision Monotonic Timing**: Uses Python's `time.monotonic()` to eliminate wall-clock drift, automatically measuring harness overhead (`scheduler_jitter_ms`).
-3. **Adaptive Binary Search Probing**: Automatically pinpoints exact revocation transition boundaries down to $\le 100\text{ms}$ precision.
-4. **Visual Exposure Timeline Dashboard**: Interactive visual timeline dashboard in [`dashboard/index.html`](dashboard/index.html) visualizing status transitions, probe markers, severity badges, and audit log tables.
-5. **Cross-Run Regression Tracking**: Records run metrics in `history/exposure_history.jsonl` with `authtime compare` to catch exposure regressions in CI pipelines.
-6. **Multi-Framework Targets**: Includes reference targets for FastAPI ([`src/app/`](src/app/)), Node.js Express ([`targets/express/`](targets/express/)), Django ([`targets/django/`](targets/django/)), and OpenID CAEP/SSF push revocation ([`src/targets/caep_target.py`](src/targets/caep_target.py)).
-7. **Property-Based Fuzzing Suite**: 100-iteration randomized property fuzzing suite in [`tests/property/test_exposure_fuzzing.py`](tests/property/test_exposure_fuzzing.py) validating timing invariant guarantees.
-8. **Transparent Severity Scoring (0–10)**: Auditably scores findings based on exposure duration, endpoint sensitivity weight, and evidence confidence.
-9. **Standalone Reproduction Script Generation**: Automatically generates standalone, runnable Python PoC scripts (`reports/poc/<experiment_id>_poc.py`) to independently reproduce findings.
-10. **Technical Security Research Paper**: Comprehensive write-up published in [`docs/findings-report.md`](docs/findings-report.md).
+```
+AuthTime/
+├── src/                            # Source Packages
+│   ├── app/                        # Reference Auth Target Application (FastAPI on 127.0.0.1:8000)
+│   │   ├── main.py                 # FastAPI application factory
+│   │   ├── config.py               # Settings & secrets
+│   │   ├── api/endpoints.py        # Protected routes & /faults/* injection controller
+│   │   ├── auth/jwt.py             # PyJWT creation & verification
+│   │   ├── cache/ttl_cache.py      # Thread-safe in-memory authorization TTL cache
+│   │   └── rbac/roles.py           # Role definitions & RBAC checks
+│   │
+│   └── authtime/                   # AuthTime Core Engine
+│       ├── adapters/               # Target Adapter Abstraction (target_adapter.py, contract.py)
+│       ├── cli.py                  # CLI entrypoint (authtime)
+│       ├── controller/             # Trial controller & statistical aggregator (experiment.py)
+│       ├── events/                 # Audit event collector (collector.py)
+│       ├── fault_injector/         # Loopback fault injection client (client.py)
+│       ├── ground_truth/           # Dynamic Ground Truth state manager (manager.py)
+│       ├── history/                # Exposure history tracker & regression diffing (tracker.py)
+│       ├── lifecycle/              # State machine & transition invariants (state_machine.py)
+│       ├── models/                 # Pydantic v2 schemas & evidence models
+│       ├── network/                # DNS-rebinding loopback safety (safety.py)
+│       ├── reporting/              # Markdown, HTML, JSON & runnable PoC generator (generator.py)
+│       ├── scenarios/              # Coarse, matrix & cross-user scenario generators
+│       ├── statistics/             # Kaplan-Meier survival estimator & censoring analysis
+│       ├── timing/                 # Monotonic clock & scheduler jitter calibration (clock.py)
+│       └── verification/           # Exposure calculator, prober & root cause analyzer
+│
+├── targets/                        # Multi-Framework Target Replicas
+│   ├── caep/                       # OpenID CAEP/SSF push revocation target (server.py)
+│   ├── express/                    # Node.js Express target (server.js, 127.0.0.1:8001)
+│   └── django/                     # Django native target (app.py, 127.0.0.1:8002)
+│
+├── dashboard/                      # Visual Exposure Timeline Dashboard
+│   └── index.html                  # Interactive HTML5/Chart.js visual dashboard
+│
+├── docs/                           # Specifications & Research Papers
+│   ├── architecture.md             # System architecture & component interface spec
+│   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
+│   └── findings-report.md          # Technical security research write-up
+│
+├── tests/                          # Automated Verification Suite (57 Tests)
+│   ├── unit/                       # Unit tests (schemas, adapters, ground truth, root cause)
+│   ├── integration/                # Integration tests (controller, fault injection, multi-framework)
+│   ├── scenarios/                  # Scenario tests (cross-user isolation)
+│   ├── system/                     # System CLI tests
+│   └── property/                   # Property-based randomized fuzzing suite (Hypothesis)
+│
+├── reports/                        # Auto-generated Output Reports & PoCs
+│   ├── sample_report.md
+│   ├── sample_report.html
+│   ├── results.json
+│   └── poc/                        # Standalone Python PoC scripts
+│
+├── Dockerfile                      # Container build manifest (bound to 127.0.0.1)
+├── docker-compose.yml              # Single target compose configuration
+├── pyproject.toml                  # Setuptools package configuration
+├── requirements.txt                # Python dependencies
+├── run.py                          # Top-level demonstration launcher
+└── README.md                       # Portfolio overview & documentation
+```
 
 ---
 
-## 🚀 Quickstart & Usage
+## 🚀 Quickstart
 
-### 1. Installation & Environment Setup
+### 1. Installation
 
 ```bash
 # Clone the repository
@@ -195,9 +186,7 @@ pip install -r requirements.txt
 pip install -e .
 ```
 
-### 2. Run Interactive Live Verification (Step-by-Step)
-
-Test AuthTime live in your terminal with real-time feedback:
+### 2. Run Interactive Live Verification
 
 ```bash
 # On Windows / Linux / macOS:
@@ -212,13 +201,19 @@ python test_live.py
 ```bash
 python run.py
 ```
-This automatically starts the local reference target, executes 3 experiment trials, and generates formatted reports in `reports/`.
+This automatically starts the local reference target, executes experiment trials, and generates formatted reports in `reports/`.
 
-### 4. Open the Visual Exposure Dashboard
+### 4. Execute Full Automated Test Suite
 
-Open [`dashboard/index.html`](dashboard/index.html) in any web browser to explore interactive timeline charts, probe markers, severity badges, and audit logs.
+```bash
+pytest --verbose
+```
 
-### 5. Using the `authtime` CLI
+### 5. Open Visual Exposure Dashboard
+
+Open [`dashboard/index.html`](dashboard/index.html) in any web browser to view interactive timeline charts, probe markers, severity badges, and audit logs.
+
+### 6. Using the `authtime` CLI
 
 ```bash
 # Start local reference target server
@@ -231,54 +226,28 @@ python -m authtime.cli run --fault-type stale_cache --repetitions 3 --output-dir
 python -m authtime.cli compare --current-exposure 6.0 --threshold 0.5
 ```
 
-### 6. Running Docker Environment
+---
 
-```bash
-docker compose up --build
-```
-> Ports are safely bound exclusively to `127.0.0.1:8000`.
+## 🛠️ Key Engineering Highlights
+
+- **Target Adapter Abstraction**: Modular `BaseTargetAdapter` interface standardizing identity verification, fault injection, probe execution, state resets, and audit event collection across web frameworks.
+- **High-Precision Monotonic Timing**: Leverages `time.monotonic()` to eliminate wall-clock drift, automatically measuring scheduler jitter and harness overhead.
+- **Adaptive Binary Search Probing**: Pinpoints exact revocation transition boundaries down to $\le 100\text{ms}$ precision.
+- **Cryptographic SSF/CAEP Security**: Implements OpenID CAEP/SSF event reception with HMAC-SHA256/RS256 token verification and `jti` replay resistance with 300s TTL eviction.
+- **Forensic Audit Log Preservation**: State resets restore authorization roles and caches while leaving immutable audit logs (`AUDIT_EVENTS`) intact for forensic auditing.
+- **Property-Based Fuzzing Suite**: 100-iteration randomized property testing with Hypothesis validating timing invariant guarantees.
+- **Standalone PoC Generation**: Automatically outputs zero-dependency, executable Python reproduction scripts (`reports/poc/<exp>_poc.py`).
 
 ---
 
-## 📊 Sample Reports & Findings
+## 🛡️ Safety Boundary & Constraints
 
-Review real generated demonstration output committed in this repository:
-- 📄 **Markdown Report**: [`reports/sample_report.md`](reports/sample_report.md)
-- 🌐 **HTML Report**: [`reports/sample_report.html`](reports/sample_report.html)
-- 🤖 **Machine-Readable JSON**: [`reports/results.json`](reports/results.json)
-- 📝 **Technical Research Write-up**: [`docs/findings-report.md`](docs/findings-report.md)
-
----
-
-## 📐 Technical & Mathematical Specification
-
-For security researchers and engineers, the central metric computed by AuthTime is the **Authorization Exposure Window**:
-
-$$\text{Exposure Window} = [t_{\text{last\_unauth}} - t_{\text{fault}},\, t_{\text{first\_block}} - t_{\text{fault}}]$$
-
-Severity scores are assigned on a transparent scale of $0.0 \dots 10.0$:
-$$\text{Severity Score} = \min\left(10.0,\, S_{\text{exposure}} \times W_{\text{endpoint}} \times C_{\text{confidence}}\right)$$
-
----
-
-## 🚫 What AuthTime Does NOT Do (Limitations & Scope)
-
-To maintain clarity and ethical alignment, AuthTime **does NOT**:
-- Scan remote IP addresses, public domain names, or external SaaS endpoints.
-- Store or process real-world passwords, API keys, or personally identifiable information (PII).
-- Perform brute-force password guessing, fuzzing of unhandled crash conditions, or remote code execution exploits.
-- Operate outside local loopback interfaces (`127.0.0.1`).
-
----
-
-## 🧪 Running the Test Suite
-
-Run the full automated verification and property-based fuzzing suite across unit, integration, property, scenario, system, and multi-framework equivalence tests:
-
-```bash
-pytest --verbose
-```
-
+> [!CAUTION]
+> **Strict Local Loopback Boundary**: AuthTime operates **exclusively** against local reference targets running on `127.0.0.1` or `localhost`.
+> - **NO** external network scanning or third-party targets.
+> - **NO** real credentials or personal data.
+> - **NO** external network traffic.
+> - **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement (`validate_and_resolve_loopback`) that immediately aborts execution if a non-loopback URL is supplied.
 
 ---
 
