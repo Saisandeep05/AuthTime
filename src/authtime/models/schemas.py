@@ -77,6 +77,7 @@ class ExposureMetric(BaseModel):
     total_probes_fired: int = Field(ge=0)
     is_censored: bool = False
     measurement_status: MeasurementStatus = "OBSERVED_TRANSITION"
+    per_replica_exposure: Optional[Dict[str, Any]] = None
 
     @model_validator(mode="after")
     def validate_temporal_invariants(self) -> "ExposureMetric":

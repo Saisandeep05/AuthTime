@@ -12,4 +12,6 @@ AuthTime is organized into decoupled, modular components:
 8. **Scenario Generator (`authtime/scenarios/`)**: Produces coarse offsets, adaptive binary search, and multi-user isolation test suites.
 9. **Experiment Controller (`authtime/controller/`)**: Coordinates baseline verification, fault injection, timing harness execution, target adapter dispatch, and trial aggregation.
 10. **Report Generator (`authtime/reporting/`)**: Formats Markdown, HTML, JSON, and standalone zero-dependency PoC scripts.
+11. **Distributed Authorization Validation Laboratory (`targets/distributed_lab/`)**: Distributed multi-replica architecture featuring PostgreSQL as authoritative source of truth, Redis as authorization & invalidation bus, signed JWT lifecycle management, multiple protected API replicas (API-1, API-2, API-3), controlled failure injection, and `DistributedLabAdapter`.
+
 

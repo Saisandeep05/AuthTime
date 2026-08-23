@@ -11,16 +11,17 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
   <a href="#-safety-boundary--constraints"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
-  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-58%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
+  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-64%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
 </p>
 
-**Tech Stack**: `Python 3.12` • `FastAPI` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
+**Tech Stack**: `Python 3.12` • `FastAPI` • `PostgreSQL` • `Redis` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
 
 <details>
 <summary><strong>📚 Table of Contents</strong> (Click to Expand)</summary>
 
 - [⚡ What You Get](#-what-you-get)
 - [📊 Explore Results](#-explore-results--sample-artifacts)
+- [🌐 Distributed Validation Lab](#-distributed-authorization-validation-laboratory)
 - [🎯 The Security Exposure Problem](#-the-security-exposure-problem)
 - [⚡ Reference Benchmark Result](#-reference-benchmark-result)
 - [✅ Verified Project Status](#-verified-project-status)
@@ -50,6 +51,30 @@
 - 🌐 [**Sample Security Report (HTML)**](reports/examples/sample_report.html) — Styled HTML audit artifact
 - 🤖 [**Machine-Readable Telemetry (JSON)**](reports/examples/results.json) — Auditable JSON metadata & results
 - 🔬 [**Technical Research Write-up**](docs/findings-report.md) — Deep-dive research on authorization revocation gaps
+
+---
+
+## 🌐 Distributed Authorization Validation Laboratory
+
+AuthTime includes a full **Distributed Authorization Validation Laboratory** (`targets/distributed_lab/`) proving real-world authorization propagation and revocation dynamics across actual distributed infrastructure components:
+
+- **PostgreSQL Source of Truth**: Authoritative DB storing users, roles, authorization version counters, and revocation audit events (`targets/distributed_lab/db/schema.sql`).
+- **Redis Authorization & Invalidation Bus**: Caches user role states and streams invalidation pub/sub events (`targets/distributed_lab/cache/redis_cache.py`).
+- **JWT Authorization Lifecycle**: Cryptographic tokens verified against per-replica role cache or DB (`targets/distributed_lab/auth/jwt_handler.py`).
+- **Multi-Replica Protected APIs**: Three independent API instances (`API-1`, `API-2`, `API-3` on ports `8010`, `8011`, `8012`).
+- **Controlled Failure Injection**:
+  - `NO_FAULT`: Immediate DB update & Redis cache invalidation across all 3 replicas ($\Delta t_{\text{exp}} = 0.0\text{s}$).
+  - `STALE_CACHE`: DB update with 60.0s TTL cache expiration ($\Delta t_{\text{exp}} = 60.0\text{s}$).
+  - `DELAYED_INVALIDATION`: DB update with 2.0s Redis invalidation delay ($\Delta t_{\text{exp}} = 2.0\text{s}$).
+  - `PARTIAL_PROPAGATION`: Replica 2 receives invalidation event 1.5s later than Replica 1 & 3.
+  - `DROPPED_EVENT`: Replica 3 misses invalidation event entirely until TTL fallback.
+  - `REDIS_UNAVAILABLE`: Temporary Redis transport failure fallback behavior.
+
+### Launching the Distributed Laboratory with Docker Compose
+
+```bash
+docker compose -f docker-compose.lab.yml up --build
+```
 
 ---
 
@@ -174,6 +199,7 @@ flowchart TD
 
 | Target Framework | Implementation Path | Execution Mode | Adapter Interface | Status |
 | :--- | :--- | :--- | :--- | :---: |
+| **Distributed Lab** | `targets/distributed_lab/` | Postgres + Redis + 3 API Replicas | `DistributedLabAdapter` | ✅ Tested E2E |
 | **FastAPI** | `src/app/main.py` | Python 3.12 (ASGI) | `HTTPTargetAdapter` | ✅ Primary Tested |
 | **Node.js Express** | `targets/express/server.js` | Node.js 18+ (HTTP) | `HTTPTargetAdapter` | ✅ Tested E2E |
 | **Django Native** | `targets/django/app.py` | Python 3.12 (WSGI) | `HTTPTargetAdapter` | ✅ Tested (Optional Req) |
@@ -220,6 +246,11 @@ AuthTime/
 │       └── verification/           # Exposure calculator, prober & root cause analyzer
 │
 ├── targets/                        # Multi-Framework Target Replicas
+│   ├── distributed_lab/            # Distributed Auth Lab (PostgreSQL, Redis, JWT, API Replicas 1/2/3)
+│   │   ├── db/                     # PostgreSQL schema & database interface (schema.sql, database.py)
+│   │   ├── cache/                  # Redis authorization & invalidation bus (redis_cache.py)
+│   │   ├── auth/                   # JWT lifecycle & verifier (jwt_handler.py)
+│   │   └── service/                # Multi-replica API app factory (app.py, server.py)
 │   ├── caep/                       # OpenID CAEP/SSF push revocation target (server.py)
 │   ├── express/                    # Node.js Express target (server.js, 127.0.0.1:8001)
 │   └── django/                     # Django native target (app.py, 127.0.0.1:8002)
