@@ -21,7 +21,9 @@
 
 - [⚡ What AuthTime Does](#-what-authtime-does)
 - [🚀 Quick Start (START HERE)](#-quick-start-start-here)
+- [🔄 End-to-End Execution Workflow & Lifecycle](#-end-to-end-execution-workflow--lifecycle)
 - [📊 Understanding the Results](#-understanding-the-results)
+- [🏗️ System Architecture & Data Flow](#-system-architecture--data-flow)
 - [⚡ Advanced Features (Optional)](#-advanced-features-optional)
   - [1. Using the `authtime` CLI](#1-using-the-authtime-cli)
   - [2. Distributed Authorization Validation Laboratory](#2-distributed-authorization-validation-laboratory)
@@ -89,6 +91,31 @@ pytest --verbose
 
 ---
 
+## 🔄 End-to-End Execution Workflow & Lifecycle
+
+AuthTime coordinates a multi-stage experimental pipeline to measure access revocation lag with high precision:
+
+<p align="center">
+  <img src="assets/animations/experiment-lifecycle.svg" alt="AuthTime Experiment Execution Pipeline" width="100%">
+</p>
+
+### How a Request & Trial Flows Through AuthTime (Plain Language)
+
+```text
+[ 1. Select Target ] ──► [ 2. Validate Baseline ] ──► [ 3. Inject Revocation Fault ]
+                                                                   │
+[ 6. Output Reports ] ◄── [ 5. Evaluate Metrics ] ◄── [ 4. Execute HTTP Probes ]
+```
+
+1. **Target Selection & Initialization**: AuthTime connects to the target authorization server (FastAPI reference app, Express.js, Django, or Level C Distributed Lab) via the `HTTPTargetAdapter`.
+2. **Pre-Fault Baseline Check**: AuthTime issues an initial HTTP request with active user credentials and confirms the target returns `200 OK` (`ALLOW`).
+3. **Controlled Fault Injection**: The Ground Truth Manager initiates role demotion (e.g., `Admin` $\rightarrow$ `User`) in the target database at timestamp $t_0$.
+4. **High-Precision Probing Loop**: AuthTime fires rapid, monotonic background HTTP probes ($\le 100\text{ms}$ resolution) using `time.monotonic()` to track exactly when post-revocation requests are accepted vs blocked.
+5. **Contract & Exposure Evaluation**: Response contracts are evaluated. AuthTime records the time of the last unauthorized `ALLOW` ($t_{\text{last\_unauth}}$) and the first enforced `DENY` ($t_{\text{first\_block}}$), computing $\Delta t_{\text{exp}} = t_{\text{first\_block}} - t_0$.
+6. **Report Generation & State Reset**: Formatted Markdown/HTML/JSON reports and executable zero-dependency Python PoC scripts are generated, and target states are reset while preserving forensic audit trails (`AUDIT_EVENTS`).
+
+---
+
 ## 📊 Understanding the Results
 
 ### Key Exposure Metrics Explained
@@ -106,6 +133,61 @@ After running `python run.py`, inspect output artifacts:
 - 📄 [**Sample Security Report (Markdown)**](reports/examples/sample_report.md) — Formatted audit write-up detailing findings and root causes.
 - 🌐 [**Sample Security Report (HTML)**](reports/examples/sample_report.html) — Styled HTML audit artifact.
 - 🤖 [**Machine-Readable Telemetry (JSON)**](reports/examples/results.json) — Auditable JSON metadata and raw probe metrics.
+
+---
+
+## 🏗️ System Architecture & Data Flow
+
+AuthTime uses a modular, decoupled architecture where the core measurement engine communicates with target applications exclusively through a standardized **Target Adapter Abstraction Layer**.
+
+### Visual Data Flow Overview
+
+<p align="center">
+  <img src="assets/animations/architecture-flow.svg" alt="AuthTime System Architecture Data Flow" width="100%">
+</p>
+
+### Component Architecture Diagram
+
+```mermaid
+flowchart TD
+    subgraph Core Engine
+        CSM["Experiment State Machine\n(state_machine.py)"]
+        GTM["Ground Truth Manager\n(ground_truth/manager.py)"]
+        EC["Experiment Controller\n(controller/experiment.py)"]
+        TA["Target Adapter Layer\n(adapters/target_adapter.py)"]
+    end
+
+    subgraph Reference Target Replicas
+        FAP["FastAPI Target\n(src/app/main.py)"]
+        EXP["Express Target\n(targets/express/server.js)"]
+        DJG["Django Native Target\n(targets/django/app.py)"]
+        CAEP["Cryptographic CAEP Target\n(targets/caep/server.py)"]
+    end
+
+    subgraph Evidence & Analysis
+        KM["Kaplan-Meier Survival Analysis\n(statistics/censoring.py)"]
+        RCA["Root Cause Analyzer\n(verification/root_cause.py)"]
+        RG["Report & PoC Generator\n(reporting/generator.py)"]
+    end
+
+    CSM --> EC
+    GTM --> EC
+    EC --> TA
+    TA -->|HTTP / Loopback| FAP
+    TA -->|HTTP / Loopback| EXP
+    TA -->|HTTP / Loopback| DJG
+    TA -->|Cryptographic SSF| CAEP
+
+    EC --> KM
+    EC --> RCA
+    RCA --> RG
+
+    RG --> MD["reports/examples/sample_report.md"]
+    RG --> HTML["reports/examples/sample_report.html"]
+    RG --> JSON["reports/examples/results.json"]
+    RG --> POC["reports/poc/<exp>_poc.py"]
+    RG --> DASH["dashboard/index.html"]
+```
 
 ---
 
