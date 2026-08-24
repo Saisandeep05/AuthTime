@@ -43,11 +43,11 @@ This document contains empirical execution evidence collected during real live H
 
 ## 🧪 Automated Test Suite Verification
 
-- **Total Tests Collected**: 86
-- **Passed**: 85
-- **Skipped**: 1 (`test_django_target_behavioral_equivalence` due to optional `django` package)
+- **Total Tests Collected**: 148
+- **Passed**: 144
+- **Skipped**: 4 (Optional target framework integration tests skipped when optional drivers are missing)
 - **Failed**: 0
-- **Warnings**: 31 (Deprecation warnings for Starlette testclient & short key warning for JWT test key)
+- **Warnings**: 3 (Starlette testclient & JWT test key length warnings)
 
 ---
 
