@@ -1,3 +1,5 @@
+# AuthTime Container & Runtime Dependencies
+# Note: pyproject.toml serves as canonical package metadata; requirements.txt supplies pinned dependencies for Docker builds.
 fastapi==0.115.0
 uvicorn==0.30.6
 pyjwt==2.9.0

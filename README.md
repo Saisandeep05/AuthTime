@@ -295,8 +295,7 @@ AuthTime/
 │   ├── distributed-validation-results.md # Empirical multi-replica validation evidence
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   ├── findings-report.md          # Technical security research write-up
-│   ├── engineering-methodology.md  # Software engineering architecture & testing methodology
-│   └── repository-curation.md      # Curation audit & repository structural report
+│   └── engineering-methodology.md  # Software engineering architecture & testing methodology
 │
 ├── tests/                          # Automated Verification Suite
 │   ├── unit/                       # Unit tests (schemas, adapters, ground truth, root cause)
