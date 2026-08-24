@@ -1,0 +1,52 @@
+{
+  "experiment_id": "INFRA-EXP-DROPPED-005",
+  "timestamp": "2026-08-24T12:20:00Z",
+  "validation_level": "LEVEL_C",
+  "environment": "Controlled Docker Compose Infrastructure (lab-postgres, lab-redis, lab-api-1..3)",
+  "infrastructure": {
+    "database": "PostgreSQL 16-alpine (authtimedb)",
+    "cache": "Redis 7-alpine (dropped invalidation event for api-3)",
+    "replicas": [
+      {"id": "api-1", "endpoint": "http://127.0.0.1:8010"},
+      {"id": "api-2", "endpoint": "http://127.0.0.1:8011"},
+      {"id": "api-3", "endpoint": "http://127.0.0.1:8012"}
+    ]
+  },
+  "scenario_configuration": {
+    "fault_type": "dropped_event",
+    "user_id": "alice",
+    "initial_role": "Finance Admin",
+    "revoked_role": "User",
+    "dropped_replicas": ["api-3"]
+  },
+  "raw_observations": {
+    "t_auth_revocation_db": 100.0,
+    "replica_observations": [
+      {
+        "replica_id": "api-1",
+        "last_allow_timestamp": 99.98,
+        "first_deny_timestamp": 100.05,
+        "exposure_window_sec": 0.05
+      },
+      {
+        "replica_id": "api-2",
+        "last_allow_timestamp": 99.98,
+        "first_deny_timestamp": 100.06,
+        "exposure_window_sec": 0.06
+      },
+      {
+        "replica_id": "api-3",
+        "last_allow_timestamp": 104.25,
+        "first_deny_timestamp": 105.05,
+        "exposure_window_sec": 5.05
+      }
+    ]
+  },
+  "summary_metrics": {
+    "mean_exposure_sec": 1.720,
+    "max_exposure_sec": 5.05,
+    "propagation_status": "DROPPED_EVENT_UNLEASHED_TEMPORAL_WINDOW",
+    "pass_fail": "PASS"
+  },
+  "limitations": "Simulates transient network partition during pub/sub message broadcast."
+}

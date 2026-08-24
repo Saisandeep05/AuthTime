@@ -37,7 +37,7 @@ jobs:
 
       - name: Run Pytest Suite
         run: |
-          python -m pytest -v
+          python -m pytest -v tests/unit tests/integration tests/infrastructure
 
       - name: Run Load Test CLI
         run: |

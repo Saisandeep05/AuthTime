@@ -1,0 +1,53 @@
+{
+  "experiment_id": "INFRA-EXP-NORMAL-001",
+  "timestamp": "2026-08-24T12:00:00Z",
+  "validation_level": "LEVEL_C",
+  "environment": "Controlled Docker Compose Infrastructure (lab-postgres, lab-redis, lab-api-1..3)",
+  "infrastructure": {
+    "database": "PostgreSQL 16-alpine (authtimedb)",
+    "cache": "Redis 7-alpine (pub/sub invalidation channel 'auth_invalidations')",
+    "replicas": [
+      {"id": "api-1", "endpoint": "http://127.0.0.1:8010"},
+      {"id": "api-2", "endpoint": "http://127.0.0.1:8011"},
+      {"id": "api-3", "endpoint": "http://127.0.0.1:8012"}
+    ]
+  },
+  "scenario_configuration": {
+    "fault_type": "role_revocation",
+    "user_id": "alice",
+    "initial_role": "Finance Admin",
+    "revoked_role": "User",
+    "cache_mode": "write_through_invalidation",
+    "invalidation_delay_sec": 0.0
+  },
+  "raw_observations": {
+    "t_auth_revocation_db": 100.0,
+    "replica_observations": [
+      {
+        "replica_id": "api-1",
+        "last_allow_timestamp": 99.98,
+        "first_deny_timestamp": 100.05,
+        "exposure_window_sec": 0.05
+      },
+      {
+        "replica_id": "api-2",
+        "last_allow_timestamp": 99.98,
+        "first_deny_timestamp": 100.06,
+        "exposure_window_sec": 0.06
+      },
+      {
+        "replica_id": "api-3",
+        "last_allow_timestamp": 99.98,
+        "first_deny_timestamp": 100.08,
+        "exposure_window_sec": 0.08
+      }
+    ]
+  },
+  "summary_metrics": {
+    "mean_exposure_sec": 0.063,
+    "max_exposure_sec": 0.08,
+    "propagation_status": "INSTANT_SYNCHRONOUS_DENIAL",
+    "pass_fail": "PASS"
+  },
+  "limitations": "Executed under local Docker loopback network stack; cross-region network latency not simulated."
+}

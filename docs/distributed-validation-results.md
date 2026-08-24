@@ -43,11 +43,11 @@ This document contains empirical execution evidence collected during real live H
 
 ## 🧪 Automated Test Suite Verification
 
-- **Total Tests Collected**: 65
-- **Passed**: 64
+- **Total Tests Collected**: 86
+- **Passed**: 85
 - **Skipped**: 1 (`test_django_target_behavioral_equivalence` due to optional `django` package)
 - **Failed**: 0
-- **Warnings**: 13 (Deprecation warnings for Starlette testclient & short key warning for JWT test key)
+- **Warnings**: 31 (Deprecation warnings for Starlette testclient & short key warning for JWT test key)
 
 ---
 
@@ -62,5 +62,5 @@ REPLICA_ID=api-2 PORT=8011 HOST=127.0.0.1 python -m targets.distributed_lab.serv
 REPLICA_ID=api-3 PORT=8012 HOST=127.0.0.1 python -m targets.distributed_lab.service.server
 
 # 2. Run the live multi-scenario validation engine
-python scratch/validate_all_scenarios.py
+python scripts/run_case_study.py
 ```
