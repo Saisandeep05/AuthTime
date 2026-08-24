@@ -46,6 +46,7 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO roles (id, name, description) VALUES
     ('Admin', 'Admin', 'Full administrative access'),
+    ('Finance Admin', 'Finance Admin', 'Finance administrative access'),
     ('User', 'User', 'Standard user access'),
     ('Guest', 'Guest', 'Guest read-only access')
 ON CONFLICT (id) DO NOTHING;

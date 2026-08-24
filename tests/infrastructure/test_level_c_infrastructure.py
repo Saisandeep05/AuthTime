@@ -45,6 +45,12 @@ async def test_postgresql_authoritative_connection_and_revocation():
     conn = await asyncpg.connect(POSTGRES_DSN)
     try:
         await conn.execute("""
+            INSERT INTO roles (id, name, description)
+            VALUES ('Finance Admin', 'Finance Admin', 'Finance Administrative Access'),
+                   ('User', 'User', 'Standard User Access')
+            ON CONFLICT (id) DO NOTHING;
+        """)
+        await conn.execute("""
             INSERT INTO users (id, username, email)
             VALUES ('alice_infra_test', 'alice_infra', 'alice@authtime.local')
             ON CONFLICT (id) DO NOTHING;
