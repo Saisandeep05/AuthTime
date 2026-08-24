@@ -4,1240 +4,1240 @@
   "initial_role": "Finance Admin",
   "revoked_role": "Employee",
   "resource_path": "/finance/payroll",
-  "t0_authoritative_monotonic": 37262.046,
-  "t0_authoritative_wall": 1787518143.1173148,
+  "t0_authoritative_monotonic": 77003.0,
+  "t0_authoritative_wall": 1787557883.135909,
   "exposure_metrics": {
     "per_replica": {
       "api-1": {
-        "t0_authoritative": 37262.046,
-        "t_last_allow": 37265.64,
-        "t_first_deny": 37266.031,
-        "dt_exposure_lower_bound_sec": 3.5939999999973224,
-        "dt_exposure_upper_bound_sec": 3.985000000000582
+        "t0_authoritative": 77003.0,
+        "t_last_allow": 77005.968,
+        "t_first_deny": 77006.468,
+        "dt_exposure_lower_bound_sec": 2.9679999999934807,
+        "dt_exposure_upper_bound_sec": 3.4679999999934807
       },
       "api-2": {
-        "t0_authoritative": 37262.046,
-        "t_last_allow": 37266.031,
-        "t_first_deny": 37266.39,
-        "dt_exposure_lower_bound_sec": 3.985000000000582,
-        "dt_exposure_upper_bound_sec": 4.3439999999973224
+        "t0_authoritative": 77003.0,
+        "t_last_allow": 77005.968,
+        "t_first_deny": 77006.468,
+        "dt_exposure_lower_bound_sec": 2.9679999999934807,
+        "dt_exposure_upper_bound_sec": 3.4679999999934807
       },
       "api-3": {
-        "t0_authoritative": 37262.046,
-        "t_last_allow": 37266.031,
-        "t_first_deny": 37266.39,
-        "dt_exposure_lower_bound_sec": 3.985000000000582,
-        "dt_exposure_upper_bound_sec": 4.3439999999973224
+        "t0_authoritative": 77003.0,
+        "t_last_allow": 77005.968,
+        "t_first_deny": 77006.468,
+        "dt_exposure_lower_bound_sec": 2.9679999999934807,
+        "dt_exposure_upper_bound_sec": 3.4679999999934807
       }
     },
     "aggregate": {
-      "min_exposure_sec": 3.985000000000582,
-      "max_exposure_sec": 4.3439999999973224,
-      "mean_exposure_sec": 4.224333333331742,
+      "min_exposure_sec": 3.4679999999934807,
+      "max_exposure_sec": 3.4679999999934807,
+      "mean_exposure_sec": 3.4679999999934807,
       "replica_count": 3,
-      "affected_replicas_mean_sec": 4.224333333331742
+      "affected_replicas_mean_sec": 3.4679999999934807
     }
   },
   "raw_probe_events": [
     {
       "probe_index": 0,
-      "timestamp_monotonic": 37262.312,
-      "dt_since_revocation_sec": 0.26599999999598367,
+      "timestamp_monotonic": 77003.406,
+      "dt_since_revocation_sec": 0.40600000000267755,
       "replica_id": "api-1",
-      "status_code": 200,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 0,
-      "timestamp_monotonic": 37262.312,
-      "dt_since_revocation_sec": 0.26599999999598367,
-      "replica_id": "api-2",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 0,
-      "timestamp_monotonic": 37262.312,
-      "dt_since_revocation_sec": 0.26599999999598367,
+      "timestamp_monotonic": 77003.406,
+      "dt_since_revocation_sec": 0.40600000000267755,
+      "replica_id": "api-2",
+      "status_code": 200,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 0,
+      "timestamp_monotonic": 77003.406,
+      "dt_since_revocation_sec": 0.40600000000267755,
       "replica_id": "api-3",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 1,
-      "timestamp_monotonic": 37262.687,
-      "dt_since_revocation_sec": 0.6409999999959837,
+      "timestamp_monotonic": 77003.921,
+      "dt_since_revocation_sec": 0.9210000000020955,
       "replica_id": "api-1",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 1,
-      "timestamp_monotonic": 37262.687,
-      "dt_since_revocation_sec": 0.6409999999959837,
+      "timestamp_monotonic": 77003.921,
+      "dt_since_revocation_sec": 0.9210000000020955,
       "replica_id": "api-2",
       "status_code": 200,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 1,
-      "timestamp_monotonic": 37262.687,
-      "dt_since_revocation_sec": 0.6409999999959837,
+      "timestamp_monotonic": 77003.921,
+      "dt_since_revocation_sec": 0.9210000000020955,
       "replica_id": "api-3",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 2,
-      "timestamp_monotonic": 37263.046,
-      "dt_since_revocation_sec": 1.0,
+      "timestamp_monotonic": 77004.437,
+      "dt_since_revocation_sec": 1.437000000005355,
       "replica_id": "api-1",
       "status_code": 200,
-      "latency_ms": 16.0
+      "latency_ms": 15.0
     },
     {
       "probe_index": 2,
-      "timestamp_monotonic": 37263.046,
-      "dt_since_revocation_sec": 1.0,
+      "timestamp_monotonic": 77004.437,
+      "dt_since_revocation_sec": 1.437000000005355,
       "replica_id": "api-2",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 2,
-      "timestamp_monotonic": 37263.046,
-      "dt_since_revocation_sec": 1.0,
+      "timestamp_monotonic": 77004.437,
+      "dt_since_revocation_sec": 1.437000000005355,
       "replica_id": "api-3",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 3,
-      "timestamp_monotonic": 37263.421,
-      "dt_since_revocation_sec": 1.375,
+      "timestamp_monotonic": 77004.953,
+      "dt_since_revocation_sec": 1.9529999999940628,
       "replica_id": "api-1",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 3,
-      "timestamp_monotonic": 37263.421,
-      "dt_since_revocation_sec": 1.375,
+      "timestamp_monotonic": 77004.953,
+      "dt_since_revocation_sec": 1.9529999999940628,
       "replica_id": "api-2",
       "status_code": 200,
-      "latency_ms": 16.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 3,
-      "timestamp_monotonic": 37263.421,
-      "dt_since_revocation_sec": 1.375,
+      "timestamp_monotonic": 77004.953,
+      "dt_since_revocation_sec": 1.9529999999940628,
       "replica_id": "api-3",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 4,
-      "timestamp_monotonic": 37263.796,
-      "dt_since_revocation_sec": 1.75,
+      "timestamp_monotonic": 77005.453,
+      "dt_since_revocation_sec": 2.452999999994063,
       "replica_id": "api-1",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 4,
-      "timestamp_monotonic": 37263.796,
-      "dt_since_revocation_sec": 1.75,
+      "timestamp_monotonic": 77005.453,
+      "dt_since_revocation_sec": 2.452999999994063,
       "replica_id": "api-2",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 4,
-      "timestamp_monotonic": 37263.796,
-      "dt_since_revocation_sec": 1.75,
+      "timestamp_monotonic": 77005.453,
+      "dt_since_revocation_sec": 2.452999999994063,
       "replica_id": "api-3",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 5,
-      "timestamp_monotonic": 37264.156,
-      "dt_since_revocation_sec": 2.110000000000582,
+      "timestamp_monotonic": 77005.968,
+      "dt_since_revocation_sec": 2.9679999999934807,
       "replica_id": "api-1",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 5,
-      "timestamp_monotonic": 37264.156,
-      "dt_since_revocation_sec": 2.110000000000582,
+      "timestamp_monotonic": 77005.968,
+      "dt_since_revocation_sec": 2.9679999999934807,
       "replica_id": "api-2",
       "status_code": 200,
       "latency_ms": 0.0
     },
     {
       "probe_index": 5,
-      "timestamp_monotonic": 37264.156,
-      "dt_since_revocation_sec": 2.110000000000582,
+      "timestamp_monotonic": 77005.968,
+      "dt_since_revocation_sec": 2.9679999999934807,
       "replica_id": "api-3",
       "status_code": 200,
+      "latency_ms": 16.0
+    },
+    {
+      "probe_index": 6,
+      "timestamp_monotonic": 77006.468,
+      "dt_since_revocation_sec": 3.4679999999934807,
+      "replica_id": "api-1",
+      "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 6,
-      "timestamp_monotonic": 37264.531,
-      "dt_since_revocation_sec": 2.485000000000582,
-      "replica_id": "api-1",
-      "status_code": 200,
+      "timestamp_monotonic": 77006.468,
+      "dt_since_revocation_sec": 3.4679999999934807,
+      "replica_id": "api-2",
+      "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 6,
-      "timestamp_monotonic": 37264.531,
-      "dt_since_revocation_sec": 2.485000000000582,
-      "replica_id": "api-2",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 6,
-      "timestamp_monotonic": 37264.531,
-      "dt_since_revocation_sec": 2.485000000000582,
+      "timestamp_monotonic": 77006.468,
+      "dt_since_revocation_sec": 3.4679999999934807,
       "replica_id": "api-3",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 7,
-      "timestamp_monotonic": 37264.921,
-      "dt_since_revocation_sec": 2.875,
-      "replica_id": "api-1",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 7,
-      "timestamp_monotonic": 37264.921,
-      "dt_since_revocation_sec": 2.875,
-      "replica_id": "api-2",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 7,
-      "timestamp_monotonic": 37264.921,
-      "dt_since_revocation_sec": 2.875,
-      "replica_id": "api-3",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 8,
-      "timestamp_monotonic": 37265.281,
-      "dt_since_revocation_sec": 3.235000000000582,
-      "replica_id": "api-1",
-      "status_code": 200,
-      "latency_ms": 15.0
-    },
-    {
-      "probe_index": 8,
-      "timestamp_monotonic": 37265.281,
-      "dt_since_revocation_sec": 3.235000000000582,
-      "replica_id": "api-2",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 8,
-      "timestamp_monotonic": 37265.281,
-      "dt_since_revocation_sec": 3.235000000000582,
-      "replica_id": "api-3",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 9,
-      "timestamp_monotonic": 37265.64,
-      "dt_since_revocation_sec": 3.5939999999973224,
-      "replica_id": "api-1",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 9,
-      "timestamp_monotonic": 37265.64,
-      "dt_since_revocation_sec": 3.5939999999973224,
-      "replica_id": "api-2",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 9,
-      "timestamp_monotonic": 37265.64,
-      "dt_since_revocation_sec": 3.5939999999973224,
-      "replica_id": "api-3",
-      "status_code": 200,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 10,
-      "timestamp_monotonic": 37266.031,
-      "dt_since_revocation_sec": 3.985000000000582,
-      "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
-      "probe_index": 10,
-      "timestamp_monotonic": 37266.031,
-      "dt_since_revocation_sec": 3.985000000000582,
+      "probe_index": 7,
+      "timestamp_monotonic": 77007.015,
+      "dt_since_revocation_sec": 4.014999999999418,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 7,
+      "timestamp_monotonic": 77007.015,
+      "dt_since_revocation_sec": 4.014999999999418,
       "replica_id": "api-2",
-      "status_code": 200,
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 7,
+      "timestamp_monotonic": 77007.015,
+      "dt_since_revocation_sec": 4.014999999999418,
+      "replica_id": "api-3",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 8,
+      "timestamp_monotonic": 77007.578,
+      "dt_since_revocation_sec": 4.577999999994063,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 8,
+      "timestamp_monotonic": 77007.578,
+      "dt_since_revocation_sec": 4.577999999994063,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 8,
+      "timestamp_monotonic": 77007.578,
+      "dt_since_revocation_sec": 4.577999999994063,
+      "replica_id": "api-3",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 9,
+      "timestamp_monotonic": 77008.156,
+      "dt_since_revocation_sec": 5.1560000000026776,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 9,
+      "timestamp_monotonic": 77008.156,
+      "dt_since_revocation_sec": 5.1560000000026776,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 9,
+      "timestamp_monotonic": 77008.156,
+      "dt_since_revocation_sec": 5.1560000000026776,
+      "replica_id": "api-3",
+      "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 10,
-      "timestamp_monotonic": 37266.031,
-      "dt_since_revocation_sec": 3.985000000000582,
+      "timestamp_monotonic": 77008.828,
+      "dt_since_revocation_sec": 5.827999999994063,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 10,
+      "timestamp_monotonic": 77008.828,
+      "dt_since_revocation_sec": 5.827999999994063,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 10,
+      "timestamp_monotonic": 77008.828,
+      "dt_since_revocation_sec": 5.827999999994063,
       "replica_id": "api-3",
-      "status_code": 200,
+      "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 11,
-      "timestamp_monotonic": 37266.39,
-      "dt_since_revocation_sec": 4.3439999999973224,
+      "timestamp_monotonic": 77009.437,
+      "dt_since_revocation_sec": 6.437000000005355,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 11,
-      "timestamp_monotonic": 37266.39,
-      "dt_since_revocation_sec": 4.3439999999973224,
+      "timestamp_monotonic": 77009.437,
+      "dt_since_revocation_sec": 6.437000000005355,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 11,
-      "timestamp_monotonic": 37266.39,
-      "dt_since_revocation_sec": 4.3439999999973224,
+      "timestamp_monotonic": 77009.437,
+      "dt_since_revocation_sec": 6.437000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 12,
-      "timestamp_monotonic": 37266.765,
-      "dt_since_revocation_sec": 4.7189999999973224,
+      "timestamp_monotonic": 77010.109,
+      "dt_since_revocation_sec": 7.10899999999674,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 12,
-      "timestamp_monotonic": 37266.765,
-      "dt_since_revocation_sec": 4.7189999999973224,
+      "timestamp_monotonic": 77010.109,
+      "dt_since_revocation_sec": 7.10899999999674,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 12,
-      "timestamp_monotonic": 37266.765,
-      "dt_since_revocation_sec": 4.7189999999973224,
+      "timestamp_monotonic": 77010.109,
+      "dt_since_revocation_sec": 7.10899999999674,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 13,
-      "timestamp_monotonic": 37267.125,
-      "dt_since_revocation_sec": 5.0789999999979045,
+      "timestamp_monotonic": 77010.812,
+      "dt_since_revocation_sec": 7.812000000005355,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 15.0
     },
     {
       "probe_index": 13,
-      "timestamp_monotonic": 37267.125,
-      "dt_since_revocation_sec": 5.0789999999979045,
+      "timestamp_monotonic": 77010.812,
+      "dt_since_revocation_sec": 7.812000000005355,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 13,
-      "timestamp_monotonic": 37267.125,
-      "dt_since_revocation_sec": 5.0789999999979045,
+      "timestamp_monotonic": 77010.812,
+      "dt_since_revocation_sec": 7.812000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 14,
-      "timestamp_monotonic": 37267.5,
-      "dt_since_revocation_sec": 5.4539999999979045,
+      "timestamp_monotonic": 77011.375,
+      "dt_since_revocation_sec": 8.375,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 14,
-      "timestamp_monotonic": 37267.5,
-      "dt_since_revocation_sec": 5.4539999999979045,
+      "timestamp_monotonic": 77011.375,
+      "dt_since_revocation_sec": 8.375,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 14,
-      "timestamp_monotonic": 37267.5,
-      "dt_since_revocation_sec": 5.4539999999979045,
+      "timestamp_monotonic": 77011.375,
+      "dt_since_revocation_sec": 8.375,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 15,
-      "timestamp_monotonic": 37267.859,
-      "dt_since_revocation_sec": 5.812999999994645,
+      "timestamp_monotonic": 77011.968,
+      "dt_since_revocation_sec": 8.96799999999348,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 15,
-      "timestamp_monotonic": 37267.859,
-      "dt_since_revocation_sec": 5.812999999994645,
+      "timestamp_monotonic": 77011.968,
+      "dt_since_revocation_sec": 8.96799999999348,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 15,
-      "timestamp_monotonic": 37267.859,
-      "dt_since_revocation_sec": 5.812999999994645,
+      "timestamp_monotonic": 77011.968,
+      "dt_since_revocation_sec": 8.96799999999348,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 16,
-      "timestamp_monotonic": 37268.234,
-      "dt_since_revocation_sec": 6.187999999994645,
+      "timestamp_monotonic": 77012.468,
+      "dt_since_revocation_sec": 9.46799999999348,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 16,
-      "timestamp_monotonic": 37268.234,
-      "dt_since_revocation_sec": 6.187999999994645,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 16,
-      "timestamp_monotonic": 37268.234,
-      "dt_since_revocation_sec": 6.187999999994645,
-      "replica_id": "api-3",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 17,
-      "timestamp_monotonic": 37268.593,
-      "dt_since_revocation_sec": 6.546999999998661,
-      "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 17,
-      "timestamp_monotonic": 37268.593,
-      "dt_since_revocation_sec": 6.546999999998661,
+      "timestamp_monotonic": 77012.468,
+      "dt_since_revocation_sec": 9.46799999999348,
       "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 16,
+      "timestamp_monotonic": 77012.468,
+      "dt_since_revocation_sec": 9.46799999999348,
+      "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
       "probe_index": 17,
-      "timestamp_monotonic": 37268.593,
-      "dt_since_revocation_sec": 6.546999999998661,
-      "replica_id": "api-3",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 18,
-      "timestamp_monotonic": 37268.968,
-      "dt_since_revocation_sec": 6.921999999998661,
+      "timestamp_monotonic": 77012.968,
+      "dt_since_revocation_sec": 9.96799999999348,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
+      "probe_index": 17,
+      "timestamp_monotonic": 77012.968,
+      "dt_since_revocation_sec": 9.96799999999348,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 17,
+      "timestamp_monotonic": 77012.968,
+      "dt_since_revocation_sec": 9.96799999999348,
+      "replica_id": "api-3",
+      "status_code": 403,
+      "latency_ms": 16.0
+    },
+    {
       "probe_index": 18,
-      "timestamp_monotonic": 37268.968,
-      "dt_since_revocation_sec": 6.921999999998661,
+      "timestamp_monotonic": 77013.609,
+      "dt_since_revocation_sec": 10.60899999999674,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 16.0
+    },
+    {
+      "probe_index": 18,
+      "timestamp_monotonic": 77013.609,
+      "dt_since_revocation_sec": 10.60899999999674,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 18,
-      "timestamp_monotonic": 37268.968,
-      "dt_since_revocation_sec": 6.921999999998661,
+      "timestamp_monotonic": 77013.609,
+      "dt_since_revocation_sec": 10.60899999999674,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 19,
-      "timestamp_monotonic": 37269.328,
-      "dt_since_revocation_sec": 7.281999999999243,
+      "timestamp_monotonic": 77014.187,
+      "dt_since_revocation_sec": 11.187000000005355,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 19,
-      "timestamp_monotonic": 37269.328,
-      "dt_since_revocation_sec": 7.281999999999243,
+      "timestamp_monotonic": 77014.187,
+      "dt_since_revocation_sec": 11.187000000005355,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 15.0
     },
     {
       "probe_index": 19,
-      "timestamp_monotonic": 37269.328,
-      "dt_since_revocation_sec": 7.281999999999243,
+      "timestamp_monotonic": 77014.187,
+      "dt_since_revocation_sec": 11.187000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 20,
-      "timestamp_monotonic": 37269.703,
-      "dt_since_revocation_sec": 7.656999999999243,
+      "timestamp_monotonic": 77014.703,
+      "dt_since_revocation_sec": 11.702999999994063,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 20,
-      "timestamp_monotonic": 37269.703,
-      "dt_since_revocation_sec": 7.656999999999243,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 20,
-      "timestamp_monotonic": 37269.703,
-      "dt_since_revocation_sec": 7.656999999999243,
+      "timestamp_monotonic": 77014.703,
+      "dt_since_revocation_sec": 11.702999999994063,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 20,
+      "timestamp_monotonic": 77014.703,
+      "dt_since_revocation_sec": 11.702999999994063,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 21,
-      "timestamp_monotonic": 37270.062,
-      "dt_since_revocation_sec": 8.015999999995984,
+      "timestamp_monotonic": 77015.296,
+      "dt_since_revocation_sec": 12.296000000002095,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 21,
-      "timestamp_monotonic": 37270.062,
-      "dt_since_revocation_sec": 8.015999999995984,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 21,
-      "timestamp_monotonic": 37270.062,
-      "dt_since_revocation_sec": 8.015999999995984,
+      "timestamp_monotonic": 77015.296,
+      "dt_since_revocation_sec": 12.296000000002095,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 21,
+      "timestamp_monotonic": 77015.296,
+      "dt_since_revocation_sec": 12.296000000002095,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 22,
-      "timestamp_monotonic": 37270.437,
-      "dt_since_revocation_sec": 8.390999999995984,
+      "timestamp_monotonic": 77015.812,
+      "dt_since_revocation_sec": 12.812000000005355,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 22,
-      "timestamp_monotonic": 37270.437,
-      "dt_since_revocation_sec": 8.390999999995984,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 22,
-      "timestamp_monotonic": 37270.437,
-      "dt_since_revocation_sec": 8.390999999995984,
+      "timestamp_monotonic": 77015.812,
+      "dt_since_revocation_sec": 12.812000000005355,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 22,
+      "timestamp_monotonic": 77015.812,
+      "dt_since_revocation_sec": 12.812000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 23,
-      "timestamp_monotonic": 37270.796,
-      "dt_since_revocation_sec": 8.75,
+      "timestamp_monotonic": 77016.343,
+      "dt_since_revocation_sec": 13.34299999999348,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
       "probe_index": 23,
-      "timestamp_monotonic": 37270.796,
-      "dt_since_revocation_sec": 8.75,
+      "timestamp_monotonic": 77016.343,
+      "dt_since_revocation_sec": 13.34299999999348,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 23,
-      "timestamp_monotonic": 37270.796,
-      "dt_since_revocation_sec": 8.75,
+      "timestamp_monotonic": 77016.343,
+      "dt_since_revocation_sec": 13.34299999999348,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 24,
-      "timestamp_monotonic": 37271.171,
-      "dt_since_revocation_sec": 9.125,
+      "timestamp_monotonic": 77016.859,
+      "dt_since_revocation_sec": 13.85899999999674,
       "replica_id": "api-1",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 24,
-      "timestamp_monotonic": 37271.171,
-      "dt_since_revocation_sec": 9.125,
+      "timestamp_monotonic": 77016.859,
+      "dt_since_revocation_sec": 13.85899999999674,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 24,
-      "timestamp_monotonic": 37271.171,
-      "dt_since_revocation_sec": 9.125,
+      "timestamp_monotonic": 77016.859,
+      "dt_since_revocation_sec": 13.85899999999674,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 25,
-      "timestamp_monotonic": 37271.531,
-      "dt_since_revocation_sec": 9.485000000000582,
+      "timestamp_monotonic": 77017.39,
+      "dt_since_revocation_sec": 14.389999999999418,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 25,
-      "timestamp_monotonic": 37271.531,
-      "dt_since_revocation_sec": 9.485000000000582,
+      "timestamp_monotonic": 77017.39,
+      "dt_since_revocation_sec": 14.389999999999418,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 25,
-      "timestamp_monotonic": 37271.531,
-      "dt_since_revocation_sec": 9.485000000000582,
+      "timestamp_monotonic": 77017.39,
+      "dt_since_revocation_sec": 14.389999999999418,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 26,
-      "timestamp_monotonic": 37271.906,
-      "dt_since_revocation_sec": 9.860000000000582,
+      "timestamp_monotonic": 77017.968,
+      "dt_since_revocation_sec": 14.96799999999348,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 26,
-      "timestamp_monotonic": 37271.906,
-      "dt_since_revocation_sec": 9.860000000000582,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 26,
-      "timestamp_monotonic": 37271.906,
-      "dt_since_revocation_sec": 9.860000000000582,
-      "replica_id": "api-3",
+      "timestamp_monotonic": 77017.968,
+      "dt_since_revocation_sec": 14.96799999999348,
+      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
+      "probe_index": 26,
+      "timestamp_monotonic": 77017.968,
+      "dt_since_revocation_sec": 14.96799999999348,
+      "replica_id": "api-3",
+      "status_code": 403,
+      "latency_ms": 16.0
+    },
+    {
       "probe_index": 27,
-      "timestamp_monotonic": 37272.265,
-      "dt_since_revocation_sec": 10.218999999997322,
+      "timestamp_monotonic": 77018.625,
+      "dt_since_revocation_sec": 15.625,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
       "probe_index": 27,
-      "timestamp_monotonic": 37272.265,
-      "dt_since_revocation_sec": 10.218999999997322,
+      "timestamp_monotonic": 77018.625,
+      "dt_since_revocation_sec": 15.625,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 27,
-      "timestamp_monotonic": 37272.265,
-      "dt_since_revocation_sec": 10.218999999997322,
+      "timestamp_monotonic": 77018.625,
+      "dt_since_revocation_sec": 15.625,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 15.0
     },
     {
       "probe_index": 28,
-      "timestamp_monotonic": 37272.64,
-      "dt_since_revocation_sec": 10.593999999997322,
+      "timestamp_monotonic": 77019.234,
+      "dt_since_revocation_sec": 16.23399999999674,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 28,
-      "timestamp_monotonic": 37272.64,
-      "dt_since_revocation_sec": 10.593999999997322,
+      "timestamp_monotonic": 77019.234,
+      "dt_since_revocation_sec": 16.23399999999674,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 28,
-      "timestamp_monotonic": 37272.64,
-      "dt_since_revocation_sec": 10.593999999997322,
+      "timestamp_monotonic": 77019.234,
+      "dt_since_revocation_sec": 16.23399999999674,
       "replica_id": "api-3",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 29,
+      "timestamp_monotonic": 77019.937,
+      "dt_since_revocation_sec": 16.937000000005355,
+      "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 29,
+      "timestamp_monotonic": 77019.937,
+      "dt_since_revocation_sec": 16.937000000005355,
+      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
       "probe_index": 29,
-      "timestamp_monotonic": 37273.0,
-      "dt_since_revocation_sec": 10.953999999997905,
-      "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 29,
-      "timestamp_monotonic": 37273.0,
-      "dt_since_revocation_sec": 10.953999999997905,
-      "replica_id": "api-2",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 29,
-      "timestamp_monotonic": 37273.0,
-      "dt_since_revocation_sec": 10.953999999997905,
+      "timestamp_monotonic": 77019.937,
+      "dt_since_revocation_sec": 16.937000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 30,
-      "timestamp_monotonic": 37273.359,
-      "dt_since_revocation_sec": 11.312999999994645,
+      "timestamp_monotonic": 77020.671,
+      "dt_since_revocation_sec": 17.671000000002095,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 30,
-      "timestamp_monotonic": 37273.359,
-      "dt_since_revocation_sec": 11.312999999994645,
+      "timestamp_monotonic": 77020.671,
+      "dt_since_revocation_sec": 17.671000000002095,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 30,
-      "timestamp_monotonic": 37273.359,
-      "dt_since_revocation_sec": 11.312999999994645,
+      "timestamp_monotonic": 77020.671,
+      "dt_since_revocation_sec": 17.671000000002095,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 31,
-      "timestamp_monotonic": 37273.718,
-      "dt_since_revocation_sec": 11.671999999998661,
+      "timestamp_monotonic": 77021.203,
+      "dt_since_revocation_sec": 18.202999999994063,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 31,
-      "timestamp_monotonic": 37273.718,
-      "dt_since_revocation_sec": 11.671999999998661,
+      "timestamp_monotonic": 77021.203,
+      "dt_since_revocation_sec": 18.202999999994063,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 31,
-      "timestamp_monotonic": 37273.718,
-      "dt_since_revocation_sec": 11.671999999998661,
+      "timestamp_monotonic": 77021.203,
+      "dt_since_revocation_sec": 18.202999999994063,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 32,
-      "timestamp_monotonic": 37274.093,
-      "dt_since_revocation_sec": 12.046999999998661,
+      "timestamp_monotonic": 77021.718,
+      "dt_since_revocation_sec": 18.71799999999348,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 32,
-      "timestamp_monotonic": 37274.093,
-      "dt_since_revocation_sec": 12.046999999998661,
+      "timestamp_monotonic": 77021.718,
+      "dt_since_revocation_sec": 18.71799999999348,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 32,
-      "timestamp_monotonic": 37274.093,
-      "dt_since_revocation_sec": 12.046999999998661,
+      "timestamp_monotonic": 77021.718,
+      "dt_since_revocation_sec": 18.71799999999348,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 33,
-      "timestamp_monotonic": 37274.453,
-      "dt_since_revocation_sec": 12.406999999999243,
+      "timestamp_monotonic": 77022.234,
+      "dt_since_revocation_sec": 19.23399999999674,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 33,
-      "timestamp_monotonic": 37274.453,
-      "dt_since_revocation_sec": 12.406999999999243,
+      "timestamp_monotonic": 77022.234,
+      "dt_since_revocation_sec": 19.23399999999674,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 33,
-      "timestamp_monotonic": 37274.453,
-      "dt_since_revocation_sec": 12.406999999999243,
+      "timestamp_monotonic": 77022.234,
+      "dt_since_revocation_sec": 19.23399999999674,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 15.0
     },
     {
       "probe_index": 34,
-      "timestamp_monotonic": 37274.828,
-      "dt_since_revocation_sec": 12.781999999999243,
+      "timestamp_monotonic": 77022.75,
+      "dt_since_revocation_sec": 19.75,
       "replica_id": "api-1",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 34,
-      "timestamp_monotonic": 37274.828,
-      "dt_since_revocation_sec": 12.781999999999243,
+      "timestamp_monotonic": 77022.75,
+      "dt_since_revocation_sec": 19.75,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 34,
-      "timestamp_monotonic": 37274.828,
-      "dt_since_revocation_sec": 12.781999999999243,
+      "timestamp_monotonic": 77022.75,
+      "dt_since_revocation_sec": 19.75,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 35,
-      "timestamp_monotonic": 37275.187,
-      "dt_since_revocation_sec": 13.140999999995984,
+      "timestamp_monotonic": 77023.265,
+      "dt_since_revocation_sec": 20.264999999999418,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 35,
-      "timestamp_monotonic": 37275.187,
-      "dt_since_revocation_sec": 13.140999999995984,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 35,
-      "timestamp_monotonic": 37275.187,
-      "dt_since_revocation_sec": 13.140999999995984,
+      "timestamp_monotonic": 77023.265,
+      "dt_since_revocation_sec": 20.264999999999418,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 35,
+      "timestamp_monotonic": 77023.265,
+      "dt_since_revocation_sec": 20.264999999999418,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 36,
-      "timestamp_monotonic": 37275.562,
-      "dt_since_revocation_sec": 13.515999999995984,
+      "timestamp_monotonic": 77023.75,
+      "dt_since_revocation_sec": 20.75,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 36,
-      "timestamp_monotonic": 37275.562,
-      "dt_since_revocation_sec": 13.515999999995984,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 36,
-      "timestamp_monotonic": 37275.562,
-      "dt_since_revocation_sec": 13.515999999995984,
+      "timestamp_monotonic": 77023.75,
+      "dt_since_revocation_sec": 20.75,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 16.0
+    },
+    {
+      "probe_index": 36,
+      "timestamp_monotonic": 77023.75,
+      "dt_since_revocation_sec": 20.75,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 37,
-      "timestamp_monotonic": 37275.937,
-      "dt_since_revocation_sec": 13.890999999995984,
+      "timestamp_monotonic": 77024.265,
+      "dt_since_revocation_sec": 21.264999999999418,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 16.0
-    },
-    {
-      "probe_index": 37,
-      "timestamp_monotonic": 37275.937,
-      "dt_since_revocation_sec": 13.890999999995984,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 37,
-      "timestamp_monotonic": 37275.937,
-      "dt_since_revocation_sec": 13.890999999995984,
+      "timestamp_monotonic": 77024.265,
+      "dt_since_revocation_sec": 21.264999999999418,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 37,
+      "timestamp_monotonic": 77024.265,
+      "dt_since_revocation_sec": 21.264999999999418,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 38,
-      "timestamp_monotonic": 37276.281,
-      "dt_since_revocation_sec": 14.235000000000582,
+      "timestamp_monotonic": 77024.75,
+      "dt_since_revocation_sec": 21.75,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 38,
-      "timestamp_monotonic": 37276.281,
-      "dt_since_revocation_sec": 14.235000000000582,
+      "timestamp_monotonic": 77024.75,
+      "dt_since_revocation_sec": 21.75,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 38,
-      "timestamp_monotonic": 37276.281,
-      "dt_since_revocation_sec": 14.235000000000582,
+      "timestamp_monotonic": 77024.75,
+      "dt_since_revocation_sec": 21.75,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 39,
-      "timestamp_monotonic": 37276.656,
-      "dt_since_revocation_sec": 14.610000000000582,
+      "timestamp_monotonic": 77025.265,
+      "dt_since_revocation_sec": 22.264999999999418,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 39,
-      "timestamp_monotonic": 37276.656,
-      "dt_since_revocation_sec": 14.610000000000582,
+      "timestamp_monotonic": 77025.265,
+      "dt_since_revocation_sec": 22.264999999999418,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 39,
-      "timestamp_monotonic": 37276.656,
-      "dt_since_revocation_sec": 14.610000000000582,
+      "timestamp_monotonic": 77025.265,
+      "dt_since_revocation_sec": 22.264999999999418,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 40,
-      "timestamp_monotonic": 37277.015,
-      "dt_since_revocation_sec": 14.968999999997322,
+      "timestamp_monotonic": 77025.765,
+      "dt_since_revocation_sec": 22.764999999999418,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 40,
-      "timestamp_monotonic": 37277.015,
-      "dt_since_revocation_sec": 14.968999999997322,
+      "timestamp_monotonic": 77025.765,
+      "dt_since_revocation_sec": 22.764999999999418,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 40,
-      "timestamp_monotonic": 37277.015,
-      "dt_since_revocation_sec": 14.968999999997322,
+      "timestamp_monotonic": 77025.765,
+      "dt_since_revocation_sec": 22.764999999999418,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 41,
-      "timestamp_monotonic": 37277.39,
-      "dt_since_revocation_sec": 15.343999999997322,
+      "timestamp_monotonic": 77026.296,
+      "dt_since_revocation_sec": 23.296000000002095,
       "replica_id": "api-1",
-      "status_code": 403,
-      "latency_ms": 15.0
-    },
-    {
-      "probe_index": 41,
-      "timestamp_monotonic": 37277.39,
-      "dt_since_revocation_sec": 15.343999999997322,
-      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 41,
-      "timestamp_monotonic": 37277.39,
-      "dt_since_revocation_sec": 15.343999999997322,
+      "timestamp_monotonic": 77026.296,
+      "dt_since_revocation_sec": 23.296000000002095,
+      "replica_id": "api-2",
+      "status_code": 403,
+      "latency_ms": 0.0
+    },
+    {
+      "probe_index": 41,
+      "timestamp_monotonic": 77026.296,
+      "dt_since_revocation_sec": 23.296000000002095,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 42,
-      "timestamp_monotonic": 37277.765,
-      "dt_since_revocation_sec": 15.718999999997322,
+      "timestamp_monotonic": 77026.796,
+      "dt_since_revocation_sec": 23.796000000002095,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 42,
-      "timestamp_monotonic": 37277.765,
-      "dt_since_revocation_sec": 15.718999999997322,
+      "timestamp_monotonic": 77026.796,
+      "dt_since_revocation_sec": 23.796000000002095,
       "replica_id": "api-2",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 42,
-      "timestamp_monotonic": 37277.765,
-      "dt_since_revocation_sec": 15.718999999997322,
+      "timestamp_monotonic": 77026.796,
+      "dt_since_revocation_sec": 23.796000000002095,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 43,
-      "timestamp_monotonic": 37278.125,
-      "dt_since_revocation_sec": 16.078999999997905,
+      "timestamp_monotonic": 77027.359,
+      "dt_since_revocation_sec": 24.35899999999674,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 43,
-      "timestamp_monotonic": 37278.125,
-      "dt_since_revocation_sec": 16.078999999997905,
+      "timestamp_monotonic": 77027.359,
+      "dt_since_revocation_sec": 24.35899999999674,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 43,
-      "timestamp_monotonic": 37278.125,
-      "dt_since_revocation_sec": 16.078999999997905,
+      "timestamp_monotonic": 77027.359,
+      "dt_since_revocation_sec": 24.35899999999674,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 44,
-      "timestamp_monotonic": 37278.5,
-      "dt_since_revocation_sec": 16.453999999997905,
+      "timestamp_monotonic": 77027.859,
+      "dt_since_revocation_sec": 24.85899999999674,
       "replica_id": "api-1",
+      "status_code": 403,
+      "latency_ms": 16.0
+    },
+    {
+      "probe_index": 44,
+      "timestamp_monotonic": 77027.859,
+      "dt_since_revocation_sec": 24.85899999999674,
+      "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 44,
-      "timestamp_monotonic": 37278.5,
-      "dt_since_revocation_sec": 16.453999999997905,
-      "replica_id": "api-2",
-      "status_code": 403,
-      "latency_ms": 0.0
-    },
-    {
-      "probe_index": 44,
-      "timestamp_monotonic": 37278.5,
-      "dt_since_revocation_sec": 16.453999999997905,
+      "timestamp_monotonic": 77027.859,
+      "dt_since_revocation_sec": 24.85899999999674,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 45,
-      "timestamp_monotonic": 37278.875,
-      "dt_since_revocation_sec": 16.828999999997905,
+      "timestamp_monotonic": 77028.421,
+      "dt_since_revocation_sec": 25.421000000002095,
       "replica_id": "api-1",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 16.0
     },
     {
       "probe_index": 45,
-      "timestamp_monotonic": 37278.875,
-      "dt_since_revocation_sec": 16.828999999997905,
+      "timestamp_monotonic": 77028.421,
+      "dt_since_revocation_sec": 25.421000000002095,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 45,
-      "timestamp_monotonic": 37278.875,
-      "dt_since_revocation_sec": 16.828999999997905,
+      "timestamp_monotonic": 77028.421,
+      "dt_since_revocation_sec": 25.421000000002095,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 46,
-      "timestamp_monotonic": 37279.25,
-      "dt_since_revocation_sec": 17.203999999997905,
+      "timestamp_monotonic": 77028.937,
+      "dt_since_revocation_sec": 25.937000000005355,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 46,
-      "timestamp_monotonic": 37279.25,
-      "dt_since_revocation_sec": 17.203999999997905,
+      "timestamp_monotonic": 77028.937,
+      "dt_since_revocation_sec": 25.937000000005355,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 46,
-      "timestamp_monotonic": 37279.25,
-      "dt_since_revocation_sec": 17.203999999997905,
+      "timestamp_monotonic": 77028.937,
+      "dt_since_revocation_sec": 25.937000000005355,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 47,
-      "timestamp_monotonic": 37279.625,
-      "dt_since_revocation_sec": 17.578999999997905,
+      "timestamp_monotonic": 77029.437,
+      "dt_since_revocation_sec": 26.437000000005355,
       "replica_id": "api-1",
       "status_code": 403,
-      "latency_ms": 15.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 47,
-      "timestamp_monotonic": 37279.625,
-      "dt_since_revocation_sec": 17.578999999997905,
+      "timestamp_monotonic": 77029.437,
+      "dt_since_revocation_sec": 26.437000000005355,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 47,
-      "timestamp_monotonic": 37279.625,
-      "dt_since_revocation_sec": 17.578999999997905,
+      "timestamp_monotonic": 77029.437,
+      "dt_since_revocation_sec": 26.437000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 48,
-      "timestamp_monotonic": 37279.984,
-      "dt_since_revocation_sec": 17.937999999994645,
+      "timestamp_monotonic": 77029.937,
+      "dt_since_revocation_sec": 26.937000000005355,
       "replica_id": "api-1",
       "status_code": 403,
       "latency_ms": 16.0
     },
     {
       "probe_index": 48,
-      "timestamp_monotonic": 37279.984,
-      "dt_since_revocation_sec": 17.937999999994645,
+      "timestamp_monotonic": 77029.937,
+      "dt_since_revocation_sec": 26.937000000005355,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 48,
-      "timestamp_monotonic": 37279.984,
-      "dt_since_revocation_sec": 17.937999999994645,
+      "timestamp_monotonic": 77029.937,
+      "dt_since_revocation_sec": 26.937000000005355,
       "replica_id": "api-3",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 49,
-      "timestamp_monotonic": 37280.359,
-      "dt_since_revocation_sec": 18.312999999994645,
+      "timestamp_monotonic": 77030.437,
+      "dt_since_revocation_sec": 27.437000000005355,
       "replica_id": "api-1",
       "status_code": 403,
-      "latency_ms": 16.0
+      "latency_ms": 0.0
     },
     {
       "probe_index": 49,
-      "timestamp_monotonic": 37280.359,
-      "dt_since_revocation_sec": 18.312999999994645,
+      "timestamp_monotonic": 77030.437,
+      "dt_since_revocation_sec": 27.437000000005355,
       "replica_id": "api-2",
       "status_code": 403,
       "latency_ms": 0.0
     },
     {
       "probe_index": 49,
-      "timestamp_monotonic": 37280.359,
-      "dt_since_revocation_sec": 18.312999999994645,
+      "timestamp_monotonic": 77030.437,
+      "dt_since_revocation_sec": 27.437000000005355,
       "replica_id": "api-3",
       "status_code": 403,
-      "latency_ms": 0.0
+      "latency_ms": 15.0
     }
   ]
 }

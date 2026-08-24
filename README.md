@@ -120,11 +120,11 @@ AuthTime coordinates a multi-stage experimental pipeline to measure access revoc
 All AuthTime measurements are backed by reproducible empirical execution:
 
 - **Level C Infrastructure Validation**: Validated in a controlled Docker environment using PostgreSQL 16, Redis 7, and three independent API replicas. See [`docs/distributed-validation-results.md`](docs/distributed-validation-results.md).
-- **Employee Offboarding Case Study**: Modeled an enterprise offboarding failure (`Finance Admin` demotion). Under the vulnerable baseline, Replica API-3 allowed access for **`4.25s`** post-revocation. Under Authorization Versioning mitigation, no post-revocation ALLOW was observed within the configured 100 ms measurement resolution (**100.0% exposure reduction**). See [`docs/real-world-case-study.md`](docs/real-world-case-study.md).
+- **Employee Offboarding Case Study**: Modeled an enterprise offboarding failure (`Finance Admin` demotion). Under the vulnerable baseline, Replica API-3 allowed access for **`3.96s`** post-revocation. Under Authorization Versioning mitigation, no post-revocation ALLOW was observed within the configured 100 ms measurement resolution (**100.0% exposure reduction**). See [`docs/real-world-case-study.md`](docs/real-world-case-study.md).
 
 | Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Replica Exposure | Engineering Outcome |
 | :--- | :---: | :---: | :--- |
-| **Vulnerable Baseline (5 Runs)** | `4.25s` (Std Dev: 0.16s) | `4.22s` | Stale cache exposure on Replica API-3 |
+| **Vulnerable Baseline (5 Runs)** | `3.96s` (Std Dev: 0.28s) | `3.96s` | Stale cache exposure on Replica API-3 |
 | **Mitigated State (5 Runs)** | **`0.00s`** | **`0.00s`** | **No ALLOW observed @ 100ms resolution** |
 
 - **Mitigation Performance Benchmark**: Version-aware cache validation adds only **0.42 ms** average latency overhead per request while preserving sub-millisecond cache hits. See [`docs/mitigation-tradeoff-report.md`](docs/mitigation-tradeoff-report.md).

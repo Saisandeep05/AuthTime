@@ -1,8 +1,8 @@
 {
   "experiment_metadata": {
     "experiment_id": "exp-employee-offboarding-case-study",
-    "timestamp_utc": "2026-08-23T20:51:04.572528+00:00",
-    "git_commit": "df5c6e22ad875677aebaf70c3b6b366c7ba0a992",
+    "timestamp_utc": "2026-08-24T07:53:52.655716+00:00",
+    "git_commit": "1ee9dd79568116ac0dd43f8219eeddba52e8b15b",
     "python_version": "3.12.10",
     "platform": "Windows-11-10.0.26200-SP0",
     "probe_interval_ms": 100,
@@ -20,21 +20,21 @@
     "/finance/reports"
   ],
   "metrics": {
-    "vulnerable_max_exposure_sec": 4.247,
-    "vulnerable_mean_exposure_sec": 4.223,
+    "vulnerable_max_exposure_sec": 3.959,
+    "vulnerable_mean_exposure_sec": 3.959,
     "vulnerable_max_stats": {
-      "min": 3.968,
-      "max": 4.344,
-      "mean": 4.247,
-      "median": 4.312,
-      "std_dev": 0.157
+      "min": 3.468,
+      "max": 4.125,
+      "mean": 3.959,
+      "median": 4.062,
+      "std_dev": 0.278
     },
     "vulnerable_mean_stats": {
-      "min": 3.968,
-      "max": 4.328,
-      "mean": 4.223,
-      "median": 4.281,
-      "std_dev": 0.148
+      "min": 3.468,
+      "max": 4.125,
+      "mean": 3.959,
+      "median": 4.062,
+      "std_dev": 0.278
     },
     "mitigated_max_exposure_sec": 0.0,
     "mitigated_mean_exposure_sec": 0.0,

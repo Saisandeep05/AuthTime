@@ -313,7 +313,7 @@ async def main_async(num_runs: int = 5):
             json.dump(last_mit_trial.pop("raw_probe_events"), f, indent=2)
 
         # Write Case Study README in experiment folder
-        exp_readme = f"""# Employee Offboarding Case Study Artifacts
+        exp_readme = rf"""# Employee Offboarding Case Study Artifacts
 
 This folder contains durable evidence artifacts collected during the real-world **Employee Offboarding Temporal Authorization Exposure Case Study**.
 
@@ -331,10 +331,10 @@ This folder contains durable evidence artifacts collected during the real-world 
 
 | Metric | Vulnerable Baseline | Mitigated State | Measured Improvement |
 | :--- | :---: | :---: | :---: |
-| **Max Exposure Duration ($\Delta t_{{\\text{{exp}}}}$)** | `{vuln_max_avg:.2f}s` | `{mit_max_avg:.2f}s` | **`{pct_reduction:.1f}% Reduction`** |
+| **Max Exposure Duration ($\Delta t_{{{\text{{exp}}}}}}$)** | `{vuln_max_avg:.2f}s` | `{mit_max_avg:.2f}s` | **`{pct_reduction:.1f}% Reduction`** |
 | **Mean Replica Exposure Duration** | `{vuln_mean_avg:.2f}s` | `{mit_mean_avg:.2f}s` | **`{pct_reduction:.1f}% Reduction`** |
 
-> **Scientific Qualification**: No post-revocation ALLOW decision was observed within the configured measurement resolution ($\le 100\\text{{ms}}$ probe interval).
+> **Scientific Qualification**: No post-revocation ALLOW decision was observed within the configured measurement resolution ($\le 100\text{{ms}}$ probe interval).
 
 ## Artifact Manifest
 
