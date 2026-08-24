@@ -14,4 +14,15 @@ AuthTime is organized into decoupled, modular components:
 10. **Report Generator (`authtime/reporting/`)**: Formats Markdown, HTML, JSON, and standalone zero-dependency PoC scripts.
 11. **Distributed Authorization Validation Laboratory (`targets/distributed_lab/`)**: Distributed multi-replica architecture featuring PostgreSQL as authoritative source of truth, Redis as authorization & invalidation bus, signed JWT lifecycle management, multiple protected API replicas (API-1, API-2, API-3), controlled failure injection, and `DistributedLabAdapter`.
 
+---
+
+## Verification Levels & System Scope
+
+AuthTime is designed as a **software-only framework by default** (Level A & Level B), with an optional Docker laboratory for advanced multi-node research (Level C):
+
+- **Level A (Unit & Invariants)**: Fast in-memory unit tests using mocks and synthetic probes (`pytest tests/unit/`). Zero external dependencies.
+- **Level B (Local Loopback Probing)**: Software-only automated HTTP probing against local ASGI/WSGI applications (`FastAPI`, `Express`, `Django`) running on `127.0.0.1`.
+- **Level C (Distributed Lab)**: Optional Docker-based multi-replica environment (`docker-compose.lab.yml`) running PostgreSQL 16 + Redis 7 + 3 API replicas to validate multi-replica invalidation propagation and race conditions under real database/cache topologies.
+
+
 

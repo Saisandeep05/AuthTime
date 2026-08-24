@@ -103,13 +103,25 @@ pytest --verbose
 
 ## What You Get
 
-| Capability | Description |
-| :--- | :--- |
-| **Exposure Measurement** | Quantify temporal lag between access revocation and system-wide enforcement. |
-| **Root-Cause Diagnosis** | Identify likely lag causes including stale worker caches, unrevoked JWTs, and propagation delays. |
-| **Evidence Generation** | Automatically output auditable JSON telemetry, Markdown reports, HTML charts, and runnable Python PoCs. |
-| **Mitigation Comparison** | Evaluate and compare authorization versioning strategies against vulnerable baselines. |
-| **Distributed Validation** | Validate authorization propagation behavior across multi-replica services in a controlled environment. |
+| Capability | Description | Committed Proof / Artifact |
+| :--- | :--- | :--- |
+| **Exposure Measurement** | Quantify temporal lag between access revocation and system-wide enforcement. | 📄 [**Sample Markdown Report**](reports/examples/sample_report.md) |
+| **Root-Cause Diagnosis** | Identify likely lag causes including stale worker caches, unrevoked JWTs, and propagation delays. | 📊 [**Sample Machine JSON**](reports/examples/results.json) |
+| **Evidence & PoC Generation** | Automatically output auditable JSON telemetry, Markdown reports, HTML charts, and runnable Python PoCs. | 🐍 [**Sample Standalone PoC**](reports/poc/sample_poc.py) \| 🌐 [**Sample HTML Report**](reports/examples/sample_report.html) |
+| **Mitigation Comparison** | Evaluate and compare authorization versioning strategies against vulnerable baselines. | 💼 [**Offboarding Case Study**](docs/real-world-case-study.md) |
+| **Distributed Validation** | Validate authorization propagation behavior across multi-replica services in a controlled environment. | 🧪 [**Level C Distributed Lab**](docs/distributed-validation-results.md) |
+
+---
+
+## Verification Levels & Infrastructure Requirements
+
+AuthTime uses a **3-tier verification architecture** designed to be 100% software-only by default, with an optional Docker lab for advanced multi-node research:
+
+| Level | Name | External Infrastructure Required? | Scope & Use Case |
+| :---: | :--- | :---: | :--- |
+| **Level A** | **Unit & Invariants** | ❌ **None** (Software-only) | Pure Python unit tests, finite state machine invariant validation, and censoring math (`pytest tests/unit/`). |
+| **Level B** | **Local Loopback Probing** | ❌ **None** (Software-only) | Automated HTTP probing against local ASGI/WSGI applications (`FastAPI`, `Express`, `Django`) on `127.0.0.1`. |
+| **Level C** | **Distributed Lab (Optional)** | 🐳 **Docker Optional** | Optional multi-process Docker environment (`docker-compose.lab.yml`) running PostgreSQL 16 + Redis 7 + 3 API replicas to validate multi-replica invalidation propagation. |
 
 ---
 

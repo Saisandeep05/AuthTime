@@ -36,12 +36,14 @@ AuthTime quantifies this vulnerability through a four-stage experimental loop:
 
 Testing against reference authorization targets yielded the following baseline metrics:
 
-| Scenario | Injected Cache TTL | Measured Exposure Window ($\Delta t_{\text{exp}}$) | Precision | Root Cause | Severity Score |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **Stale Cache (10s)** | 10.0s | **10.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **6.2 (MEDIUM)** |
-| **Stale Cache (30s)** | 30.0s | **30.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.5 (HIGH)** |
-| **Stale Cache (60s)** | 60.0s | **60.00s** (Accelerated 4.52s ± 0.05s) | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.3 (HIGH)** |
-| **Cross-User Isolation** | N/A | **0.00s** | $\pm 0.01\text{s}$ | `NONE` | **0.0 (NONE)** |
+| Scenario | Injected Cache TTL | Full Engine Exposure (`1.0x` Scale) | Accelerated Demo Exposure (`0.1x` Scale)* | Precision | Root Cause | Severity Score |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Stale Cache (10s)** | 10.0s | **10.00s** | **1.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **6.2 (MEDIUM)** |
+| **Stale Cache (30s)** | 30.0s | **30.00s** | **3.00s** | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.5 (HIGH)** |
+| **Stale Cache (60s)** | 60.0s | **60.00s** | **4.52s** ($\ge 6.00\text{s}$ Horizon) | $\pm 0.05\text{s}$ | `AUTHORIZATION_CACHE` | **7.3 (HIGH)** |
+| **Cross-User Isolation** | N/A | **0.00s** | **0.00s** | $\pm 0.01\text{s}$ | `NONE` | **0.0 (NONE)** |
+
+*\*Note on Execution Modes: In Full Real-Time Engine Mode (`1.0x` time scale), probes run at 1:1 real-time speed. In Accelerated Demo Mode (`0.1x` time scale), timing intervals are scaled down by 10x for fast CI/demo verification while preserving exact proportionality.*
 
 
 ### Headline Observation:

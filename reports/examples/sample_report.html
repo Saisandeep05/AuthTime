@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AuthTime Security Report - FIND-EXP-MAIN-1787491866-3</title>
+    <title>AuthTime Security Report - FIND-EXP-MAIN-1787592981-3</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; max-width: 900px; margin: 2rem auto; padding: 0 1rem; background-color: #f8fafc; }
         .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
@@ -25,38 +25,38 @@
         <h2>Executive Summary</h2>
         <table>
             <tr><th>Protocol Version</th><td><code>1.0</code></td></tr>
-            <tr><th>Run Identifier</th><td><code>RUN-20260823-e2713c11f4074eaa98654d771c341a44</code></td></tr>
+            <tr><th>Run Identifier</th><td><code>RUN-20260824-e7e120e05bd8430a9d380e9db1759bf6</code></td></tr>
             <tr><th>Finding Title</th><td>Authorization Exposure Finding: OBSERVATION_HORIZON_REACHED</td></tr>
             <tr><th>Fault Type</th><td><code>stale_cache</code></td></tr>
             <tr><th>Severity Score</th><td><code>5.4 / 10.0</code> <span class="badge medium">MEDIUM</span></td></tr>
             <tr><th>Root Cause</th><td><code>OBSERVATION_HORIZON_REACHED</code> (Confidence: <strong>INFERRED</strong>)</td></tr>
             <tr><th>Measurement Status</th><td><code>CENSORED_LOWER_BOUND</code></td></tr>
-            <tr><th>Baseline Status</th><td><strong>FAILED</strong></td></tr>
-            <tr><th>Cleanup Status</th><td><strong>FAILED</strong></td></tr>
+            <tr><th>Baseline Status</th><td><strong>PASSED</strong></td></tr>
+            <tr><th>Cleanup Status</th><td><strong>VERIFIED</strong></td></tr>
         </table>
     </div>
 
     <div class="card">
         <h2>Exposure Window Metrics</h2>
         <table>
-            <tr><th>Revocation Timestamp (t_fault)</th><td><code>10984.046s</code></td></tr>
-            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>10984.046s</code></td></tr>
-            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>10990.046s</code></td></tr>
+            <tr><th>Revocation Timestamp (t_fault)</th><td><code>6880.078s</code></td></tr>
+            <tr><th>First Unauthorized Access (t_first_unauth)</th><td><code>6880.078s</code></td></tr>
+            <tr><th>Last Unauthorized Access (t_last_unauth)</th><td><code>6886.078s</code></td></tr>
             <tr><th>First Blocked Access (t_first_block)</th><td><code>NOT OBSERVED</code></td></tr>
             <tr><th>Exposure Interval</th><td><code>[6.00s, ∞] (RIGHT-CENSORED at horizon 6.00s)</code></td></tr>
             <tr><th>Estimated Exposure Window</th><td><strong><code>≥ 6.00s (Conservative Lower Bound)</code></strong></td></tr>
             <tr><th>Measurement Precision</th><td><code>UNBOUNDED (Censored Observation)</code></td></tr>
-            <tr><th>Scheduler Jitter</th><td><code>7.80ms</code></td></tr>
+            <tr><th>Scheduler Jitter</th><td><code>11.30ms</code></td></tr>
         </table>
         
         
-            <h2>Aggregate Trial Statistics (N=0)</h2>
-            
+            <h2>Aggregate Trial Statistics (N=3)</h2>
+            <p class='note'><strong>Note:</strong> Sample size N &lt; 5 or right-censored data present: ordinary mean and P95 are suppressed (NOT ESTIMABLE).</p>
             <ul>
-                <li><strong>Minimum Exposure:</strong> <code>0.00s</code></li>
-                <li><strong>Maximum Exposure:</strong> <code>0.00s</code></li>
+                <li><strong>Minimum Exposure:</strong> <code>3.00s</code></li>
+                <li><strong>Maximum Exposure:</strong> <code>6.00s</code></li>
                 <li><strong>Mean Exposure (µ):</strong> <code>NOT ESTIMABLE (Right-Censored Data Present)</code></li>
-                <li><strong>Median Exposure (x̃):</strong> <code>0.00s</code></li>
+                <li><strong>Median Exposure (x̃):</strong> <code>6.00s</code></li>
             </ul>
             
     </div>
@@ -71,7 +71,7 @@
     <div class="card">
         <h2>Reproduction & PoC Script</h2>
         <pre><code>curl -H &#x27;Authorization: Bearer &lt;token&gt;&#x27; http://127.0.0.1:8000/admin/users</code></pre>
-        <p>Standalone Python PoC: <code>reports/poc/EXP-MAIN-1787491866-3_poc.py</code></p>
+        <p>Standalone Python PoC: <code>reports/poc/sample_poc.py</code></p>
     </div>
 </body>
 </html>

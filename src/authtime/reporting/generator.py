@@ -111,6 +111,10 @@ class ReportGenerator:
         est_exp_str = f"`{metrics.estimated_exposure_sec:.2f}s`" if metrics.estimated_exposure_sec is not None else f"`≥ {metrics.exposure_interval_min_sec:.2f}s (Conservative Lower Bound)`"
         precision_str = f"`±{metrics.precision_sec:.2f}s`" if metrics.precision_sec is not None else "`UNBOUNDED (Censored Observation)`"
 
+        poc_link = finding.poc_script_path
+        if poc_link.startswith("reports/poc/"):
+            poc_link = "../poc/" + os.path.basename(poc_link)
+
         md = f"""# AuthTime Security Verification Report: {finding.finding_id}
 
 ## Executive Summary
@@ -153,7 +157,7 @@ class ReportGenerator:
 ```bash
 {finding.reproduction_curl}
 ```
-Standalone reproduction script generated at: [`{finding.poc_script_path}`]({finding.poc_script_path})
+Standalone reproduction script generated at: [`{finding.poc_script_path}`]({poc_link})
 """
         return md
 

@@ -128,12 +128,18 @@ async def run_experiment(
 
     stats = controller.aggregate_trial_statistics(results)
     last_res = results[-1]
-
+    last_res.finding.poc_script_path = "reports/poc/sample_poc.py"
     os.makedirs("reports/examples", exist_ok=True)
+    os.makedirs("reports/poc", exist_ok=True)
     md_content = ReportGenerator.generate_markdown_report(last_res, stats)
     html_content = ReportGenerator.generate_html_report(last_res, stats)
     json_content = ReportGenerator.generate_json_report(last_res, stats)
     poc_path = ReportGenerator.generate_poc_script(last_res, "reports/poc")
+    
+    # Also write canonical tracked sample_poc.py for committed repository documentation
+    with open("reports/poc/sample_poc.py", "w", encoding="utf-8") as f_poc:
+        with open(poc_path, "r", encoding="utf-8") as f_src:
+            f_poc.write(f_src.read())
 
     sample_md = "reports/examples/sample_report.md"
     sample_html = "reports/examples/sample_report.html"

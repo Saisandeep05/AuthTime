@@ -39,6 +39,16 @@ src/authtime/
 
 ---
 
+## 🧪 Verification Levels & System Scope
+
+AuthTime is designed as a **software-only framework by default** (Level A & Level B), with an optional Docker laboratory for advanced multi-node research (Level C):
+
+- **Level A (Unit & Invariants)**: Fast in-memory unit tests using mocks and synthetic probes (`pytest tests/unit/`). Zero external dependencies.
+- **Level B (Local Loopback Probing)**: Software-only automated HTTP probing against local ASGI/WSGI applications (`FastAPI`, `Express`, `Django`) running on `127.0.0.1`.
+- **Level C (Distributed Lab)**: Optional Docker-based multi-replica environment (`docker-compose.lab.yml`) running PostgreSQL 16 + Redis 7 + 3 API replicas to validate multi-replica invalidation propagation and race conditions under real database/cache topologies.
+
+---
+
 ## 🔌 Extending AuthTime: Implementing a Custom Target Adapter
 
 AuthTime uses standardized adapters to interact with different backend target frameworks (e.g., FastAPI, Express, Django, Go, or Rust services).

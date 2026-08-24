@@ -22,5 +22,6 @@ history/exposure_history.jsonl
 !reports/examples/sample_report.md
 !reports/examples/sample_report.html
 !reports/examples/results.json
+!reports/poc/sample_poc.py
 node_modules/
 
