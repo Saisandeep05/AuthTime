@@ -295,7 +295,7 @@ AuthTime/
 │   ├── distributed-validation-results.md # Empirical multi-replica validation evidence
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   ├── findings-report.md          # Technical security research write-up
-│   ├── skill-utilization.md        # Capability & skill taxonomy matrix
+│   ├── engineering-methodology.md  # Software engineering architecture & testing methodology
 │   └── development/                # Process & Development History
 │       ├── implementation_plan.md  # Architectural implementation plan
 │       └── DEVELOPMENT_LOG.md      # Development milestone log

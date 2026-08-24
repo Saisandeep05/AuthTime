@@ -560,7 +560,7 @@ AuthTime/
 Git and GitHub serve as development infrastructure.
 
 ### Repository Inspection & Dynamic Upstream Protocol
-Before executing any Git push operation, the agent **MUST**:
+Before executing any Git push operation, the maintainer **MUST**:
 1. Inspect the existing Git repository (`git status`).
 2. Inspect configured Git remotes (`git remote -v`).
 3. Determine the active branch (`git branch --show-current`).
