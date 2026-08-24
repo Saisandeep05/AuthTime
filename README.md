@@ -1,6 +1,6 @@
 # AuthTime
 
-> **An open-source controlled security research harness for experimentally measuring and quantifying Temporal Authorization Exposure Windows ($\Delta t_{\text{exp}}$) during access revocation fault injection.**
+> **AuthTime measures how long revoked users can continue accessing protected resources in distributed authorization systems.** It serves as an open-source controlled security research harness for experimentally measuring and quantifying Temporal Authorization Exposure Windows ($\Delta t_{\text{exp}}$) during access revocation fault injection.
 
 <p align="center">
   <img src="assets/animations/authtime-exposure-window.svg" alt="AuthTime Exposure Window Measurement Animation" width="100%">
@@ -105,14 +105,13 @@ AuthTime coordinates a multi-stage experimental pipeline to measure access revoc
 
 ## What You Get
 
-| Capability | Summary & Result |
+| Capability | Description |
 | :--- | :--- |
-| **Exposure Measurement** | Pinpoint exact temporal delay between revocation and enforcement ($\le 100\text{ms}$ resolution). |
-| **Root-Cause Analysis** | Classify lag causes (stale cache, unrevoked JWT, async delay) with confidence scoring. |
-| **Multi-Framework Targets** | Built-in target implementations for FastAPI, Express.js, Django, and OpenID CAEP/SSF. |
-| **Distributed Validation** | Tested against real infrastructure (PostgreSQL 16 + Redis 7 + 3 independent API replicas). |
-| **Evidence Generation** | Automatically outputs auditable JSON telemetry, Markdown reports, HTML charts, and runnable Python PoCs. |
-| **Automated Verification** | 85 passed, 4 skipped unit, integration, property fuzzing, and system tests. |
+| **Exposure Measurement** | Quantify temporal lag between access revocation and system-wide enforcement. |
+| **Root-Cause Diagnosis** | Identify likely lag causes including stale worker caches, unrevoked JWTs, and propagation delays. |
+| **Evidence Generation** | Automatically output auditable JSON telemetry, Markdown reports, HTML charts, and runnable Python PoCs. |
+| **Mitigation Comparison** | Evaluate and compare authorization versioning strategies against vulnerable baselines. |
+| **Distributed Validation** | Validate authorization propagation behavior across multi-replica services in a controlled environment. |
 
 ---
 
@@ -120,7 +119,7 @@ AuthTime coordinates a multi-stage experimental pipeline to measure access revoc
 
 All AuthTime measurements are backed by reproducible empirical execution:
 
-- **Level C Infrastructure Validation**: Validated in a controlled Docker Compose environment using real PostgreSQL 16 as the authoritative database, Redis 7 for invalidation pub/sub, and three independent API container replicas. See [`docs/distributed-validation-results.md`](docs/distributed-validation-results.md).
+- **Level C Infrastructure Validation**: Validated in a controlled Docker environment using PostgreSQL 16, Redis 7, and three independent API replicas. See [`docs/distributed-validation-results.md`](docs/distributed-validation-results.md).
 - **Employee Offboarding Case Study**: Modeled an enterprise offboarding failure (`Finance Admin` demotion). Under the vulnerable baseline, Replica API-3 allowed access for **`4.25s`** post-revocation. Under Authorization Versioning mitigation, no post-revocation ALLOW was observed within the configured 100 ms measurement resolution (**100.0% exposure reduction**). See [`docs/real-world-case-study.md`](docs/real-world-case-study.md).
 
 | Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Replica Exposure | Engineering Outcome |
@@ -201,12 +200,12 @@ authtime compare --current-exposure 6.0 --threshold 0.5
 
 ### 2. Distributed Authorization Laboratory
 
-To run the Level C multi-replica PostgreSQL + Redis environment:
+AuthTime includes a **Distributed Authorization Validation Laboratory** (`targets/distributed_lab/`) to validate multi-replica propagation:
 
 ```bash
 docker compose -f docker-compose.lab.yml up --build
 ```
-This spins up PostgreSQL 16, Redis 7, and three independent API replicas (`API-1`, `API-2`, `API-3` on ports `8010`, `8011`, `8012`) to test multi-process invalidation propagation.
+This spins up a controlled Docker environment with PostgreSQL 16, Redis 7, and three independent API replicas (`API-1`, `API-2`, `API-3` on ports `8010`, `8011`, `8012`) to test multi-process invalidation propagation.
 
 ### 3. Real-World Case Study Execution
 
