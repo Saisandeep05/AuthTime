@@ -1,5 +1,5 @@
 """
-Comprehensive Adversarial Response Test Matrix for AuthTime Authorization Oracle.
+Adversarial response test matrix for AuthTime authorization predicate.
 Verifies that all ambiguous, malformed, non-contract, or unexpected target responses evaluate to 'UNKNOWN',
 and that transport errors are classified cleanly as typed observations (never fabricated HTTP statuses or ALLOW).
 """

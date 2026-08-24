@@ -1,6 +1,6 @@
 # AuthTime Software Engineering Methodology & Capability Matrix
 
-> **Comprehensive overview of software engineering architecture, testing methodologies, security practices, and metrology standards applied across the AuthTime project.**
+> **Overview of software engineering architecture, testing methodologies, security practices, and metrology standards applied across the AuthTime project.**
 
 ---
 

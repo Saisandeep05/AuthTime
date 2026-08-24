@@ -65,7 +65,7 @@ AuthTime includes an end-to-end enterprise case study modeling a real-world auth
 
 ### Case Study Links & Artifacts
 
-- 📘 [**Full Case Study Documentation**](docs/real-world-case-study.md) — Comprehensive technical write-up & root cause analysis
+- 📘 [**Full Case Study Documentation**](docs/real-world-case-study.md) — Technical write-up & root cause analysis
 - 🧪 [**Vulnerable Evidence JSON**](experiments/employee_offboarding_case_study/vulnerable-results.json) — Per-replica probe logs & metrics under baseline
 - 🛡️ [**Mitigated Evidence JSON**](experiments/employee_offboarding_case_study/mitigated-results.json) — Per-replica timing logs under Authorization Versioning
 - 📊 [**Before vs After Comparison JSON**](experiments/employee_offboarding_case_study/comparison.json) — Structured before/after metrics summary with reproducibility metadata
