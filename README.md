@@ -10,88 +10,77 @@
   <a href="https://github.com/Saisandeep05/AuthTime/actions"><img src="https://github.com/Saisandeep05/AuthTime/actions/workflows/ci.yml/badge.svg" alt="CI Pipeline"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
-  <a href="#-safety-boundary--constraints"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
-  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-85%20Passed%20%7C%204%20Skipped-success.svg" alt="Tests Status"></a>
+  <a href="#safety"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
+  <a href="#verified-results"><img src="https://img.shields.io/badge/Tests-85%20Passed%20%7C%204%20Skipped-success.svg" alt="Tests Status"></a>
 </p>
 
 **Tech Stack**: `Python 3.12` • `FastAPI` • `PostgreSQL` • `Redis` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
 
-<details>
-<summary><strong>📚 Table of Contents</strong> (Click to Expand)</summary>
-
-- [⚡ What AuthTime Does](#-what-authtime-does)
-- [🚀 Quick Start (START HERE)](#-quick-start-start-here)
-- [🔄 End-to-End Execution Workflow & Lifecycle](#-end-to-end-execution-workflow--lifecycle)
-- [📊 Understanding the Results](#-understanding-the-results)
-- [🏗️ System Architecture & Data Flow](#-system-architecture--data-flow)
-- [⚡ Advanced Features (Optional)](#-advanced-features-optional)
-  - [1. Using the `authtime` CLI](#1-using-the-authtime-cli)
-  - [2. Distributed Authorization Validation Laboratory](#2-distributed-authorization-validation-laboratory)
-  - [3. Real-World Employee Offboarding Case Study](#3-real-world-employee-offboarding-case-study)
-  - [4. Advanced Validation Tools (`scripts/`)](#4-advanced-validation-tools-scripts)
-  - [5. Supported Target Frameworks](#5-supported-target-frameworks)
-- [📂 Repository Map](#-repository-map)
-- [📘 Technical Documentation & Research](#-technical-documentation--research)
-- [🛡️ Safety Boundary & Constraints](#-safety-boundary--constraints)
-- [📜 License](#-license)
-</details>
+### Quick Navigation
+- [What AuthTime Does](#what-authtime-does)
+- [Quick Start](#quick-start)
+- [How AuthTime Works](#how-authtime-works)
+- [What You Get](#what-you-get)
+- [Verified Results](#verified-results)
+- [Architecture](#architecture)
+- [Advanced Usage](#advanced-usage)
+- [Supported Targets](#supported-targets)
+- [Repository Structure](#repository-structure)
+- [Documentation](#documentation)
+- [Safety](#safety)
+- [License](#license)
 
 ---
 
-## ⚡ What AuthTime Does
+## What AuthTime Does
 
-When an administrative user's privileges are revoked in a primary database (due to employee termination, role demotion, or security compromise), distributed microservices and web applications often **fail to immediately enforce revocation**. 
+When an administrative user's privileges are revoked in a central database (due to employee offboarding, role demotion, or account suspension), distributed microservices and API gateways often fail to enforce that revocation immediately.
 
-Applications continue accepting unauthorized requests during a silent **Temporal Authorization Exposure Window** ($\Delta t_{\text{exp}}$) caused by:
-1. **Stale In-Memory Caches**: Application workers caching user permissions until a local TTL expires.
-2. **Unrevoked Stateless JWT Tokens**: Valid cryptographic signatures accepted until token expiration (`exp`).
-3. **Asynchronous Propagation Delays**: Back-channel revocation events failing or delayed across message brokers.
+Applications continue accepting unauthorized requests during a silent **Temporal Authorization Exposure Window** ($\Delta t_{\text{exp}}$). This delay is caused by stale worker caches trusting outdated permissions, stateless JWT tokens remaining valid until expiration, or asynchronous message broker propagation lag.
 
 <p align="center">
   <img src="assets/diagrams/authorization-exposure-model.svg" alt="Stale Authorization Exposure Model" width="100%">
 </p>
 
-**AuthTime** provides an empirical, automated research harness to inject controlled revocation faults, execute high-precision HTTP probing ($\le 100\text{ms}$ resolution), measure exact exposure windows, and generate standalone proof-of-concept reproduction scripts.
-
-| ⏱️ **Measure Exposure Window ($\Delta t_{\text{exp}}$)** | 🔍 **Classify Root Cause** | 📜 **Generate Standalone PoC** |
-| :--- | :--- | :--- |
-| Pinpoint exact temporal delay between role revocation and enforcement down to $\le 100\text{ms}$ precision. | Diagnose revocation lag (stale cache, unrevoked JWT, async delay) with confidence metrics. | Automatically output executable zero-dependency Python scripts reproducing findings. |
+**AuthTime** provides an empirical, automated research harness that injects controlled revocation faults, executes high-precision HTTP probing ($\le 100\text{ms}$ resolution), measures exact exposure windows, and generates standalone proof-of-concept reproduction scripts.
 
 ---
 
-## 🚀 Quick Start (START HERE)
+## Quick Start
 
-### 1. Install Dependencies
+> **START HERE**: Execute the 4 steps below to run your first experiment.
+
+### 1. Clone & Setup
 
 ```bash
-# Clone the repository
 git clone https://github.com/Saisandeep05/AuthTime.git
 cd AuthTime
 
-# Install Python dependencies and package in editable mode
 pip install -r requirements.txt
 pip install -e .
 ```
 
-### 2. Run AuthTime Main Verification Engine
+### 2. Run Main Demonstration Engine
 
 ```bash
 python run.py
 ```
 
-> **What this does**: Automatically starts the local reference FastAPI target application on `http://127.0.0.1:8000`, executes experiment trials, calculates exposure metrics, generates reports in `reports/examples/`, and launches the interactive **Web Control Center & Dashboard**.
+### 3. View Interactive Dashboard & Reports
 
-### 3. Run Automated Verification Suite
+After running `python run.py`:
+- Open `http://127.0.0.1:8000` or [`dashboard/index.html`](dashboard/index.html) in your browser to view interactive timeline charts and audit logs.
+- Generated Markdown, HTML, and JSON reports are saved to `reports/examples/`.
+
+### 4. Run Automated Test Suite
 
 ```bash
 pytest --verbose
 ```
 
-> Executes the complete test suite (85 passed, 4 skipped) validating schemas, ground truth, adaptive probing, fault injection, and security invariants.
-
 ---
 
-## 🔄 End-to-End Execution Workflow & Lifecycle
+## How AuthTime Works
 
 AuthTime coordinates a multi-stage experimental pipeline to measure access revocation lag with high precision:
 
@@ -99,75 +88,79 @@ AuthTime coordinates a multi-stage experimental pipeline to measure access revoc
   <img src="assets/animations/experiment-lifecycle.svg" alt="AuthTime Experiment Execution Pipeline" width="100%">
 </p>
 
-### How a Request & Trial Flows Through AuthTime (Plain Language)
-
 ```text
 [ 1. Select Target ] ──► [ 2. Validate Baseline ] ──► [ 3. Inject Revocation Fault ]
                                                                    │
 [ 6. Output Reports ] ◄── [ 5. Evaluate Metrics ] ◄── [ 4. Execute HTTP Probes ]
 ```
 
-1. **Target Selection & Initialization**: AuthTime connects to the target authorization server (FastAPI reference app, Express.js, Django, or Level C Distributed Lab) via the `HTTPTargetAdapter`.
-2. **Pre-Fault Baseline Check**: AuthTime issues an initial HTTP request with active user credentials and confirms the target returns `200 OK` (`ALLOW`).
-3. **Controlled Fault Injection**: The Ground Truth Manager initiates role demotion (e.g., `Admin` $\rightarrow$ `User`) in the target database at timestamp $t_0$.
-4. **High-Precision Probing Loop**: AuthTime fires rapid, monotonic background HTTP probes ($\le 100\text{ms}$ resolution) using `time.monotonic()` to track exactly when post-revocation requests are accepted vs blocked.
-5. **Contract & Exposure Evaluation**: Response contracts are evaluated. AuthTime records the time of the last unauthorized `ALLOW` ($t_{\text{last\_unauth}}$) and the first enforced `DENY` ($t_{\text{first\_block}}$), computing $\Delta t_{\text{exp}} = t_{\text{first\_block}} - t_0$.
-6. **Report Generation & State Reset**: Formatted Markdown/HTML/JSON reports and executable zero-dependency Python PoC scripts are generated, and target states are reset while preserving forensic audit trails (`AUDIT_EVENTS`).
+1. **Target Selection**: Connects to the target application via a standardized `TargetAdapter` interface.
+2. **Baseline Check**: Sends pre-fault requests to confirm authorized credentials return `200 OK` (`ALLOW`).
+3. **Fault Injection**: Demotes the user role or revokes session state in the target database at timestamp $t_0$.
+4. **HTTP Probing**: Fires rapid, monotonic background HTTP requests ($\le 100\text{ms}$ resolution) using `time.monotonic()`.
+5. **Metric Calculation**: Pinpoints the last unauthorized `ALLOW` ($t_{\text{last\_unauth}}$) and first enforced `DENY` ($t_{\text{first\_block}}$), computing $\Delta t_{\text{exp}} = t_{\text{first\_block}} - t_0$.
+6. **Report & Reset**: Outputs structured JSON/HTML reports and zero-dependency Python PoC scripts, then resets target state while preserving immutable audit logs.
 
 ---
 
-## 📊 Understanding the Results
+## What You Get
 
-### Key Exposure Metrics Explained
-
-- **Temporal Exposure Window ($\Delta t_{\text{exp}}$)**: The total duration post-revocation where the target application continues returning `200 OK` (`ALLOW`) for revoked credentials.
-- **ALLOW Decision**: The target application accepted a request using revoked credentials.
-- **DENY Decision**: The target application correctly blocked the request (`401 Unauthorized` or `403 Forbidden`).
-- **Severity Score (0.0 - 10.0)**: Transparent severity score calculated per the auditable formula in [`docs/severity-scoring.md`](docs/severity-scoring.md).
-
-### Report Outputs & Visual Dashboard
-
-After running `python run.py`, inspect output artifacts:
-
-- 📈 [**Interactive Visual Dashboard**](dashboard/index.html) — Open `dashboard/index.html` in any web browser to view interactive timeline charts, probe markers, severity badges, and audit logs.
-- 📄 [**Sample Security Report (Markdown)**](reports/examples/sample_report.md) — Formatted audit write-up detailing findings and root causes.
-- 🌐 [**Sample Security Report (HTML)**](reports/examples/sample_report.html) — Styled HTML audit artifact.
-- 🤖 [**Machine-Readable Telemetry (JSON)**](reports/examples/results.json) — Auditable JSON metadata and raw probe metrics.
+| Capability | Summary & Result |
+| :--- | :--- |
+| **Exposure Measurement** | Pinpoint exact temporal delay between revocation and enforcement ($\le 100\text{ms}$ resolution). |
+| **Root-Cause Analysis** | Classify lag causes (stale cache, unrevoked JWT, async delay) with confidence scoring. |
+| **Multi-Framework Targets** | Built-in target implementations for FastAPI, Express.js, Django, and OpenID CAEP/SSF. |
+| **Distributed Validation** | Tested against real infrastructure (PostgreSQL 16 + Redis 7 + 3 independent API replicas). |
+| **Evidence Generation** | Automatically outputs auditable JSON telemetry, Markdown reports, HTML charts, and runnable Python PoCs. |
+| **Automated Verification** | 85 passed, 4 skipped unit, integration, property fuzzing, and system tests. |
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## Verified Results
 
-AuthTime uses a modular, decoupled architecture where the core measurement engine communicates with target applications exclusively through a standardized **Target Adapter Abstraction Layer**.
+All AuthTime measurements are backed by reproducible empirical execution:
 
-### Visual Data Flow Overview
+- **Level C Infrastructure Validation**: Validated in a controlled Docker Compose environment using real PostgreSQL 16 as the authoritative database, Redis 7 for invalidation pub/sub, and three independent API container replicas. See [`docs/distributed-validation-results.md`](docs/distributed-validation-results.md).
+- **Employee Offboarding Case Study**: Modeled an enterprise offboarding failure (`Finance Admin` demotion). Under the vulnerable baseline, Replica API-3 allowed access for **`4.25s`** post-revocation. Under Authorization Versioning mitigation, no post-revocation ALLOW was observed within the configured 100 ms measurement resolution (**100.0% exposure reduction**). See [`docs/real-world-case-study.md`](docs/real-world-case-study.md).
+
+| Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Replica Exposure | Engineering Outcome |
+| :--- | :---: | :---: | :--- |
+| **Vulnerable Baseline (5 Runs)** | `4.25s` (Std Dev: 0.16s) | `4.22s` | Stale cache exposure on Replica API-3 |
+| **Mitigated State (5 Runs)** | **`0.00s`** | **`0.00s`** | **No ALLOW observed @ 100ms resolution** |
+
+- **Mitigation Performance Benchmark**: Version-aware cache validation adds only **0.42 ms** average latency overhead per request while preserving sub-millisecond cache hits. See [`docs/mitigation-tradeoff-report.md`](docs/mitigation-tradeoff-report.md).
+- **Test Suite Verification**: **85 passed, 4 skipped** across unit, integration, property fuzzing, and system test suites (`pytest --verbose`).
+
+---
+
+## Architecture
+
+AuthTime uses a modular architecture where the core measurement engine interacts with target systems through a standardized Target Adapter interface.
 
 <p align="center">
   <img src="assets/animations/architecture-flow.svg" alt="AuthTime System Architecture Data Flow" width="100%">
 </p>
 
-### Component Architecture Diagram
-
 ```mermaid
 flowchart TD
     subgraph Core Engine
-        CSM["Experiment State Machine\n(state_machine.py)"]
-        GTM["Ground Truth Manager\n(ground_truth/manager.py)"]
-        EC["Experiment Controller\n(controller/experiment.py)"]
-        TA["Target Adapter Layer\n(adapters/target_adapter.py)"]
+        CSM["State Machine"]
+        GTM["Ground Truth Manager"]
+        EC["Experiment Controller"]
+        TA["Target Adapter"]
     end
 
-    subgraph Reference Target Replicas
-        FAP["FastAPI Target\n(src/app/main.py)"]
-        EXP["Express Target\n(targets/express/server.js)"]
-        DJG["Django Native Target\n(targets/django/app.py)"]
-        CAEP["Cryptographic CAEP Target\n(targets/caep/server.py)"]
+    subgraph Target Systems
+        FAP["FastAPI Target"]
+        EXP["Express Target"]
+        DJG["Django Target"]
+        LAB["Distributed Lab"]
     end
 
-    subgraph Evidence & Analysis
-        KM["Kaplan-Meier Survival Analysis\n(statistics/censoring.py)"]
-        RCA["Root Cause Analyzer\n(verification/root_cause.py)"]
-        RG["Report & PoC Generator\n(reporting/generator.py)"]
+    subgraph Analysis & Output
+        KM["Kaplan-Meier Estimator"]
+        RCA["Root Cause Analyzer"]
+        RG["Report Generator"]
     end
 
     CSM --> EC
@@ -176,150 +169,113 @@ flowchart TD
     TA -->|HTTP / Loopback| FAP
     TA -->|HTTP / Loopback| EXP
     TA -->|HTTP / Loopback| DJG
-    TA -->|Cryptographic SSF| CAEP
+    TA -->|Distributed HTTP| LAB
 
     EC --> KM
     EC --> RCA
     RCA --> RG
-
-    RG --> MD["reports/examples/sample_report.md"]
-    RG --> HTML["reports/examples/sample_report.html"]
-    RG --> JSON["reports/examples/results.json"]
-    RG --> POC["reports/poc/<exp>_poc.py"]
-    RG --> DASH["dashboard/index.html"]
 ```
+
+> For full component specifications and interface contracts, see [`docs/architecture.md`](docs/architecture.md).
 
 ---
 
-## ⚡ Advanced Features (Optional)
+## Advanced Usage
 
-> *The features below are optional for advanced users, infrastructure engineers, and automated CI pipelines.*
+> *The workflows below are optional and not required for basic AuthTime usage.*
 
 ### 1. Using the `authtime` CLI
 
-For users who want command-level control or CI integration:
+For users who require command-line control or CI integration:
 
 ```bash
-# Start local reference target server
+# Start reference target application
 authtime target start --port 8000
 
 # Execute experiment scenario
 authtime run --fault-type stale_cache --repetitions 3 --output-dir reports/examples
 
-# Compare current exposure against historical baseline for CI regression testing
+# Compare exposure against baseline threshold
 authtime compare --current-exposure 6.0 --threshold 0.5
 ```
 
----
+### 2. Distributed Authorization Laboratory
 
-### 2. Distributed Authorization Validation Laboratory
-
-AuthTime includes a full **Distributed Authorization Validation Laboratory** (`targets/distributed_lab/`) proving real-world authorization propagation across actual infrastructure components:
-
-- **PostgreSQL Source of Truth**: Authoritative DB storing users, roles, authorization version counters, and revocation audit events (`targets/distributed_lab/db/schema.sql`).
-- **Redis Authorization & Invalidation Bus**: Caches user role states and streams invalidation pub/sub events (`targets/distributed_lab/cache/redis_cache.py`).
-- **Multi-Replica Protected APIs**: Three independent API instances (`API-1`, `API-2`, `API-3` on ports `8010`, `8011`, `8012`).
+To run the Level C multi-replica PostgreSQL + Redis environment:
 
 ```bash
-# Launch the Level C Distributed Laboratory using Docker Compose
 docker compose -f docker-compose.lab.yml up --build
 ```
+This spins up PostgreSQL 16, Redis 7, and three independent API replicas (`API-1`, `API-2`, `API-3` on ports `8010`, `8011`, `8012`) to test multi-process invalidation propagation.
 
----
+### 3. Real-World Case Study Execution
 
-### 3. Real-World Employee Offboarding Case Study
-
-AuthTime includes an enterprise case study modeling an offboarding failure for employee `alice` (`Finance Admin` demotion):
+To execute the enterprise offboarding scenario:
 
 ```bash
 python run.py --case-study
 ```
+Simulates employee demotion and compares vulnerable stale cache behavior against version-aware cache mitigation across multiple trial runs.
 
-- **Vulnerable Baseline**: Due to asynchronous cache invalidation lag, Replica `API-3` allows unauthorized access for **`4.25s`** post-revocation.
-- **Engineering Mitigation**: Implemented **Authorization Versioning & Version-Aware Cache Validation** (`auth_version`).
-- **Mitigated Outcome**: **`100.0% reduction in observed exposure`** (`0.00s` exposure at 100ms measurement resolution).
+### 4. Advanced Validation & Stress Testing Tools
 
-| Experiment State | Max Exposure ($\Delta t_{\text{exp}}$) | Mean Replica Exposure | Engineering Outcome |
-| :--- | :---: | :---: | :--- |
-| **Vulnerable Baseline (5 Runs)** | `4.25s` (Std Dev: 0.16s) | `4.22s` | Stale cache exposure on Replica API-3 |
-| **Mitigated State (5 Runs)** | **`0.00s`** | **`0.00s`** | **100.0% Reduction (No ALLOW @ 100ms Res)** |
-
-- 📘 [**Full Case Study Documentation**](docs/real-world-case-study.md) — Technical write-up & root cause analysis
-- 🧪 [**Vulnerable Evidence JSON**](experiments/employee_offboarding_case_study/vulnerable-results.json)
-- 🛡️ [**Mitigated Evidence JSON**](experiments/employee_offboarding_case_study/mitigated-results.json)
-- 📊 [**Before vs After Comparison JSON**](experiments/employee_offboarding_case_study/comparison.json)
+Standalone tools located in `scripts/`:
+- **Load Testing**: `python scripts/run_load_test.py --concurrency 50`
+- **Endurance Testing**: `python scripts/run_endurance_test.py --duration 30`
+- **Mitigation Benchmarking**: `python scripts/benchmark_mitigation.py`
 
 ---
 
-### 4. Advanced Validation Tools (`scripts/`)
+## Supported Targets
 
-Standalone Python scripts located in `scripts/` for performance benchmarking and stress testing:
-
-```bash
-# Run high-concurrency async load testing
-python scripts/run_load_test.py --concurrency 50 --duration 10
-
-# Run long-duration endurance testing
-python scripts/run_endurance_test.py --duration 30
-
-# Benchmark performance overhead of authorization versioning mitigation
-python scripts/benchmark_mitigation.py
-
-# Run interactive terminal verification script
-python scripts/test_live.py
-```
+| Target | Mode | Status |
+| :--- | :--- | :---: |
+| **FastAPI Reference** | Python 3.12 (ASGI) | ✅ Primary Reference |
+| **Distributed Lab** | Postgres + Redis + 3 Replicas | ✅ Tested E2E |
+| **Express.js** | Node.js 18+ (HTTP) | ✅ Tested E2E |
+| **Django Native** | Python 3.12 (WSGI) | ✅ Tested E2E |
+| **OpenID CAEP / SSF** | Cryptographic SSF (HMAC/RS256) | ✅ Tested E2E |
 
 ---
 
-### 5. Supported Target Frameworks
-
-| Target Framework | Implementation Path | Execution Mode | Adapter Interface | Status |
-| :--- | :--- | :--- | :--- | :---: |
-| **FastAPI Reference** | `src/app/main.py` | Python 3.12 (ASGI) | `HTTPTargetAdapter` | ✅ Primary Reference |
-| **Distributed Lab** | `targets/distributed_lab/` | Postgres + Redis + 3 Replicas | `DistributedLabAdapter` | ✅ Tested E2E |
-| **Node.js Express** | `targets/express/server.js` | Node.js 18+ (HTTP) | `HTTPTargetAdapter` | ✅ Tested E2E |
-| **Django Native** | `targets/django/app.py` | Python 3.12 (WSGI) | `HTTPTargetAdapter` | ✅ Tested E2E |
-| **OpenID CAEP / SSF** | `targets/caep/server.py` | Cryptographic SSF | `HTTPTargetAdapter` | ✅ Tested E2E |
-
----
-
-## 📂 Repository Map
+## Repository Structure
 
 ```text
-src/           Core AuthTime engine (timing, prober, controller, reporting) & reference FastAPI app
-targets/       Target application replicas and distributed laboratory (PostgreSQL + Redis)
-tests/         Automated test suite (unit, integration, infrastructure, property fuzzing)
-experiments/   Reproducible empirical experiment evidence JSON artifacts
-docs/          Public technical documentation, research write-ups, and architecture specs
+src/           Core AuthTime measurement engine & reference FastAPI app
+targets/       Target framework replicas and Level C distributed lab
+tests/         Automated test suite (unit, integration, property fuzzing, system)
+experiments/   Empirical experiment evidence JSON artifacts
+docs/          Technical specifications, research write-ups, and methodology
 dashboard/     Interactive HTML5 visual exposure timeline dashboard
 scripts/       Advanced validation tools (load testing, endurance, benchmarking)
-reports/       Sample demonstration reports (Markdown, HTML, JSON)
+reports/       Sample audit reports (Markdown, HTML, JSON) and runnable Python PoCs
 ```
 
 ---
 
-## 📘 Technical Documentation & Research
+## Documentation
 
-- 🏗️ [**System Architecture Specification**](docs/architecture.md) — System design & component boundaries
-- 🔬 [**Technical Security Research Write-up**](docs/findings-report.md) — Deep-dive research on authorization revocation gaps
-- 🧪 [**Live Multi-Process Validation Results**](docs/distributed-validation-results.md) — Empirical evidence & Level C metrics
-- 💼 [**Real-World Offboarding Case Study**](docs/real-world-case-study.md) — End-to-end offboarding failure & versioning fix
-- 📊 [**Mitigation Overhead Benchmark Report**](docs/mitigation-tradeoff-report.md) — Latency tradeoff benchmark report
-- 📐 [**Severity Scoring Formula Spec**](docs/severity-scoring.md) — Transparent 0-10 severity formula spec
-- 🌐 [**Software Engineering Methodology**](docs/engineering-methodology.md) — Architecture & testing methodology
+For technical deep dives, consult the dedicated documentation:
+
+- 🏗️ [**Architecture Specification**](docs/architecture.md) — Component contracts & design specifications
+- 🔬 [**Security Research Write-up**](docs/findings-report.md) — Technical research on authorization revocation gaps
+- 🧪 [**Distributed Validation Results**](docs/distributed-validation-results.md) — Empirical evidence & Level C metrics
+- 💼 [**Offboarding Case Study**](docs/real-world-case-study.md) — End-to-end offboarding failure analysis & mitigation
+- 📊 [**Mitigation Benchmark Report**](docs/mitigation-tradeoff-report.md) — Performance overhead & latency tradeoffs
+- 📐 [**Severity Scoring Formula**](docs/severity-scoring.md) — Transparent 0-10 severity score formula
+- 🌐 [**Engineering Methodology**](docs/engineering-methodology.md) — Architecture & testing principles
 
 ---
 
-## 🛡️ Safety Boundary & Constraints
+## Safety
 
 **Strict Local Loopback Boundary**: AuthTime operates **exclusively** against local reference targets running on `127.0.0.1` or `localhost`.
-- **NO** external network scanning or third-party targets.
-- **NO** real credentials or personal data.
-- **NO** external network traffic.
-- **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement (`validate_and_resolve_loopback`) that immediately aborts execution if a non-loopback URL is supplied.
+- No external network scanning or third-party targets.
+- No real credentials or personal data used.
+- Hardcoded runtime enforcement (`validate_and_resolve_loopback`) immediately aborts execution if a non-loopback URL is supplied.
 
 ---
 
-## 📜 License
+## License
 
 This project is licensed under the [MIT License](LICENSE).
