@@ -11,7 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
   <a href="#-safety-boundary--constraints"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
-  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-70%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
+  <a href="#-verified-project-status"><img src="https://img.shields.io/badge/Tests-85%20Passed%20%7C%201%20Skipped-success.svg" alt="Tests Status"></a>
 </p>
 
 **Tech Stack**: `Python 3.12` • `FastAPI` • `PostgreSQL` • `Redis` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
@@ -145,7 +145,7 @@ In our reference web application benchmark setup:
 
 ## ✅ Verified Project Status
 
-- **70 Automated Tests Passing (70 passed, 1 skipped cleanly)** across unit, integration, property fuzzing, system CLI, and case study test suites.
+- **85 Automated Tests Passing (85 passed, 1 skipped cleanly)** across unit, integration, property fuzzing, system CLI, case study, race condition, and failure mode test suites.
 - **Target Adapter Abstraction Layer** (`BaseTargetAdapter` / `HTTPTargetAdapter`) decoupling measurement orchestration from target web frameworks.
 - **Cryptographically Hardened SSF/CAEP Implementation** (HMAC-SHA256 & RS256 token verification, `jti` replay resistance with 300s TTL eviction).
 - **Forensic Audit Log Preservation** (`AUDIT_EVENTS` preserved across state reset cycles).
@@ -277,7 +277,7 @@ AuthTime/
 │
 ├── targets/                        # Multi-Framework Target Replicas
 │   ├── distributed_lab/            # Distributed Auth Lab (PostgreSQL, Redis, JWT, API Replicas 1/2/3)
-│   │   ├── db/                     # PostgreSQL schema & database interface (schema.sql, database.py)
+│   │   ├── db/                     # PostgreSQL schema & database store (schema.sql, database.py, store.py)
 │   │   ├── cache/                  # Redis authorization & invalidation bus (redis_cache.py)
 │   │   ├── auth/                   # JWT lifecycle & verifier (jwt_handler.py)
 │   │   └── service/                # Multi-replica API app factory (app.py, server.py)
@@ -290,8 +290,12 @@ AuthTime/
 │
 ├── docs/                           # Technical Specifications & Research
 │   ├── architecture.md             # System architecture & component interface spec
+│   ├── real-world-case-study.md    # Offboarding case study & mitigation analysis
+│   ├── mitigation-tradeoff-report.md # Mitigation performance overhead benchmark report
+│   ├── distributed-validation-results.md # Empirical multi-replica validation evidence
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   ├── findings-report.md          # Technical security research write-up
+│   ├── skill-utilization.md        # Capability & skill taxonomy matrix
 │   └── development/                # Process & Development History
 │       ├── implementation_plan.md  # Architectural implementation plan
 │       └── DEVELOPMENT_LOG.md      # Development milestone log
