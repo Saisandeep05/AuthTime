@@ -17,6 +17,8 @@ from datetime import datetime, timezone, timedelta
 
 import httpx
 
+from authtime.logging import logger
+
 from authtime.constants import CURRENT_PROTOCOL_VERSION, CURRENT_SCHEMA_VERSION
 from authtime.fault_injector.client import FaultInjectorClient
 from authtime.events.collector import EventCollector
@@ -111,7 +113,8 @@ class ExperimentController:
             actual = evaluate_http_decision(st_code, body_text, resource_path, self.contract)
 
             return expected == actual
-        except Exception:
+        except Exception as exc:
+            logger.debug("Baseline verification failed: %s", exc)
             return False
 
     async def verify_cleanup(
@@ -132,7 +135,8 @@ class ExperimentController:
             await adapter.reset_state()
             id_data = await adapter.verify_identity()
             return id_data.get("product") == "AuthTime"
-        except Exception:
+        except Exception as exc:
+            logger.debug("Cleanup verification failed: %s", exc)
             return False
 
 

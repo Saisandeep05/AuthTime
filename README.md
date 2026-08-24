@@ -11,7 +11,7 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License"></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.12-green.svg" alt="Python 3.12"></a>
   <a href="#safety"><img src="https://img.shields.io/badge/Security-Local%20Loopback%20Only-red.svg" alt="Security Boundary"></a>
-  <a href="#verified-results"><img src="https://img.shields.io/badge/Tests-85%20Passed%20%7C%204%20Skipped-success.svg" alt="Tests Status"></a>
+  <a href="#verified-results"><img src="https://img.shields.io/badge/Tests-144%20Passed%20%7C%204%20Skipped-success.svg" alt="Tests Status"></a>
 </p>
 
 **Tech Stack**: `Python 3.12` • `FastAPI` • `PostgreSQL` • `Redis` • `Django` • `Express.js` • `OpenID CAEP/SSF` • `JWT` • `HTTPX` • `Pytest` • `Hypothesis` • `Docker`
@@ -126,7 +126,7 @@ All AuthTime measurements are backed by reproducible empirical execution:
 | **Mitigated State (5 Runs)** | **`0.00s`** | **`0.00s`** | **No ALLOW observed @ 100ms resolution** |
 
 - **Mitigation Performance Benchmark**: Version-aware cache validation adds only **0.42 ms** average latency overhead per request while preserving sub-millisecond cache hits. See [`docs/mitigation-tradeoff-report.md`](docs/mitigation-tradeoff-report.md).
-- **Test Suite Verification**: **85 passed, 4 skipped** across unit, integration, property fuzzing, and system test suites (`pytest --verbose`).
+- **Test Suite Verification**: **144 passed, 4 skipped** across unit, integration, property fuzzing, and system test suites (`pytest --verbose`).
 
 ---
 

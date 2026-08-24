@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime, timezone
 import httpx
 from authtime.models.schemas import EvidenceEvent
+from authtime.logging import logger
 
 
 class EventCollector:
@@ -45,7 +46,8 @@ class EventCollector:
             for item in raw_events:
                 try:
                     utc_dt = datetime.fromisoformat(item["utc_timestamp"])
-                except Exception:
+                except Exception as exc:
+                    logger.debug("Failed to parse event timestamp: %s", exc)
                     utc_dt = datetime.now(timezone.utc)
 
                 events.append(
@@ -61,6 +63,7 @@ class EventCollector:
                 )
             return events
         except Exception as e:
+            logger.debug("Event fetch failed for experiment %s: %s", experiment_id, e)
             return [
                 EvidenceEvent(
                     event_id=f"evt-err-{experiment_id}",

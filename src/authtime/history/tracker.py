@@ -8,6 +8,7 @@ import time
 import subprocess
 from typing import Dict, Any, List, Optional
 from authtime.models.schemas import ExperimentResult
+from authtime.logging import logger
 
 
 def get_git_commit_hash() -> str:
@@ -16,8 +17,8 @@ def get_git_commit_hash() -> str:
         res = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, timeout=2)
         if res.returncode == 0:
             return res.stdout.strip()
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Failed to retrieve git commit hash: %s", exc)
     return os.getenv("GIT_COMMIT", "unknown")
 
 
@@ -63,7 +64,8 @@ class ExposureHistoryTracker:
                 if stripped:
                     try:
                         entries.append(json.loads(stripped))
-                    except Exception:
+                    except Exception as exc:
+                        logger.debug("Skipping malformed history line: %s", exc)
                         continue
         return entries
 
