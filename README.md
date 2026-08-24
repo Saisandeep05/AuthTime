@@ -82,24 +82,22 @@ pytest --verbose
 
 ## How AuthTime Works
 
-AuthTime coordinates a multi-stage experimental pipeline to measure access revocation lag with high precision:
-
 <p align="center">
   <img src="assets/animations/experiment-lifecycle.svg" alt="AuthTime Experiment Execution Pipeline" width="100%">
 </p>
 
-```text
-[ 1. Select Target ] ──► [ 2. Validate Baseline ] ──► [ 3. Inject Revocation Fault ]
-                                                                   │
-[ 6. Output Reports ] ◄── [ 5. Evaluate Metrics ] ◄── [ 4. Execute HTTP Probes ]
-```
+> AuthTime establishes a known-good authorization state, triggers a controlled revocation or fault, probes the target while the change propagates, measures the resulting exposure window, and produces evidence for analysis.
 
-1. **Target Selection**: Connects to the target application via a standardized `TargetAdapter` interface.
-2. **Baseline Check**: Sends pre-fault requests to confirm authorized credentials return `200 OK` (`ALLOW`).
-3. **Fault Injection**: Demotes the user role or revokes session state in the target database at timestamp $t_0$.
-4. **HTTP Probing**: Fires rapid, monotonic background HTTP requests ($\le 100\text{ms}$ resolution) using `time.monotonic()`.
-5. **Metric Calculation**: Pinpoints the last unauthorized `ALLOW` ($t_{\text{last\_unauth}}$) and first enforced `DENY` ($t_{\text{first\_block}}$), computing $\Delta t_{\text{exp}} = t_{\text{first\_block}} - t_0$.
-6. **Report & Reset**: Outputs structured JSON/HTML reports and zero-dependency Python PoC scripts, then resets target state while preserving immutable audit logs.
+### The Workflow
+
+1. **Target** — Connect to the selected authorization system.
+2. **Baseline** — Confirm the user is currently authorized.
+3. **Revocation/Fault** — Change or revoke authorization and record the event time.
+4. **Probe** — Repeatedly send requests while the system propagates the change.
+5. **Measure** — Detect when authorization changes from `ALLOW` to `DENY` and calculate the exposure window.
+6. **Report** — Store evidence and generate the resulting report.
+
+> **Exposure window:** The time between the authoritative authorization change and the first observed denial of the revoked request.
 
 ---
 
