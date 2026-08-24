@@ -6,6 +6,7 @@ Provides FastAPI service replicas representing API-1, API-2, and API-3 nodes.
 import os
 import time
 import asyncio
+from contextlib import asynccontextmanager
 from typing import Dict, Any, Optional, List
 from fastapi import FastAPI, Header, HTTPException, status
 from pydantic import BaseModel
@@ -40,21 +41,24 @@ def create_lab_replica_app(
 ) -> FastAPI:
     """Factory creating an independent, identifiable API replica service instance."""
 
-    app = FastAPI(
-        title=f"AuthTime Distributed Lab API Replica [{replica_id}]",
-        version="1.0.0",
-    )
-
     db_instance = db or LabDatabase()
     cache_instance = cache or LabRedisCache()
     jwt_instance = jwt_handler or LabJWTHandler()
     replica_list = all_replica_ids or ["api-1", "api-2", "api-3"]
 
-    @app.on_event("startup")
-    async def startup_event():
+    @asynccontextmanager
+    async def lifespan(app: FastAPI):
         await db_instance.initialize()
         await cache_instance.initialize()
+        yield
 
+    app = FastAPI(
+        title=f"AuthTime Distributed Lab API Replica [{replica_id}]",
+        version="1.0.0",
+        lifespan=lifespan,
+    )
+
+    @app.get("/")
     @app.get("/identity")
     async def identity():
         return {

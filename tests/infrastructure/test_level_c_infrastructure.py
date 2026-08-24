@@ -45,25 +45,32 @@ async def test_postgresql_authoritative_connection_and_revocation():
     conn = await asyncpg.connect(POSTGRES_DSN)
     try:
         await conn.execute("""
-            CREATE TABLE IF NOT EXISTS users (
-                user_id VARCHAR(64) PRIMARY KEY,
-                role VARCHAR(32) NOT NULL,
-                auth_version INT NOT NULL DEFAULT 1,
-                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-            );
+            INSERT INTO users (id, username, email)
+            VALUES ('alice_infra_test', 'alice_infra', 'alice@authtime.local')
+            ON CONFLICT (id) DO NOTHING;
         """)
         await conn.execute("""
-            INSERT INTO users (user_id, role, auth_version)
-            VALUES ('alice_infra_test', 'Finance Admin', 1)
-            ON CONFLICT (user_id) DO UPDATE SET role = 'Finance Admin', auth_version = 1;
+            INSERT INTO user_roles (user_id, role_id)
+            VALUES ('alice_infra_test', 'Finance Admin')
+            ON CONFLICT (user_id, role_id) DO UPDATE SET role_id = 'Finance Admin';
+        """)
+        await conn.execute("""
+            INSERT INTO authorization_versions (user_id, auth_version)
+            VALUES ('alice_infra_test', 1)
+            ON CONFLICT (user_id) DO UPDATE SET auth_version = 1;
         """)
 
-        role_before = await conn.fetchval("SELECT role FROM users WHERE user_id = $1", 'alice_infra_test')
+        role_before = await conn.fetchval("SELECT role_id FROM user_roles WHERE user_id = $1", 'alice_infra_test')
         assert role_before == 'Finance Admin'
 
-        await conn.execute("UPDATE users SET role = 'User', auth_version = auth_version + 1 WHERE user_id = $1", 'alice_infra_test')
-        role_after = await conn.fetchval("SELECT role FROM users WHERE user_id = $1", 'alice_infra_test')
+        await conn.execute("UPDATE user_roles SET role_id = 'User' WHERE user_id = $1", 'alice_infra_test')
+        await conn.execute("UPDATE authorization_versions SET auth_version = auth_version + 1 WHERE user_id = $1", 'alice_infra_test')
+
+        role_after = await conn.fetchval("SELECT role_id FROM user_roles WHERE user_id = $1", 'alice_infra_test')
+        ver_after = await conn.fetchval("SELECT auth_version FROM authorization_versions WHERE user_id = $1", 'alice_infra_test')
+
         assert role_after == 'User'
+        assert ver_after == 2
 
     finally:
         await conn.close()
@@ -109,7 +116,7 @@ async def test_redis_authoritative_connection_and_invalidation():
 
         await pubsub.unsubscribe("auth_invalidations")
     finally:
-        await r.close()
+        await r.aclose()
 
 
 @pytest.mark.asyncio
@@ -125,10 +132,13 @@ async def test_three_replica_processes_and_identity():
     async with httpx.AsyncClient(timeout=3.0) as client:
         replica_ids = set()
         for port in REPLICA_PORTS:
-            res = await client.get(f"http://127.0.0.1:{port}/")
-            assert res.status_code == 200
-            data = res.json()
+            res_identity = await client.get(f"http://127.0.0.1:{port}/identity")
+            assert res_identity.status_code == 200
+            data = res_identity.json()
             assert "replica_id" in data
             replica_ids.add(data["replica_id"])
+
+            res_root = await client.get(f"http://127.0.0.1:{port}/")
+            assert res_root.status_code == 200
 
         assert len(replica_ids) == 3, f"Expected 3 distinct replica identities, got {replica_ids}"
