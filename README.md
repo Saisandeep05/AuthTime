@@ -381,8 +381,7 @@ python -m authtime.cli compare --current-exposure 6.0 --threshold 0.5
 
 ## 🛠️ Key Engineering Highlights
 
-- **Target Adapter Abstraction**: Modular `BaseTargetAdapter` interface standardizing identity verification, fault injection, probe execution, state resets, and audit event collection across web frameworks.
-- **High-Precision Monotonic Timing**: Leverages `time.monotonic()` to eliminate wall-clock drift, automatically measuring scheduler jitter and harness overhead.
+- **High-Precision Monotonic Timing**: Uses `time.monotonic()` to eliminate wall-clock drift, automatically measuring scheduler jitter and harness overhead.
 - **Adaptive Binary Search Probing**: Pinpoints exact revocation transition boundaries down to $\le 100\text{ms}$ precision.
 - **Cryptographic SSF/CAEP Security**: Implements OpenID CAEP/SSF event reception with HMAC-SHA256/RS256 token verification and `jti` replay resistance with 300s TTL eviction.
 - **Forensic Audit Log Preservation**: State resets restore authorization roles and caches while leaving immutable audit logs (`AUDIT_EVENTS`) intact for forensic auditing.
@@ -393,12 +392,11 @@ python -m authtime.cli compare --current-exposure 6.0 --threshold 0.5
 
 ## 🛡️ Safety Boundary & Constraints
 
-> [!CAUTION]
-> **Strict Local Loopback Boundary**: AuthTime operates **exclusively** against local reference targets running on `127.0.0.1` or `localhost`.
-> - **NO** external network scanning or third-party targets.
-> - **NO** real credentials or personal data.
-> - **NO** external network traffic.
-> - **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement (`validate_and_resolve_loopback`) that immediately aborts execution if a non-loopback URL is supplied.
+**Strict Local Loopback Boundary**: AuthTime operates **exclusively** against local reference targets running on `127.0.0.1` or `localhost`.
+- **NO** external network scanning or third-party targets.
+- **NO** real credentials or personal data.
+- **NO** external network traffic.
+- **Fail-Safe Abort**: AuthTime includes hardcoded runtime enforcement (`validate_and_resolve_loopback`) that immediately aborts execution if a non-loopback URL is supplied.
 
 ---
 
