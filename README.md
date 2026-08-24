@@ -296,9 +296,7 @@ AuthTime/
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   ├── findings-report.md          # Technical security research write-up
 │   ├── engineering-methodology.md  # Software engineering architecture & testing methodology
-│   ├── repository-curation.md      # Curation audit & repository structural report
-│   └── development/                # Development Milestone Log
-│       └── DEVELOPMENT_LOG.md      # Development milestone log
+│   └── repository-curation.md      # Curation audit & repository structural report
 │
 ├── tests/                          # Automated Verification Suite
 │   ├── unit/                       # Unit tests (schemas, adapters, ground truth, root cause)

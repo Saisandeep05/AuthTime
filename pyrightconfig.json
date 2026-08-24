@@ -3,8 +3,7 @@
     "src",
     "tests",
     "scripts",
-    "run.py",
-    "test_live.py"
+    "run.py"
   ],
   "exclude": [
     "**/__pyrefly_virtual__/**",

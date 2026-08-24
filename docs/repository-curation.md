@@ -1,10 +1,10 @@
 # AuthTime Repository Curation & Structural Audit Report
 
-This document records the systematic inventory, dependency reference audit, structural curation, and validation results for the **AuthTime** repository.
+This document records the systematic inventory, dependency reference audit, aggressive structural curation, and validation results for the **AuthTime** repository.
 
 ---
 
-## 🌐 1. Repository Architectural Structure
+## 🌐 1. Final Public Repository Structure
 
 ```text
 AuthTime/
@@ -20,7 +20,6 @@ AuthTime/
 ├── Dockerfile.lab                      # Distributed lab multi-replica Dockerfile
 ├── docker-compose.yml                  # Primary reference target Compose setup
 ├── docker-compose.lab.yml              # Distributed lab Compose environment (PostgreSQL + Redis + 3 API replicas)
-├── docker-compose.multi-node.yml       # Multi-node loopback cluster setup
 ├── run.py                              # Top-level interactive runner script
 │
 ├── src/                                # Primary Source Packages
@@ -32,24 +31,21 @@ AuthTime/
 │   │   ├── static/index.html           # Target web UI
 │   │   └── main.py                     # Target application entrypoint
 │   │
-│   ├── authtime/                       # Core Monotonic Timing & Probing Engine
-│   │   ├── adapters/                   # Target adapter interfaces & HTTP prober
-│   │   ├── controller/                 # Experiment controller & trial runner
-│   │   ├── events/                     # Audit event collector & correlation
-│   │   ├── fault_injector/             # Controlled HTTP fault injector client
-│   │   ├── ground_truth/               # Ground truth state manager
-│   │   ├── history/                    # Exposure regression tracker
-│   │   ├── models/                     # Evidence & Pydantic validation schemas
-│   │   ├── network/                    # Loopback safety boundary enforcement
-│   │   ├── reporting/                  # Report generator & PoC script generator
-│   │   ├── scenarios/                  # Scenario generator & offset matrix
-│   │   ├── statistics/                 # Kaplan-Meier censoring & statistical metrics
-│   │   ├── timing/                     # Monotonic clock & prober timing math
-│   │   ├── verification/               # Adaptive prober, predicate, & root cause analyzer
-│   │   └── cli.py                      # Command-line interface entrypoint
-│   │
-│   └── targets/                        # CAEP Target Adapter
-│       └── caep_target.py              # CAEP target adapter implementation
+│   └── authtime/                       # Core Monotonic Timing & Probing Engine
+│       ├── adapters/                   # Target adapter interfaces & HTTP prober
+│       ├── controller/                 # Experiment controller & trial runner
+│       ├── events/                     # Audit event collector & correlation
+│       ├── fault_injector/             # Controlled HTTP fault injector client
+│       ├── ground_truth/               # Ground truth state manager
+│       ├── history/                    # Exposure regression tracker
+│       ├── models/                     # Evidence & Pydantic validation schemas
+│       ├── network/                    # Loopback safety boundary enforcement
+│       ├── reporting/                  # Report generator & PoC script generator
+│       ├── scenarios/                  # Scenario generator & offset matrix
+│       ├── statistics/                 # Kaplan-Meier censoring & statistical metrics
+│       ├── timing/                     # Monotonic clock & prober timing math
+│       ├── verification/               # Adaptive prober, predicate, & root cause analyzer
+│       └── cli.py                      # Command-line interface entrypoint
 │
 ├── targets/                            # Experiment Target Replicas & Distributed Lab
 │   ├── caep/server.py                  # OpenID CAEP/SSF push revocation server
@@ -79,9 +75,7 @@ AuthTime/
 │   ├── mitigation-tradeoff-report.md   # Tradeoff & overhead benchmark report
 │   ├── real-world-case-study.md        # Employee offboarding case study
 │   ├── severity-scoring.md             # Transparent 0-10 severity formula spec
-│   ├── repository-curation.md          # Curation audit report (this document)
-│   └── development/                    # Development History
-│       └── DEVELOPMENT_LOG.md          # Milestone development log
+│   └── repository-curation.md          # Curation audit report (this document)
 │
 ├── experiments/                        # Empirical Evidence Artifacts
 │   ├── employee_offboarding_case_study/# Offboarding scenario raw evidence & results
@@ -96,7 +90,8 @@ AuthTime/
 │   ├── benchmark_mitigation.py         # Performance overhead benchmarking CLI
 │   ├── run_case_study.py               # Offboarding case study runner
 │   ├── run_endurance_test.py           # Long-run endurance tester
-│   └── run_load_test.py                # High-concurrency load tester
+│   ├── run_load_test.py                # High-concurrency load tester
+│   └── test_live.py                    # Interactive terminal verification script
 │
 └── assets/                             # Displayed Visual Assets
     ├── animations/                     # SVG animation diagrams
@@ -105,30 +100,26 @@ AuthTime/
 
 ---
 
-## 📋 2. Inventory Classification Matrix
+## 🗑️ 2. Deletion Record Matrix
 
-| File Path | Classification | Rationale |
+| File Path | Classification | Deletion Reason & Evidence |
 | :--- | :--- | :--- |
-| `src/authtime/` | **A. Core Required** | Core timing, probing, controller, and reporting engine |
-| `src/app/` | **A. Core Required** | Primary FastAPI reference target application |
-| `targets/distributed_lab/` | **B. Required Infrastructure** | Multi-replica distributed validation laboratory |
-| `targets/express/` | **E. Required Example** | Node.js Express target replica server |
-| `targets/django/` | **E. Required Example** | Django target replica application |
-| `targets/caep/` | **E. Required Example** | OpenID CAEP/SSF push revocation server |
-| `tests/` | **C. Required Testing** | Complete 89-test verification suite |
-| `docs/*.md` | **D. Required Documentation** | Technical research, architecture, and case study reports |
-| `experiments/` | **E. Required Evidence** | Empirical JSON evidence artifacts |
-| `reports/examples/` | **E. Required Example** | Canonical sample output reports |
-| `assets/` | **F. Active Asset** | SVGs rendered in `README.md` |
-| `scripts/` | **C/E. Required Tool/Script** | Standalone load, endurance, and benchmarking CLI scripts |
-| `.gitignore` | **G. Generated Gitignore** | Excludes temporary logs, caches, and `reports/poc/EXP-*.py` |
+| `src/targets/caep_target.py` | `DELETE_DUPLICATE` | Duplicate target file inside `src/`. Actual target is `targets/caep/server.py`. |
+| `src/targets/__init__.py` | `DELETE_UNREFERENCED` | Empty package init file inside `src/targets/`. |
+| `docs/development/DEVELOPMENT_LOG.md` | `DELETE_OBSOLETE` | Historical development log recording past checkpoint phases. |
+| `docker-compose.multi-node.yml` | `DELETE_OBSOLETE` | Obsolete basic Compose setup superseded by `docker-compose.lab.yml`. |
+| `scripts/test_live.ps1` | `DELETE_DUPLICATE` | Windows-only PowerShell script wrapper duplicating `scripts/test_live.py`. |
+| `reports/poc/EXP-MAIN-1787489758-3_poc.py` | `DELETE_GENERATED` | Generated PoC script output from past manual test run. |
+| `reports/poc/EXP-MAIN-1787490255-3_poc.py` | `DELETE_GENERATED` | Generated PoC script output from past manual test run. |
+| `reports/poc/EXP-MAIN-1787490973-3_poc.py` | `DELETE_GENERATED` | Generated PoC script output from past manual test run. |
+| `reports/poc/EXP-MAIN-1787491142-3_poc.py` | `DELETE_GENERATED` | Generated PoC script output from past manual test run. |
 
 ---
 
-## 🧪 3. Validation Summary
+## 🧪 3. Verification Summary
 
 ```text
-================= 85 passed, 4 skipped, 3 warnings in 29.81s ==================
+================= 85 passed, 4 skipped, 3 warnings in 29.62s ==================
 ```
 
 All 89 unit, integration, infrastructure, property, and system tests were verified cleanly without regression.
