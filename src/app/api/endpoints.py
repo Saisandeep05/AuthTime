@@ -52,7 +52,7 @@ class LoginRequest(BaseModel):
 
 
 class FaultInjectRequest(BaseModel):
-    fault_type: Literal["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"]
+    fault_type: Literal["stale_cache", "role_revocation", "token_expiry", "session_delegation_revocation", "cross_user_isolation"]
     user_id: str = Field(..., min_length=1, max_length=128)
     secondary_user_id: Optional[str] = Field(None, min_length=1, max_length=128)
     new_role: Optional[str] = "User"
@@ -203,7 +203,7 @@ def inject_fault(
         effective_cache_ttl = req.cache_ttl_seconds * req.time_scale_factor
         auth_cache.set(f"auth:{req.secondary_user_id}", RoleEnum.ADMIN.value, ttl_seconds=effective_cache_ttl)
 
-    elif req.fault_type == "agent_session_revocation":
+    elif req.fault_type == "session_delegation_revocation":
         USER_ROLES_DB[user_id] = RoleEnum.USER.value
         effective_cache_ttl = req.cache_ttl_seconds * req.time_scale_factor
         auth_cache.set(f"auth:{user_id}", RoleEnum.ADMIN.value, ttl_seconds=effective_cache_ttl)
@@ -258,7 +258,7 @@ def get_events(experiment_id: Optional[str] = None):
 
 
 class RunExperimentRequest(BaseModel):
-    fault_type: str = Field("stale_cache", pattern="^(stale_cache|role_revocation|token_expiry|agent_session_revocation|cross_user_isolation)$")
+    fault_type: str = Field("stale_cache", pattern="^(stale_cache|role_revocation|token_expiry|session_delegation_revocation|cross_user_isolation)$")
     time_scale: float = Field(1.0, gt=0.0, le=10.0)
     repetitions: int = Field(3, ge=1, le=20)
     target_url: str = Field("http://127.0.0.1:8000")

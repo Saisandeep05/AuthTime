@@ -31,7 +31,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--fault-type",
         type=str,
         default="stale_cache",
-        choices=["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"],
+        choices=["stale_cache", "role_revocation", "token_expiry", "session_delegation_revocation", "cross_user_isolation"],
         help="Fault scenario type.",
     )
     run_parser.add_argument("--target-url", type=str, default="http://127.0.0.1:8000", help="Target URL (must be 127.0.0.1 or localhost).")
@@ -51,7 +51,7 @@ def create_parser() -> argparse.ArgumentParser:
         "--fault-type",
         type=str,
         default="stale_cache",
-        choices=["stale_cache", "role_revocation", "token_expiry", "agent_session_revocation", "cross_user_isolation"],
+        choices=["stale_cache", "role_revocation", "token_expiry", "session_delegation_revocation", "cross_user_isolation"],
         help="Fault type to compare against.",
     )
     compare_parser.add_argument("--threshold", type=float, default=0.5, help="Regression threshold in seconds.")

@@ -26,7 +26,7 @@ def test_root_cause_classifications():
     assert code_col == "CACHE_KEY_COLLISION"
     assert conf_col in ("CONFIRMED", "SUPPORTED")
 
-    code_agent, conf_agent, _ = RootCauseAnalyzer.analyze_root_cause("agent_session_revocation", {}, dummy_metric)
+    code_agent, conf_agent, _ = RootCauseAnalyzer.analyze_root_cause("session_delegation_revocation", {}, dummy_metric)
     assert code_agent == "DELEGATED_CREDENTIAL_STALENESS"
     assert conf_agent in ("SUPPORTED", "INFERRED")
 

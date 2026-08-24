@@ -62,7 +62,7 @@ async def test_caep_target_behavioral_equivalence():
     transport = httpx.ASGITransport(app=caep_app)
     async with httpx.AsyncClient(transport=transport, base_url="http://127.0.0.1:8000") as client:
         controller = ExperimentController("http://127.0.0.1:8000", http_client=client)
-        scen = ScenarioGenerator.generate_single_fault_scenario("agent_session_revocation", time_scale_factor=0.01)
+        scen = ScenarioGenerator.generate_single_fault_scenario("session_delegation_revocation", time_scale_factor=0.01)
         result = await controller.run_single_trial("exp-eq-caep", scen, http_client=client)
         assert result.baseline_passed is True
         assert result.cleanup_status == "VERIFIED"

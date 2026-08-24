@@ -189,7 +189,7 @@ def inject_fault(payload: Dict[str, Any], request: Request):
     if user_id in ACTIVE_SESSIONS:
         ACTIVE_SESSIONS[user_id]["revoked"] = True
         ACTIVE_SESSIONS[user_id]["revoked_at"] = time.monotonic()
-    return {"status": "SUCCESS", "fault_type": "agent_session_revocation", "target_user": user_id}
+    return {"status": "SUCCESS", "fault_type": "session_delegation_revocation", "target_user": user_id}
 
 
 @app.post("/faults/reset")

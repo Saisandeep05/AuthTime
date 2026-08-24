@@ -76,12 +76,12 @@ class RootCauseAnalyzer:
                 f"Observed exposure window ({exp_sec:.2f}s) matches stateless JWT token expiration duration.",
             )
 
-        if fault_type == "agent_session_revocation":
+        if fault_type == "session_delegation_revocation":
             conf_ag: ConfidenceLevel = "SUPPORTED" if has_direct_audit_events else "INFERRED"
             return (
                 "DELEGATED_CREDENTIAL_STALENESS",
                 conf_ag,
-                f"Revoking delegator permission did not invalidate down-scope delegated agent session credential (exposure: {exp_sec:.2f}s).",
+                f"Revoking delegator permission did not invalidate down-scope delegated session credential (exposure: {exp_sec:.2f}s).",
             )
 
         if fault_type == "role_revocation":

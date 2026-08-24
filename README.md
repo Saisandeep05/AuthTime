@@ -296,8 +296,7 @@ AuthTime/
 │   ├── severity-scoring.md         # Transparent 0-10 severity formula spec
 │   ├── findings-report.md          # Technical security research write-up
 │   ├── engineering-methodology.md  # Software engineering architecture & testing methodology
-│   └── development/                # Process & Development History
-│       ├── implementation_plan.md  # Architectural implementation plan
+│   └── development/                # Development Milestone Log
 │       └── DEVELOPMENT_LOG.md      # Development milestone log
 │
 ├── tests/                          # Automated Verification Suite
